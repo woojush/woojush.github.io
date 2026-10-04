@@ -1,0 +1,54 @@
+name: Deploy to GitHub Pages
+
+on:
+  # main에 push할 때마다 배포
+  push:
+    branches: [main]
+  # Actions 탭에서 수동 실행
+  workflow_dispatch:
+
+# 저장소 checkout + Pages 배포에 필요한 최소 권한
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 배포가 겹치면 이전 실행을 취소하지 않고 순서대로 처리
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # astro.config.mjs의 `site`. 사용자명을 코드에 하드코딩하지 않기 위해 여기서 주입한다.
+      # 커스텀 도메인을 연결하면 이 값을 그 도메인으로 바꾼다. (예: https://example.com)
+      SITE_URL: https://${{ github.repository_owner }}.github.io
+    steps:
+      - name: Check repository name
+        run: |
+          expected="$(echo "${{ github.repository_owner }}.github.io" | tr '[:upper:]' '[:lower:]')"
+          actual="$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')"
+          if [ "$expected" != "$actual" ]; then
+            echo "::warning title=Repository name::이 설계는 <username>.github.io 저장소(루트 경로, base '/')를 전제로 한다. 현재 저장소 이름은 '$actual' 이므로 링크와 자산 경로가 깨질 수 있다. (docs/03_technical_stack.md 6절)"
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install, build, and upload site output
+        uses: withastro/action@v6
+        with:
+          node-version: 22
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

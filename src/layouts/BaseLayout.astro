@@ -1,0 +1,38 @@
+---
+// Phase 0: 스타일 없는 최소 틀. 디자인 토큰/테마/접근성은 Phase 1에서 구현한다.
+import { site } from '@/data/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: string;
+}
+
+const { title, description, lang = site.defaultLang } = Astro.props;
+const pageTitle = title === site.name ? title : `${title} — ${site.name}`;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <header>
+      <a href="/">{site.name}</a>
+      <nav aria-label="Main">
+        <ul>
+          {site.nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

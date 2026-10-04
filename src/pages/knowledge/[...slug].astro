@@ -1,0 +1,19 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getEntries } from '@/lib/content';
+
+// URL은 파일명(entry.id)에서만 만들어진다. topic 등 metadata는 URL에 쓰지 않는다.
+export async function getStaticPaths() {
+  const entries = await getEntries('knowledge');
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description} lang={entry.data.lang}>
+  <h1>{entry.data.title}</h1>
+  <Content />
+</BaseLayout>

@@ -1,0 +1,11 @@
+# HOME의 NOW 영역. items는 배열이므로 행을 추가/삭제/이름 변경해도 코드 수정이 필요 없다.
+updated: 2026-10-04
+items:
+  - label: Learning
+    text: Linear Algebra → Least Squares → Machine Learning
+  - label: Building
+    text: Personal Knowledge System
+  - label: Exploring
+    text: (작성 예정)
+  - label: Thinking
+    text: (작성 예정)

@@ -1,0 +1,13 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const entry = await getEntry('about', 'about');
+if (!entry) throw new Error('src/content/about.md 가 없다.');
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={entry.data.title}>
+  <h1>{entry.data.title}</h1>
+  <Content />
+</BaseLayout>

@@ -1,0 +1,11 @@
+---
+// Phase 0: HOME은 배포/라우팅 확인용 최소 페이지다. NOW/Recent/Selected는 Phase 4에서 구현한다.
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { site } from '@/data/site';
+---
+
+<BaseLayout title={site.name}>
+  <h1>{site.name}</h1>
+  <p>{site.tagline}</p>
+  <p>Phase 0 — 배포 기반 점검 중.</p>
+</BaseLayout>

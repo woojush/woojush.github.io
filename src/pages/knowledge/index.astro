@@ -1,0 +1,19 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getEntries } from '@/lib/content';
+
+const entries = await getEntries('knowledge');
+---
+
+<BaseLayout title="Knowledge">
+  <h1>Knowledge</h1>
+  {entries.length > 0 && (
+    <ul>
+      {entries.map((entry) => (
+        <li>
+          <a href={`/knowledge/${entry.id}/`}>{entry.data.title}</a>
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>

@@ -14,7 +14,22 @@
   animation: nav-beam 8s linear infinite;
 }
 
-/* 알약 테두리를 도는 빛줄기. 어두운 테마에서는 밝게, 밝은 테마에서는 어둡게(--particle) */
+/* 알약 테두리를 따라 도는 붉은 빛과 푸른 빛. 각각 둘레의 1/6(60°)만 보이고 서로 반대편에서 돈다.
+ * 바깥 테두리의 가는 선(.nav::before)과 알약 안쪽의 번지는 빛(.nav-pill::before) 두 겹이다. */
+.nav::before,
+.nav-pill::before {
+  background: conic-gradient(
+    from var(--beam-angle, 0deg),
+    transparent 0%,
+    rgba(var(--glitter-red), 0.9) 8.33%,
+    transparent 16.67%,
+    transparent 50%,
+    rgba(var(--glitter-blue), 0.9) 58.33%,
+    transparent 66.67%,
+    transparent 100%
+  );
+}
+
 .nav::before {
   content: '';
   position: absolute;
@@ -22,27 +37,11 @@
   z-index: 0;
   padding: 1px;
   border-radius: inherit;
-  background: conic-gradient(
-    from var(--beam-angle, 0deg),
-    transparent 0%,
-    transparent 58%,
-    rgba(var(--particle), 0.02) 62%,
-    rgba(var(--particle), 0.06) 65%,
-    rgba(var(--particle), 0.14) 67%,
-    rgba(var(--particle), 0.28) 69%,
-    rgba(var(--particle), 0.4) 70%,
-    rgba(var(--particle), 0.4) 70.5%,
-    rgba(var(--particle), 0.28) 71.5%,
-    rgba(var(--particle), 0.14) 73%,
-    rgba(var(--particle), 0.06) 75%,
-    rgba(var(--particle), 0.02) 78%,
-    transparent 82%
-  );
   mask:
     linear-gradient(#fff, #fff) content-box,
     linear-gradient(#fff, #fff);
   mask-composite: exclude;
-  filter: blur(0.5rem) brightness(1.3) saturate(1.4);
+  filter: blur(0.5px);
   pointer-events: none;
 }
 
@@ -55,11 +54,28 @@
   justify-content: center;
   padding-inline: 1.375rem;
   border-radius: 1.875rem;
-  /* lifestories처럼 색이 있는 면(--surface)을 82% 불투명하게 깔고 뒤 화면 블러를 더한다. 안쪽 효과는 알약 모양으로 잘린다 */
-  background: color-mix(in srgb, color-mix(in srgb, var(--text) var(--nav-bg-tint), var(--bg)) var(--nav-bg-opacity), transparent);
+  /* 페이지 배경색 82% 불투명 + 뒤 화면 블러. 탁한 회색 대신 붉은·푸른 빛이 번지는 몽환적인 면. 안쪽 효과는 알약 모양으로 잘린다 */
+  background: color-mix(in srgb, var(--bg) var(--nav-bg-opacity), transparent);
   -webkit-backdrop-filter: blur(var(--nav-blur));
   backdrop-filter: blur(var(--nav-blur));
+  box-shadow: inset 0 0 0 1px rgba(var(--particle), 0.1);
   overflow: hidden;
+}
+
+.nav-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 0.5rem;
+  border-radius: inherit;
+  mask:
+    linear-gradient(#fff, #fff) content-box,
+    linear-gradient(#fff, #fff);
+  mask-composite: exclude;
+  filter: blur(0.625rem);
+  opacity: 0.85;
+  pointer-events: none;
 }
 
 .nav-list {

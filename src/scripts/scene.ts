@@ -2,7 +2,7 @@
 // 기준은 lifestories.org/discover의 별 장면이다(코드는 복사하지 않고 원리만 보고 직접 구현했다). docs/07 §3.
 //  - 입자는 한 덩어리의 점구름(Points). 대부분 아주 작고 가끔 큰 별, 일부는 성단처럼 뭉친다.
 //  - 입자마다 제 박자로 반짝이고(twinkle), 멀리·아주 가까이에서는 흐려지며, 화면에서 최대 크기가 제한된다.
-//  - 처음 한 번 입자들이 중앙에서 순서대로 터져 나오며 자리 잡는다(genesis intro).
+//  - 별은 처음부터 이미 자리에 있고, 화면 전체가 부드럽게 나타난 뒤 별들이 점차 앞으로 다가온다(터져 나오는 연출 없음).
 //  - 색은 CSS 토큰 --particle(rgb 채널). 테마가 바뀌면 다시 읽는다.
 //  - prefers-reduced-motion이면 한 장면만 그린다. 탭이 숨겨지면 멈춘다. WebGL이 없으면 캔버스를 숨긴다.
 import {
@@ -178,8 +178,8 @@ function start(canvas: HTMLCanvasElement): void {
   let clock = 0;
   let last = 0;
   let intro = 0;
-  const INTRO_SECONDS = 3.4;
-  const FLY_SPEED = 2.4; // 초당 깊이 이동량(36 중): 별이 중앙에서 바깥으로 확대되며 흐른다
+  const FADE_SECONDS = 1.6; // 캔버스가 나타나는 시간(별의 위치·크기는 그대로)
+  const FLY_SPEED = 0.8; // 초당 깊이 이동량(36 중): 이미 있는 별이 천천히 앞으로 다가온다
   const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 
   function render(): void {
@@ -190,16 +190,15 @@ function start(canvas: HTMLCanvasElement): void {
     const dt = Math.min((now - last) / 1000 || 0, 0.05);
     last = now;
     clock += dt;
-    intro = Math.min(1, intro + dt / INTRO_SECONDS);
+    intro = Math.min(1, intro + dt / FADE_SECONDS);
     px += (tx - px) * Math.min(1, dt * 2.2);
     py += (ty - py) * Math.min(1, dt * 2.2);
     const u = material.uniforms;
     u.uTime.value = clock;
-    u.uIntro.value = ease(intro);
     u.uFly.value = clock * FLY_SPEED;
     u.uPan.value = [px, py];
     u.uRoll.value = clock * 0.004;
-    canvas.style.opacity = '1';
+    canvas.style.opacity = String(ease(intro));
     render();
   }
 

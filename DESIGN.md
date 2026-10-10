@@ -203,7 +203,7 @@
 - 메인 영상 (소스 미정, 용량·저작권·개인정보 기준 때문에 보류)
 - 탭 바의 추가 동작, uses / now / skills 같은 하위 구성 (`docs/07` §6)
 - 실제 배경색을 더 갈색으로 조정할지 여부. 현재 토큰을 유지하는 것이 기본이며, 색상 변경은 별도 승인 후 진행한다.
-- DESIGN_VARIANCE, MOTION_INTENSITY, VISUAL_DENSITY 제안값 승인 여부
+- ~~DESIGN_VARIANCE, MOTION_INTENSITY, VISUAL_DENSITY 제안값 승인 여부~~ **해소(2026-10-10):** 사용자가 Claude에게 위임해 §1의 제안값(메인 6/4/2, 읽는 페이지 4/2/3)을 그대로 채택했다.
 
 ---
 

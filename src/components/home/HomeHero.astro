@@ -25,18 +25,18 @@ const words = title.flatMap((seg) =>
 <div class="vignette" aria-hidden="true"></div>
 
 <section class="hero">
-  <h1 class="hero-title">
-    {
-      words.map((item, i) => (
-        <>
-          <span class:list={['word', { strong: item.strong }]} style={`--i:${i}`}>
-            {item.w}
-          </span>{' '}
-        </>
-      ))
-    }
-  </h1>
-  <p class="hero-sub" style={`--i:${words.length}`}>{sub}</p>
+  <div class="hero-inner">
+    <h1 class="hero-title">
+      {
+        words.map((item) => (
+          <>
+            <span class:list={['word', { strong: item.strong }]}>{item.w}</span>{' '}
+          </>
+        ))
+      }
+    </h1>
+    <p class="hero-sub">{sub}</p>
+  </div>
 </section>
 
 <script>
@@ -60,22 +60,37 @@ const words = title.flatMap((seg) =>
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--bg) 70%, transparent) 100%);
+    background-image:
+      radial-gradient(ellipse at center, transparent 40%, color-mix(in srgb, var(--bg) 80%, transparent) 100%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.2 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size: auto, 180px 180px;
+    background-repeat: no-repeat, repeat;
   }
 
+  /* 화면 정중앙, 가운데 정렬. 문구는 한 번에 나타난다 */
   .hero {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    min-height: 62dvh;
+    padding-inline: var(--space-5);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    max-width: var(--page-max);
+    text-align: center;
   }
 
   .hero-title {
-    max-width: var(--page-max);
+    max-width: none;
     margin: 0 0 var(--space-6);
     font-size: var(--fs-display);
     line-height: var(--lh-display);
     font-weight: var(--fw-regular);
+    text-wrap: balance;
   }
 
   .word.strong {
@@ -83,31 +98,46 @@ const words = title.flatMap((seg) =>
   }
 
   .hero-sub {
-    margin: 0;
+    margin: 0 auto;
     color: var(--text-muted);
     font-size: var(--fs-m);
     line-height: var(--lh-m);
   }
 
-  /* 움직임을 줄이는 설정이 아닐 때만, 처음엔 숨겨 두었다가 순서대로 떠오른다 */
+  /* 별이 먼저 보이고 그 사이로 다가온다. 메인 문장이 한 번에 나타나 천천히 커지고(별이 다가오는 것과 같은 방향),
+   * 3초 뒤 아래에 작은 문장이 나타나 같이 커진다. 움직임을 줄이는 설정이면 처음부터 보이고 커지지 않는다. */
   @media (prefers-reduced-motion: no-preference) {
-    .word,
-    .hero-sub {
-      opacity: 0;
-      transform: translateY(0.35em);
-      animation: rise var(--duration-slow) var(--ease-out) forwards;
+    .hero-inner {
+      animation: approach 18s cubic-bezier(0.2, 0.6, 0.3, 1) 2s both;
     }
 
-    .word,
+    .hero-title,
     .hero-sub {
-      animation-delay: calc(2400ms + var(--i) * 110ms);
+      opacity: 0;
+      animation: appear 0.9s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+    }
+
+    .hero-title {
+      animation-delay: 2s;
+    }
+
+    .hero-sub {
+      animation-delay: 5s; /* 메인 문장이 나타나고 3초 뒤 */
     }
   }
 
-  @keyframes rise {
+  @keyframes approach {
+    from {
+      transform: scale(0.94);
+    }
+    to {
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes appear {
     to {
       opacity: 1;
-      transform: none;
     }
   }
 </style>

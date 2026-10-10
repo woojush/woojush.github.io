@@ -10,6 +10,7 @@ import {
   BufferAttribute,
   BufferGeometry,
   Color,
+  LineSegments,
   NormalBlending,
   OrthographicCamera,
   Points,
@@ -59,7 +60,52 @@ const VERT = /* glsl */ `
     float ph = aSeed * 40.0;
     float sp = 1.0 + fract(aSeed * 7.31) * 3.0;
     float tw = 0.35 + 0.65 * (0.5 + 0.5 * sin(uTime * 1.6 * sp + ph) * sin(uTime * 1.1 * sp + ph * 1.7));
-    vAlpha = far * near * tw * onset;
+    float edge = smoothstep(0.35, 1.1, length(xy));
+    vAlpha = far * near * tw * onset * (1.0 - 0.7 * edge);
+  }
+`;
+
+const STREAK_VERT = /* glsl */ `
+  uniform float uFly;
+  uniform float uDepth;
+  uniform float uD0;
+  uniform float uNear;
+  uniform vec2 uPan;
+  uniform float uRoll;
+  uniform float uTime;
+  uniform float uStreak;     // 꼬리 길이(깊이 단위)
+  uniform float uAb;         // 색수차 방향(-1, 0, +1)
+  attribute float aEnd;      // 0 = 머리(현재 위치), 1 = 꼬리(조금 먼 위치)
+  attribute float aSeed;
+  attribute float aZ;
+  varying float vAlpha;
+  void main() {
+    float dist = uNear + mod(aZ - uFly, uDepth) + aEnd * uStreak;
+    float c = cos(uRoll), s = sin(uRoll);
+    vec2 p = vec2(position.x * c - position.y * s, position.x * s + position.y * c);
+    vec2 xy = p * (uD0 / dist) + uPan * vec2(0.05, 0.035) * (uD0 / dist);
+    float r = length(xy);
+    // 테두리 쪽으로 갈수록 색이 갈라진다(색수차)
+    xy *= 1.0 + uAb * 0.028 * r * r;
+    gl_Position = vec4(xy, 0.0, 1.0);
+    float t = dist / uDepth;
+    float far = 1.0 - smoothstep(0.55, 1.0, t);
+    float near = smoothstep(0.0, 0.08, t);
+    float ph = aSeed * 40.0;
+    float sp = 1.0 + fract(aSeed * 7.31) * 3.0;
+    float tw = 0.45 + 0.55 * (0.5 + 0.5 * sin(uTime * 1.6 * sp + ph) * sin(uTime * 1.1 * sp + ph * 1.7));
+    // 중앙에서는 점, 테두리 쪽에서만 줄무늬가 보인다. 꼬리 끝은 투명
+    float edge = smoothstep(0.55, 1.15, r);
+    vAlpha = far * near * tw * edge * (1.0 - aEnd);
+  }
+`;
+
+const STREAK_FRAG = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uOpacity;
+  varying float vAlpha;
+  void main() {
+    gl_FragColor = vec4(uColor, vAlpha * uOpacity);
   }
 `;
 
@@ -95,15 +141,15 @@ function start(canvas: HTMLCanvasElement): void {
   const size = new Float32Array(COUNT);
   const seed = new Float32Array(COUNT);
   const zs = new Float32Array(COUNT);
-  const CLUSTERS = 40;
+  const CLUSTERS = 24;
   const centers = Array.from({ length: CLUSTERS }, () => [Math.random() * 2.4 - 1.2, Math.random() * 2.4 - 1.2, Math.random() * DEPTH]);
   const gauss = () => Math.sqrt(-2 * Math.log(Math.max(1e-6, Math.random()))) * Math.cos(2 * Math.PI * Math.random());
   for (let i = 0; i < COUNT; i++) {
     let x: number, y: number, z: number, big = 0.11 + Math.random() * 0.28;
-    if (Math.random() < 0.35) {
+    if (Math.random() < 0.08) {
       const c = centers[(Math.random() * CLUSTERS) | 0];
-      x = c[0] + gauss() * 0.08;
-      y = c[1] + gauss() * 0.08;
+      x = c[0] + gauss() * 0.3;
+      y = c[1] + gauss() * 0.3;
       z = c[2] + gauss() * 1.4;
       big = 0.13 + Math.random() * 0.5;
     } else {
@@ -151,6 +197,57 @@ function start(canvas: HTMLCanvasElement): void {
   points.frustumCulled = false;
   scene.add(points);
 
+  // 테두리 쪽 줄무늬: 같은 별을 (머리, 꼬리) 두 점의 선분으로 그린다. 가운데 흰 줄 + 붉은·푸른 색수차 줄 두 겹
+  const sPos = new Float32Array(COUNT * 6);
+  const sEnd = new Float32Array(COUNT * 2);
+  const sSeed = new Float32Array(COUNT * 2);
+  const sZ = new Float32Array(COUNT * 2);
+  for (let i = 0; i < COUNT; i++) {
+    for (let k = 0; k < 2; k++) {
+      sPos.set([pos[i * 3], pos[i * 3 + 1], 0], (i * 2 + k) * 3);
+      sEnd[i * 2 + k] = k;
+      sSeed[i * 2 + k] = seed[i];
+      sZ[i * 2 + k] = zs[i];
+    }
+  }
+  const sGeo = new BufferGeometry();
+  sGeo.setAttribute('position', new BufferAttribute(sPos, 3));
+  sGeo.setAttribute('aEnd', new BufferAttribute(sEnd, 1));
+  sGeo.setAttribute('aSeed', new BufferAttribute(sSeed, 1));
+  sGeo.setAttribute('aZ', new BufferAttribute(sZ, 1));
+  const streakMats = [
+    { ab: 0, color: new Color(0xc2c2c2), opacity: 0.4 },
+    { ab: 1, color: new Color(1.0, 0.25, 0.2), opacity: 0.16 },
+    { ab: -1, color: new Color(0.25, 0.45, 1.0), opacity: 0.16 },
+  ].map((m, i) => {
+    const mat = new ShaderMaterial({
+      vertexShader: STREAK_VERT,
+      fragmentShader: STREAK_FRAG,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      blending: AdditiveBlending,
+      uniforms: {
+        uFly: material.uniforms.uFly,
+        uDepth: material.uniforms.uDepth,
+        uD0: material.uniforms.uD0,
+        uNear: material.uniforms.uNear,
+        uPan: material.uniforms.uPan,
+        uRoll: material.uniforms.uRoll,
+        uTime: material.uniforms.uTime,
+        uStreak: { value: 0.16 },
+        uAb: { value: m.ab },
+        uColor: { value: m.color },
+        uOpacity: { value: m.opacity },
+      },
+    });
+    const lines = new LineSegments(sGeo, mat);
+    lines.frustumCulled = false;
+    lines.renderOrder = i;
+    scene.add(lines);
+    return { mat, base: m, lines };
+  });
+
   function readTheme(): void {
     const rgb = css('--particle').split(',').map((n) => Number(n.trim()));
     if (rgb.length === 3 && rgb.every((n) => !Number.isNaN(n))) material.uniforms.uColor.value = new Color(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
@@ -159,6 +256,11 @@ function start(canvas: HTMLCanvasElement): void {
     material.blending = light ? NormalBlending : AdditiveBlending;
     material.uniforms.uOpacity.value = light ? 0.7 : 0.95;
     material.needsUpdate = true;
+    // 줄무늬·색수차는 어두운 배경에서만(밝은 배경에서는 빛으로 더하는 효과가 보이지 않는다)
+    streakMats.forEach((m, i) => {
+      m.lines.visible = !light;
+      if (i === 0) m.mat.uniforms.uColor.value = material.uniforms.uColor.value;
+    });
     if (reduce.matches) render();
   }
 

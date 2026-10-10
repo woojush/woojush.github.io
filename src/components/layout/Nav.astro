@@ -1,11 +1,11 @@
 ---
-// 주 메뉴(탭 바). 항목은 data/site.ts의 nav(5개 고정)를 받아 그리기만 한다.
-// 모양: 유리 알약(.nav-bar) 안에 캡슐(.nav-capsule)이 있고, 캡슐은 scripts/nav-capsule.ts가 옮긴다.
-//   현재 위치 표시: 캡슐 + 굵기 + aria-current (색만으로 표시하지 않는다). JS가 없으면 정적 표시(.nav-indicator).
-// 탭처럼 보이지만 각각 별도 페이지의 일반 링크다 (ARIA tabs 아님). 페이지를 옮기면 캡슐이
-// 같은 view-transition-name 덕분에 이전 위치에서 새 탭으로 미끄러진다 (base.css의 @view-transition).
-//   정확히 그 페이지   → aria-current="page"
-//   그 섹션의 하위 글  → aria-current="true"
+// 주 메뉴(탭 바). 항목은 data/site.ts의 nav를 받아 그리기만 한다. home은 메뉴에 없고, 이름과 가운데 허브가 홈 링크다.
+// 모양은 lifestories.org의 상단 알약을 따른다 (docs/07 §3 c).
+//   데스크톱(마우스): 화면 위 가운데에 떠 있는 작은 알약 + 가운데 허브. 마우스가 올라가면 늘어나며 글자가 안쪽으로 모인다.
+//   그 밖(모바일·터치): 이름 아래 한 줄에 글자가 처음부터 보이는 알약.
+// 각각 별도 페이지의 일반 링크다 (ARIA tabs 아님). 정확히 그 페이지는 aria-current="page", 그 섹션의 하위 글은 "true".
+import '@/styles/nav.css';
+
 interface Props {
   items: readonly { label: string; href: string }[];
   currentPath: string;
@@ -18,210 +18,41 @@ function currentState(href: string): 'page' | 'true' | undefined {
   if (href !== '/' && currentPath.startsWith(href)) return 'true';
   return undefined;
 }
+
+// 가운데 허브를 사이에 두고 항목을 반으로 나눈다. 글자는 바깥쪽에서 안쪽으로 모여든다.
+const half = Math.ceil(items.length / 2);
+const shifts = ['-0.875rem', '-0.5rem', '0.5rem', '0.875rem'];
+const entries = items.map((item, i) => ({
+  ...item,
+  state: currentState(item.href),
+  shift: shifts[Math.min(i < half ? i : shifts.length - (items.length - i), shifts.length - 1)],
+  spacerBefore: i === half,
+}));
 ---
 
 <nav class="nav" aria-label="Main">
-  <div class="nav-bar">
-    <span class="nav-capsule" aria-hidden="true">
-      <i></i><i></i><i></i><i></i><i></i>
-    </span>
+  <span class="nav-blob" aria-hidden="true"></span>
+  <div class="nav-pill">
     <ul class="nav-list">
       {
-        items.map((item) => {
-          const state = currentState(item.href);
-          return (
+        entries.map((item) => (
+          <>
+            {item.spacerBefore && <li class="nav-spacer" aria-hidden="true" />}
             <li>
-              <a class="nav-link" href={item.href} aria-current={state}>
-                {state && <span class="nav-indicator" aria-hidden="true" />}
-                <span class="nav-text">{item.label}</span>
+              <a class="nav-link" href={item.href} aria-current={item.state} style={`--shift:${item.shift}`}>
+                {item.label}
               </a>
             </li>
-          );
-        })
+          </>
+        ))
       }
     </ul>
   </div>
+  <a class="nav-hub" href="/" aria-label="Home" aria-current={currentPath === '/' ? 'page' : undefined}>
+    <span></span><span></span><span></span><span></span>
+  </a>
 </nav>
 
 <script>
-  import '@/scripts/nav-capsule.ts';
+  import '@/scripts/nav.ts';
 </script>
-
-<style>
-  /* 모바일: 이름·토글 아래 한 줄을 통째로 차지한다. 탭 5개가 320px에서도 한 줄에 들어간다 */
-  .nav {
-    flex: 1 0 100%;
-  }
-
-  /* 유리 알약: surface 50% + 배경 블러. 테두리는 text-muted를 옅게 */
-  .nav-bar {
-    position: relative;
-    padding: var(--space-1);
-    background: color-mix(in srgb, var(--surface) 50%, transparent);
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid color-mix(in srgb, var(--text-muted) 16%, transparent);
-    border-radius: var(--radius);
-  }
-
-  .nav-list {
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .nav-list li {
-    flex: 1 1 auto;
-    display: flex;
-  }
-
-  .nav-link {
-    position: relative;
-    flex: 1 1 auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--tap);
-    padding: 0 var(--space-1); /* 320px에서도 5개가 한 줄에 들어가도록 좁게 */
-    color: var(--text-muted);
-    font-size: var(--fs-s);
-    line-height: var(--lh-s);
-    text-decoration: none;
-    transition: color var(--duration) var(--ease);
-  }
-
-  .nav-link:hover,
-  .nav-link[aria-current] {
-    color: var(--text);
-  }
-
-  .nav-link[aria-current] {
-    font-weight: var(--fw-strong);
-  }
-
-  .nav-text {
-    position: relative; /* 캡슐 위로 올린다 */
-  }
-
-  /* JS가 없을 때의 정적 현재 위치 표시 */
-  .nav-indicator {
-    position: absolute;
-    inset: 0;
-    background: var(--surface);
-    border-radius: var(--radius);
-    view-transition-name: nav-indicator;
-  }
-
-  /* ───────── 캡슐 (JS가 켜졌을 때) ───────── */
-  .nav-capsule {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: var(--cap-w, 0);
-    height: var(--cap-h, 32px);
-    transform: translate(var(--cap-x, 0), -50%);
-    border-radius: var(--radius);
-    background: color-mix(in srgb, var(--text) var(--capsule-rest), transparent);
-    box-shadow: 0 0 28px color-mix(in srgb, var(--accent) var(--glow-rest), transparent);
-    opacity: 0;
-    pointer-events: none;
-    display: none;
-  }
-
-  .nav[data-js] .nav-capsule {
-    display: block;
-  }
-
-  .nav[data-js] .nav-indicator {
-    display: none;
-  }
-
-  .nav[data-placed] .nav-capsule {
-    opacity: 1;
-    view-transition-name: nav-indicator;
-  }
-
-  .nav[data-hover] .nav-capsule {
-    background: color-mix(in srgb, var(--text) var(--capsule-hover), transparent);
-    box-shadow: 0 0 28px color-mix(in srgb, var(--accent) var(--glow-hover), transparent);
-  }
-
-  /* 전환은 첫 배치가 끝난 뒤에만. 이탈 스프링이 기본, 호버 중에는 진입 스프링 */
-  .nav[data-ready] .nav-capsule {
-    transition:
-      transform var(--spring-out-duration) var(--spring-out),
-      width var(--spring-out-duration) var(--spring-out),
-      height var(--spring-out-duration) var(--spring-out),
-      background-color var(--duration-slow) var(--ease-out),
-      box-shadow var(--duration-slow) var(--ease-out),
-      opacity var(--duration) var(--ease);
-  }
-
-  .nav[data-ready][data-hover] .nav-capsule {
-    transition:
-      transform var(--spring-in-duration) var(--spring-in),
-      width var(--spring-in-duration) var(--spring-in),
-      height var(--spring-in-duration) var(--spring-in),
-      background-color var(--duration-slow) var(--ease-out),
-      box-shadow var(--duration-slow) var(--ease-out),
-      opacity var(--duration) var(--ease);
-  }
-
-  /* 입자 5개: 호버 중에만 캡슐 위로 천천히 떠오른다 */
-  .nav-capsule i {
-    position: absolute;
-    bottom: 50%;
-    left: calc(var(--n) * 18% + 8%);
-    width: 2px;
-    height: 2px;
-    border-radius: 50%;
-    background: var(--accent);
-    opacity: 0;
-  }
-
-  .nav-capsule i:nth-child(1) { --n: 0; --d: 0s; }
-  .nav-capsule i:nth-child(2) { --n: 1; --d: 0.5s; }
-  .nav-capsule i:nth-child(3) { --n: 2; --d: 1s; }
-  .nav-capsule i:nth-child(4) { --n: 3; --d: 1.5s; }
-  .nav-capsule i:nth-child(5) { --n: 4; --d: 2s; }
-
-  .nav[data-hover] .nav-capsule i {
-    animation: nav-spark 2.5s var(--ease-out) var(--d) infinite;
-  }
-
-  @keyframes nav-spark {
-    0% { opacity: 0; transform: translateY(0); }
-    30% { opacity: 0.8; }
-    100% { opacity: 0; transform: translateY(-18px); }
-  }
-
-  /* 터치: 호버가 없으므로 페이지가 열릴 때 글로우를 한 번 맥동시킨다 */
-  @media (hover: none) {
-    .nav[data-ready] .nav-capsule,
-    .nav[data-placed] .nav-capsule {
-      animation: nav-pulse 900ms var(--ease-out) 1;
-    }
-  }
-
-  @keyframes nav-pulse {
-    0% { box-shadow: 0 0 28px color-mix(in srgb, var(--accent) var(--glow-rest), transparent); }
-    35% { box-shadow: 0 0 28px color-mix(in srgb, var(--accent) var(--glow-hover), transparent); }
-    100% { box-shadow: 0 0 28px color-mix(in srgb, var(--accent) var(--glow-rest), transparent); }
-  }
-
-  /* 데스크톱: 가운데 */
-  @media (min-width: 641px) {
-    .nav {
-      flex: 0 1 auto;
-    }
-
-    .nav-link {
-      min-width: 88px;
-      padding: 0 var(--space-4);
-      font-size: var(--fs-base);
-    }
-  }
-</style>

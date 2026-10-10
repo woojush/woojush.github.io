@@ -185,7 +185,7 @@ a {
 
 /* ───────── 페이지 전환 (docs/07) ─────────
  * 같은 사이트 안에서 링크를 따라가면 브라우저가 이전/새 페이지를 크로스페이드하고,
- * 이름이 붙은 요소(헤더, 탭 표시)는 따로 이동시킨다. 미지원 브라우저는 평소처럼 이동한다.
+ * 이름이 붙은 요소(탭 바)는 그대로 둔다. 미지원 브라우저는 평소처럼 이동한다.
  * 움직임을 줄이는 설정이면 켜지 않는다.
  */
 @media (prefers-reduced-motion: no-preference) {
@@ -198,14 +198,9 @@ a {
   animation-duration: var(--duration-slow);
 }
 
-::view-transition-group(nav-indicator) {
-  animation-duration: var(--duration-slow);
-  animation-timing-function: var(--ease-out);
-}
-
-/* 헤더는 두 페이지의 같은 요소끼리 교차 페이드하지 않고 그대로 둔다 */
-::view-transition-old(site-header),
-::view-transition-new(site-header) {
+/* 떠 있는 탭 바는 페이지를 옮겨도 그대로 둔다 (두 페이지의 같은 요소끼리 교차 페이드하지 않는다) */
+::view-transition-old(site-nav),
+::view-transition-new(site-nav) {
   animation: none;
   mix-blend-mode: normal;
 }

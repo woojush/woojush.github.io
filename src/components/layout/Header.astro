@@ -1,5 +1,5 @@
 ---
-// 사이트 헤더: 이름(좌) + 탭 바 + 테마 토글. 스크롤해도 고정하지 않는다. 선 대신 탭 바 자체가 구분선 역할.
+// 사이트 헤더: 이름(좌) + 테마 토글(우). 탭 바는 데스크톱에서 화면 위 가운데에 떠 있고(nav.css), 모바일에서는 이름 아래 한 줄이다.
 // DOM 순서가 곧 Tab 순서다: 이름 → [모바일 토글] → 메뉴 → [데스크톱 토글].
 // 두 토글 중 화면 폭에 맞는 하나만 보인다 (ThemeToggle.astro 참고).
 import Nav from './Nav.astro';
@@ -24,9 +24,9 @@ const { name, items, currentPath } = Astro.props;
 </header>
 
 <style>
-  /* 페이지를 옮겨도 헤더는 제자리에 있고 탭 표시만 움직이게 따로 분리한다 (view transition) */
+  /* 떠 있는 탭 바(position: fixed)가 본문 위에 오도록 base.css의 z-index: 1보다 높인다 */
   .site-header {
-    view-transition-name: site-header;
+    z-index: 3;
   }
 
   .header-inner {
@@ -39,18 +39,6 @@ const { name, items, currentPath } = Astro.props;
   }
 
   /* 이름을 왼쪽에 두고, 나머지(토글/메뉴)를 오른쪽으로 민다 */
-  /* 데스크톱: 이름(왼쪽) / 탭 바(가운데) / 테마(오른쪽 끝) */
-  @media (min-width: 641px) {
-    .header-inner {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-    }
-
-    .header-inner :global(.theme-toggle[data-placement='desktop']) {
-      justify-self: end;
-    }
-  }
-
   .site-name {
     display: inline-flex;
     align-items: center;

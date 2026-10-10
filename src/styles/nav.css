@@ -1,0 +1,279 @@
+/*
+ * nav.css — 탭 바(Nav.astro)의 스타일. 컴포넌트에서 분리한 것이다(스타일이 길어서).
+ * 값은 tokens.css의 탭 바 토큰을 쓴다. 기준: docs/07 §3 c (lifestories.org의 상단 알약).
+ */
+@property --beam-angle { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
+@property --hub-spin { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
+@property --hover-boost { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --drift-ax { syntax: '<length>'; inherits: true; initial-value: 0px; }
+@property --drift-ay { syntax: '<length>'; inherits: true; initial-value: 0px; }
+@property --drift-bx { syntax: '<length>'; inherits: true; initial-value: 0px; }
+@property --drift-by { syntax: '<length>'; inherits: true; initial-value: 0px; }
+@property --drift-fx { syntax: '<length>'; inherits: true; initial-value: 0px; }
+@property --drift-fy { syntax: '<length>'; inherits: true; initial-value: 0px; }
+
+/* ───────── 모바일·터치 기본: 이름 아래 한 줄, 글자가 보인다 ───────── */
+.nav {
+  position: relative;
+  flex: 1 0 100%;
+  height: var(--nav-h);
+  border-radius: 1.875rem;
+  animation: nav-beam 8s linear infinite;
+}
+
+/* 알약 테두리를 도는 빛줄기. 어두운 테마에서는 밝게, 밝은 테마에서는 어둡게(--particle) */
+.nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--beam-angle, 0deg),
+    transparent 0%,
+    transparent 58%,
+    rgba(var(--particle), 0.02) 62%,
+    rgba(var(--particle), 0.06) 65%,
+    rgba(var(--particle), 0.14) 67%,
+    rgba(var(--particle), 0.28) 69%,
+    rgba(var(--particle), 0.4) 70%,
+    rgba(var(--particle), 0.4) 70.5%,
+    rgba(var(--particle), 0.28) 71.5%,
+    rgba(var(--particle), 0.14) 73%,
+    rgba(var(--particle), 0.06) 75%,
+    rgba(var(--particle), 0.02) 78%,
+    transparent 82%
+  );
+  mask:
+    linear-gradient(#fff, #fff) content-box,
+    linear-gradient(#fff, #fff);
+  mask-composite: exclude;
+  filter: blur(0.5rem) brightness(1.3) saturate(1.4);
+  pointer-events: none;
+}
+
+.nav-pill {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 1.375rem;
+  border-radius: 1.875rem;
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  -webkit-backdrop-filter: blur(var(--nav-blur));
+  backdrop-filter: blur(var(--nav-blur));
+  overflow: hidden;
+  animation: nav-drift-a 12s ease-in-out infinite, nav-drift-b 9s ease-in-out infinite,
+    nav-drift-f 5s ease-in-out infinite;
+}
+
+/* 가장자리에서 번지는 글로우. 원본의 위치·색을 따르고, 천천히 흐른다 */
+.nav-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 4.375rem 2.1875rem at calc(33% + var(--drift-ax) + var(--drift-fx) * var(--hover-boost)) calc(-7% + var(--drift-ay) + var(--drift-fy) * var(--hover-boost)), var(--glow-tan), transparent),
+    radial-gradient(ellipse 3.75rem 1.875rem at calc(12% + var(--drift-bx) - var(--drift-fx) * var(--hover-boost)) calc(-5% + var(--drift-by) + var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
+    radial-gradient(ellipse 2.5rem 2.5rem at calc(2% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(68% + var(--drift-ay) + var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent),
+    radial-gradient(ellipse 1.25rem 1.75rem at calc(2% + var(--drift-ax) + var(--drift-fx) * var(--hover-boost)) calc(68% + var(--drift-by) - var(--drift-fy) * var(--hover-boost)), var(--glow-green), transparent),
+    radial-gradient(ellipse 11.25rem 1.875rem at calc(74% + var(--drift-ax) - var(--drift-fx) * var(--hover-boost)) calc(100% + var(--drift-ay) + var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
+    radial-gradient(ellipse 5.3125rem 1.5625rem at calc(55% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(100% + var(--drift-by) - var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent),
+    radial-gradient(ellipse 4.625rem 1.875rem at calc(94% + var(--drift-bx) + var(--drift-fx) * var(--hover-boost)) calc(0% + var(--drift-ay) - var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
+    radial-gradient(ellipse 1.625rem 2.1875rem at calc(100% + var(--drift-ax) - var(--drift-fx) * var(--hover-boost)) calc(27% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)), var(--glow-red), transparent);
+  box-shadow: inset 0 0 0.3125rem 0.0625rem rgba(0, 0, 0, 0.14);
+  opacity: 0.55;
+  pointer-events: none;
+  transition:
+    opacity 0.3s var(--ease-custom),
+    filter 0.3s var(--ease-custom),
+    --hover-boost 0.6s var(--ease-custom);
+}
+
+.nav-list {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-spacer {
+  display: none;
+}
+
+.nav-link {
+  position: relative;
+  color: var(--text);
+  font-size: var(--fs-s);
+  line-height: 1.15;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-link[aria-current] {
+  font-weight: var(--fw-strong);
+}
+
+/* 터치 영역: 글자 둘레로 넓힌다 */
+.nav-link::before {
+  content: '';
+  position: absolute;
+  inset: -0.625rem -0.5rem;
+}
+
+.nav-hub,
+.nav-blob {
+  display: none;
+}
+
+@keyframes nav-beam {
+  from { --beam-angle: 0deg; }
+  to { --beam-angle: 360deg; }
+}
+
+@keyframes nav-spin {
+  from { --hub-spin: 0deg; }
+  to { --hub-spin: 90deg; }
+}
+
+@keyframes nav-drift-a {
+  0%, 100% { --drift-ax: 0px; --drift-ay: 0px; }
+  25% { --drift-ax: 8px; --drift-ay: -4px; }
+  50% { --drift-ax: -5px; --drift-ay: 6px; }
+  75% { --drift-ax: 4px; --drift-ay: 7px; }
+}
+
+@keyframes nav-drift-b {
+  0%, 100% { --drift-bx: 0px; --drift-by: 0px; }
+  33% { --drift-bx: -6px; --drift-by: 5px; }
+  66% { --drift-bx: 7px; --drift-by: -6px; }
+}
+
+@keyframes nav-drift-f {
+  0%, 100% { --drift-fx: 0px; --drift-fy: 0px; }
+  25% { --drift-fx: 12px; --drift-fy: -8px; }
+  50% { --drift-fx: -10px; --drift-fy: 10px; }
+  75% { --drift-fx: 9px; --drift-fy: -7px; }
+}
+
+/* ───────── 데스크톱(마우스): 위 가운데에 떠 있는 알약 ───────── */
+@media (min-width: 641px) and (hover: hover) {
+  .nav {
+    position: fixed;
+    top: calc((var(--header-h) - var(--nav-h)) / 2);
+    left: 50%;
+    flex: none;
+    width: var(--nav-w-rest);
+    transform: translateX(-50%);
+    transition: width var(--nav-spring-duration) var(--nav-spring);
+    view-transition-name: site-nav;
+  }
+
+  .nav:hover,
+  .nav:focus-within {
+    width: var(--nav-w-open);
+    --hover-boost: 1;
+  }
+
+  .nav-pill {
+    gap: 1.25rem;
+    padding-inline: 1.25rem;
+    /* 가운데 허브 자리를 비운다 */
+    mask: radial-gradient(circle, transparent 0.9375rem, #000 1rem);
+  }
+
+  .nav:hover .nav-pill::before,
+  .nav:focus-within .nav-pill::before {
+    opacity: 1;
+    filter: brightness(1.15) saturate(1.3);
+  }
+
+  .nav-list {
+    gap: 1.25rem;
+  }
+
+  .nav-spacer {
+    display: block;
+    flex-shrink: 0;
+    width: 1.875rem;
+    height: 1.875rem;
+  }
+
+  /* 평소에는 글자가 없다. 올라가면 안쪽으로 모이며 나타난다 */
+  .nav-link {
+    font-size: var(--fs-base);
+    opacity: 0;
+    transform: translate(var(--shift)) scale(0.96);
+    pointer-events: none;
+    transition:
+      opacity 0.55s var(--ease-custom),
+      transform 0.4s var(--nav-label-spring);
+  }
+
+  .nav:hover .nav-link,
+  .nav:focus-within .nav-link {
+    opacity: 1;
+    transform: none;
+    pointer-events: all;
+  }
+
+  .nav-hub {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    display: block;
+    width: 1.875rem;
+    height: 1.875rem;
+    transform: translate(-50%, -50%) rotate(var(--hub-spin, 0deg));
+    border-radius: 50%;
+    will-change: transform;
+  }
+
+  .nav:hover .nav-hub {
+    animation: nav-spin 0.6s var(--ease-custom);
+  }
+
+  .nav-hub span {
+    position: absolute;
+    width: 0.1875rem;
+    height: 0.1875rem;
+    background: color-mix(in srgb, var(--text) 75%, transparent);
+  }
+
+  .nav-hub span:nth-child(1) { top: calc(50% - 0.28125rem); left: calc(50% - 0.28125rem); }
+  .nav-hub span:nth-child(2) { top: calc(50% - 0.28125rem); left: calc(50% + 0.09375rem); }
+  .nav-hub span:nth-child(3) { top: calc(50% + 0.09375rem); left: calc(50% - 0.28125rem); }
+  .nav-hub span:nth-child(4) { top: calc(50% + 0.09375rem); left: calc(50% + 0.09375rem); }
+
+  /* 글자 밑에서 은은하게 올라오는 빛. 알약 아래쪽 가장자리에 걸쳐 있고 글자를 따라 움직인다 */
+  .nav-blob {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 0;
+    display: block;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle 1.75rem at 35% 35%, color-mix(in srgb, var(--accent) 85%, #fff), transparent),
+      radial-gradient(circle 1.625rem at 70% 40%, color-mix(in srgb, var(--accent) 70%, #fff), transparent),
+      radial-gradient(circle 1.875rem at 45% 70%, color-mix(in srgb, var(--accent) 80%, #fff), transparent);
+    filter: blur(0.625rem);
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition:
+      opacity 0.45s var(--ease-custom),
+      translate 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+}

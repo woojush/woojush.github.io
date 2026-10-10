@@ -23,6 +23,7 @@ const canvas = document.querySelector<HTMLCanvasElement>('[data-scene]');
 const VERT = /* glsl */ `
   uniform float uFly;        // 지금까지 날아온 거리(깊이 방향)
   uniform float uDepth;      // 깊이 범위
+  uniform float uD0;         // 화면 가장자리에 정확히 걸리는 깊이
   uniform float uNear;
   uniform vec2 uPan;         // 포인터 시차(-1~1)
   uniform float uRoll;       // 아주 느린 회전
@@ -41,13 +42,13 @@ const VERT = /* glsl */ `
     float dist = uNear + mod(aZ - uFly, uDepth);
     float c = cos(uRoll), s = sin(uRoll);
     vec2 p = vec2(position.x * c - position.y * s, position.x * s + position.y * c);
-    vec2 xy = p * dist * uTan;
+    // 원근: 화면 위치는 p * D0 / dist. 멀리 있을 땐 중앙에 모여 있다가, 다가올수록 가속하며 테두리 쪽으로 퍼져 나간다
+    vec2 xy = p * (uD0 / dist);
     // 가까운 별일수록 포인터에 크게 반응한다
-    xy += uPan * vec2(1.2, 0.8) * (uNear * 6.0) / dist * 2.2;
-    // genesis: 입자마다 시차를 두고 중앙에서 퍼져 나온다
+    xy += uPan * vec2(0.05, 0.035) * (uD0 / dist);
     float onset = smoothstep(aSeed * 0.65, aSeed * 0.65 + 0.35, uIntro);
     xy *= mix(1.0 - uIntroSpread, 1.0, onset);
-    gl_Position = vec4(xy / (dist * uTan), 0.0, 1.0);
+    gl_Position = vec4(xy, 0.0, 1.0);
     float t = dist / uDepth;
     float size = (0.9 + aSize * 3.2) * mix(2.4, 0.6, t) * uDpr;
     gl_PointSize = min(size, uMaxPx * uDpr) * onset;
@@ -132,13 +133,14 @@ function start(canvas: HTMLCanvasElement): void {
     uniforms: {
       uFly: { value: 0 },
       uDepth: { value: DEPTH },
+      uD0: { value: 7 },
       uNear: { value: 0.3 },
       uPan: { value: [0, 0] },
       uRoll: { value: 0 },
       uTan: { value: [FOV_TAN, FOV_TAN] },
       uTime: { value: 0 },
       uIntro: { value: 1 },
-      uIntroSpread: { value: 0.55 },
+      uIntroSpread: { value: 0 },
       uDpr: { value: 1 },
       uMaxPx: { value: 3.5 },
       uColor: { value: new Color(0xc2c2c2) },

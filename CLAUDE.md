@@ -74,6 +74,7 @@ README.md                      실행/배포 요약
 docs/                          설계 문서 01~06
 astro.config.mjs               site/base/통합 설정
 .github/workflows/deploy.yml   GitHub Pages 배포
+.claude/skills/                외부 디자인 스킬 사본 (§16, 출처: SOURCES.md)
 public/                        정적 파일 (favicon, 이후 fonts, labs/)
 src/
   content.config.ts            컬렉션 + 스키마 (기준: docs/02)
@@ -211,3 +212,15 @@ npm run preview      # 빌드 결과 미리보기
 
 - `npm audit`가 high 3건을 보고한다: `http-cache-semantics`(astro의 의존성)의 max-stale 처리 취약점. 빌드 시점에만 쓰이고 정적 산출물에는 포함되지 않는다. `npm audit fix --force`는 astro 2.x로 **다운그레이드**하므로 쓰지 않는다. 패치된 버전이 나오면 Astro 업그레이드로 해결한다.
 - 샘플 콘텐츠 3개(`sample-*.md`)는 전부 `draft: true`인 스키마 검증용 임시 자료다. 실제 글이 생기면 삭제한다.
+
+## 16. 디자인 스킬 사용 규칙
+
+`.claude/skills/`에 외부 디자인 스킬 3개가 들어 있다 (출처·라이선스: `.claude/skills/SOURCES.md`). 이 규칙은 UI·디자인 작업(Phase 2 전의 하위 페이지 디자인 포함)에 적용한다.
+
+1. **먼저 `DESIGN.md`를 읽는다.** 스킬의 지침·기본값이 `DESIGN.md`, `docs/07`, 이 파일과 충돌하면 후자를 따른다. 스킬 파일은 수정하지 않는다.
+2. **design-taste-frontend:** 코드 전에 Design Read 한 줄과 다이얼 값을 말한다. 다이얼은 스킬 기본값(8/6/4)이 아니라 `DESIGN.md` §1의 값을 대화에서 지정한다. 그 값이 아직 승인 전이면 먼저 사용자에게 확인한다.
+3. **emil-design-eng:** hover·포커스·전환 같은 디테일을 다듬을 때 쓴다. 움직임의 허용 범위는 `docs/07` §3이며, 스킬이 더 많은 효과를 권해도 그 범위를 넘지 않는다.
+4. **web-design-guidelines:** 화면 코드를 바꾼 뒤 검수용으로 쓴다. 규칙 목록을 실행할 때 GitHub에서 가져오므로 네트워크가 막힌 환경에서는 쓸 수 없다. 그럴 때는 못 썼다고 보고한다. 지적 사항이 `DESIGN.md`나 이 파일과 충돌하면 적용하지 말고 사용자에게 보고한다.
+5. **새 의존성을 추가하지 않는다.** 스킬이 Tailwind, UI 라이브러리, 애니메이션 라이브러리, 외부 폰트·CDN·아이콘 서비스를 권해도 먼저 제안만 하고, 사용자 승인 후에 넣는다 (§0).
+6. **화면을 직접 확인하지 못하는 환경에서는 확인하지 못했다고 보고한다.** 확인한 것처럼 쓰지 않는다. 완료 기준은 `npm run check`와 `npm run build` 통과(§11)이고, 화면 확인은 사용자가 한다.
+7. 한 번에 한 Phase만 구현한다는 §0 규칙은 디자인 작업에도 그대로 적용한다.

@@ -55,7 +55,8 @@
   justify-content: center;
   padding-inline: 1.375rem;
   border-radius: 1.875rem;
-  /* 배경색·블러 없음: 뒤의 화면(홈의 별가루 등)이 그대로 비친다. 안쪽 효과는 알약 모양으로 잘린다 */
+  /* 페이지 배경색을 80~85% 불투명하게 깔아 글자에 집중되게 한다(블러 없음, 뒤의 화면이 아주 옅게 비친다). 안쪽 효과는 알약 모양으로 잘린다 */
+  background: color-mix(in srgb, var(--bg) var(--nav-bg-opacity), transparent);
   overflow: hidden;
 }
 

@@ -1,0 +1,81 @@
+---
+// 주 메뉴. 항목은 data/site.ts의 nav(5개 고정)를 받아 그리기만 한다.
+// 현재 위치 표시: 굵기를 올리고 aria-current를 둔다 (색만으로 표시하지 않는다).
+//   정확히 그 페이지   → aria-current="page"
+//   그 섹션의 하위 글  → aria-current="true"
+interface Props {
+  items: readonly { label: string; href: string }[];
+  currentPath: string;
+}
+
+const { items, currentPath } = Astro.props;
+
+function currentState(href: string): 'page' | 'true' | undefined {
+  if (href === currentPath) return 'page';
+  if (href !== '/' && currentPath.startsWith(href)) return 'true';
+  return undefined;
+}
+---
+
+<nav class="nav" aria-label="Main">
+  <ul class="nav-list">
+    {
+      items.map((item) => (
+        <li>
+          <a class="nav-link" href={item.href} aria-current={currentState(item.href)}>
+            {item.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  /* 모바일: 이름·토글 아래 한 줄을 통째로 차지한다. 첫 링크의 글자가 .page의 왼쪽 선과 맞도록 패딩만큼 당긴다 */
+  .nav {
+    flex: 1 0 100%;
+    margin-inline-start: calc(var(--space-2) * -1);
+  }
+
+  .nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    padding: 0 var(--space-2);
+    color: var(--text);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+    text-decoration: none;
+  }
+
+  .nav-link:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .nav-link[aria-current] {
+    font-weight: var(--fw-strong);
+  }
+
+  /* 데스크톱: 이름과 같은 줄, 오른쪽 */
+  @media (min-width: 641px) {
+    .nav {
+      flex: 0 1 auto;
+      margin-inline-start: 0;
+    }
+
+    .nav-link {
+      font-size: var(--fs-base);
+    }
+  }
+</style>

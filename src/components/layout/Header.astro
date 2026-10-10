@@ -1,0 +1,58 @@
+---
+// 사이트 헤더: 이름(좌) + 메뉴 + 테마 토글. 스크롤해도 고정하지 않는다 (MVP).
+// DOM 순서가 곧 Tab 순서다: 이름 → [모바일 토글] → 메뉴 → [데스크톱 토글].
+// 두 토글 중 화면 폭에 맞는 하나만 보인다 (ThemeToggle.astro 참고).
+import Nav from './Nav.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  name: string;
+  items: readonly { label: string; href: string }[];
+  currentPath: string;
+}
+
+const { name, items, currentPath } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="page header-inner">
+    <a class="site-name" href="/">{name}</a>
+    <ThemeToggle placement="mobile" />
+    <Nav items={items} currentPath={currentPath} />
+    <ThemeToggle placement="desktop" />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .header-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--space-4);
+    min-height: var(--header-h);
+    padding-block: var(--space-2);
+  }
+
+  /* 이름을 왼쪽에 두고, 나머지(토글/메뉴)를 오른쪽으로 민다 */
+  .site-name {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    margin-inline-end: auto;
+    color: var(--text);
+    font-size: var(--fs-m);
+    font-weight: var(--fw-strong);
+    line-height: var(--lh-m);
+    text-decoration: none;
+  }
+
+  .site-name:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+</style>

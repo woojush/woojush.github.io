@@ -1,5 +1,12 @@
 ---
-// Phase 0: 스타일 없는 최소 틀. 디자인 토큰/테마/접근성은 Phase 1에서 구현한다.
+// 모든 페이지의 공통 틀: <html>, <head>, 첫 페인트 전 테마 지정, skip link, header / main / footer.
+// 콘텐츠 조회는 하지 않는다 (docs/05_folder_structure.md 4.2절).
+import '@/styles/tokens.css';
+import '@/styles/fonts.css';
+import '@/styles/base.css';
+import themeInit from '@/scripts/theme-init.js?raw';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
 import { site } from '@/data/site';
 
 interface Props {
@@ -20,19 +27,17 @@ const pageTitle = title === site.name ? title : `${title} — ${site.name}`;
     <meta name="generator" content={Astro.generator} />
     {description && <meta name="description" content={description} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {/* 페이지가 그려지기 전에 data-theme을 지정한다 (다크 모드에서 흰 화면이 번쩍이지 않게). 반드시 인라인 */}
+    <script is:inline set:html={themeInit} />
     <title>{pageTitle}</title>
   </head>
   <body>
-    <header>
-      <a href="/">{site.name}</a>
-      <nav aria-label="Main">
-        <ul>
-          {site.nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
-        </ul>
-      </nav>
-    </header>
-    <main>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+    <Header name={site.name} items={site.nav} currentPath={Astro.url.pathname} />
+    {/* .page: header / footer와 같은 컨테이너라서 왼쪽 선이 맞는다. tabindex=-1: skip link 이동 후 포커스를 받는다 */}
+    <main id="main" class="page" tabindex="-1">
       <slot />
     </main>
+    <Footer name={site.name} links={site.links} />
   </body>
 </html>

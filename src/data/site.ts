@@ -1,4 +1,9 @@
 // 사이트 단위 설정. 개인정보는 확정 전이므로 placeholder를 사용한다 (CLAUDE.md "공개 정보 원칙" 참고).
+export interface SiteLink {
+  label: string;
+  href: string;
+}
+
 export const site = {
   name: 'Shin WooJu', // placeholder — 실명 확정 전
   tagline: 'AI Engineering student', // 학교/정체성 표현은 허용, 구체적 개인정보는 placeholder
@@ -11,4 +16,7 @@ export const site = {
     { label: 'projects', href: '/projects/' },
     { label: 'writing', href: '/writing/' },
   ],
+  // 푸터 링크 (GitHub 등 외부 링크). 비어 있으면 푸터에 링크 영역을 그리지 않는다.
+  // 새 외부 링크/개인정보를 넣기 전에는 사용자에게 확인한다 (CLAUDE.md 4절).
+  links: [] as readonly SiteLink[],
 } as const;

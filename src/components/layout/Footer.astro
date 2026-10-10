@@ -1,0 +1,72 @@
+---
+// 푸터: 링크 몇 개 + 저작권. 링크가 없으면 링크 영역은 그리지 않는다 (빈 상태는 숨긴다).
+interface Props {
+  name: string;
+  links: readonly { label: string; href: string }[];
+}
+
+const { name, links } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="page footer-inner">
+    {
+      links.length > 0 && (
+        <nav aria-label="Footer">
+          <ul class="footer-links">
+            {links.map((link) => (
+              <li>
+                <a class="footer-link" href={link.href}>
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+    <p class="copyright">© {year} {name}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--rule);
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  .footer-inner {
+    padding-block: var(--space-5);
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .footer-link:hover {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .copyright {
+    margin: 0;
+  }
+</style>

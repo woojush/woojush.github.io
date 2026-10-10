@@ -9,6 +9,7 @@
 - **디자인 방향 v2 적용됨** (2026-10-10, `docs/07`): 어두운 기본 테마, 탭 바, 메인 별가루 히어로. Phase 2 전에 하위 페이지별 디자인을 구체화한다.
 - **정보 구조 논의 반영 완료** (2026-10-10): 메뉴 순서 `home projects about knowledge writing`(외부 방문자가 projects를 먼저 보도록), HOME은 NOW + 최근 활동만 유지하되 Selected projects를 Recent보다 위에, ABOUT은 소개 → 학력/스킬 → … → Links 순서(`docs/01` §2·§4). 탭 디자인은 향후 수정 예정(순서·이름은 유지).
 - **한국어만 지원**한다. UI 라벨은 영어를 유지한다. 영어 글·UI 작업은 하지 않는다.
+- **탭 바 캡슐 구현됨** (2026-10-10, `tabbar-v3` 브랜치): 사용자가 Figma 시안으로 지시한 유리 알약·스프링 캡슐·앰버 글로우·입자를 코드로 옮겼다. `docs/07` §3 c와 `DESIGN.md`에 예외로 기록했다. 값은 `tokens.css`의 탭 바 토큰, 동작은 `src/scripts/nav-capsule.ts`.
 - **About 구현됨** (2026-10-10, `about-page` 브랜치): 구성은 Intro → Interests → Why this site → Path(Timeline) → Elsewhere. 문구는 사용자가 직접 쓴 것이다. Intro의 "Robot AI 엔지니어"는 사용자의 표현이며, 사이트 전체의 주제를 한 분야로 제한하지 않는 §1 원칙은 그대로다.
 - GitHub·이메일·LinkedIn은 공개 확정, `site.ts`의 `links`에 추가했다(푸터와 About의 Elsewhere가 같이 쓴다).
 - 다음은 **하위 페이지별 디자인 설계** 단계이고, 그 뒤에 **Phase 2** (글 읽기 파이프라인)다. 사용자 승인 전에는 Phase 2로 넘어가지 않는다.

@@ -55,8 +55,8 @@
   justify-content: center;
   padding-inline: 1.375rem;
   border-radius: 1.875rem;
-  /* 원래 배경: 글자색 7%의 옅은 막 + 뒤 화면 블러. 안쪽 효과는 알약 모양으로 잘린다 */
-  background: color-mix(in srgb, var(--text) 7%, transparent);
+  /* lifestories처럼 색이 있는 면(--surface)을 82% 불투명하게 깔고 뒤 화면 블러를 더한다. 안쪽 효과는 알약 모양으로 잘린다 */
+  background: color-mix(in srgb, var(--surface) var(--nav-bg-opacity), transparent);
   -webkit-backdrop-filter: blur(var(--nav-blur));
   backdrop-filter: blur(var(--nav-blur));
   overflow: hidden;

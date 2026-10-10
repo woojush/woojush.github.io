@@ -53,7 +53,7 @@ const VERT = /* glsl */ `
     float t = dist / uDepth;
     // 원근법: 처음(먼 곳)의 크기에서 시작해, 다가올수록 거리에 반비례하는 쪽으로 점점 커진다
     float size = (0.9 + aSize * 3.2) * 0.6 * pow(uDepth / dist, 0.55) * uDpr;
-    gl_PointSize = clamp(size, 1.0, uMaxPx * uDpr) * onset;
+    gl_PointSize = clamp(size, 3.0 * uDpr, uMaxPx * uDpr) * onset; // 최소 3px(discover의 1px보다 2px 크게)
     // 먼 쪽과 바로 눈앞에서는 흐려진다
     float far = 1.0 - smoothstep(0.55, 1.0, t);
     float near = smoothstep(0.0, 0.08, t);
@@ -64,7 +64,7 @@ const VERT = /* glsl */ `
     float rr = length(xy);
     float edge = smoothstep(0.35, 1.1, rr);
     // 별들이 한 점으로 모이는 한가운데는 비워서, 가운데에 점이 생기지 않고 효과가 자연스럽게 번져 나오게 한다
-    float hole = smoothstep(0.1, 0.5, rr);
+    float hole = smoothstep(0.28, 0.8, rr);
     vAlpha = far * near * tw * onset * (1.0 - 0.7 * edge) * hole;
   }
 `;
@@ -123,7 +123,7 @@ const FRAG = /* glsl */ `
   void main() {
     float r = length(gl_PointCoord - 0.5) * 2.0;
     if (r > 1.0) discard;
-    float a = pow(1.0 - r, 1.6);
+    float a = pow(1.0 - r, 0.9);
     gl_FragColor = vec4(uColor, a * vAlpha * uOpacity);
   }
 `;
@@ -195,7 +195,7 @@ function start(canvas: HTMLCanvasElement): void {
       uIntro: { value: 1 },
       uIntroSpread: { value: 0 },
       uDpr: { value: 1 },
-      uMaxPx: { value: 6 },
+      uMaxPx: { value: 9 },
       uColor: { value: new Color(0xc2c2c2) },
       uOpacity: { value: 0.95 },
     },

@@ -4,13 +4,6 @@
  */
 @property --beam-angle { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
 @property --hub-spin { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
-@property --hover-boost { syntax: '<number>'; inherits: true; initial-value: 0; }
-@property --drift-ax { syntax: '<length>'; inherits: true; initial-value: 0px; }
-@property --drift-ay { syntax: '<length>'; inherits: true; initial-value: 0px; }
-@property --drift-bx { syntax: '<length>'; inherits: true; initial-value: 0px; }
-@property --drift-by { syntax: '<length>'; inherits: true; initial-value: 0px; }
-@property --drift-fx { syntax: '<length>'; inherits: true; initial-value: 0px; }
-@property --drift-fy { syntax: '<length>'; inherits: true; initial-value: 0px; }
 
 /* ───────── 모바일·터치 기본: 이름 아래 한 줄, 글자가 보인다 ───────── */
 .nav {
@@ -64,33 +57,6 @@
   border-radius: 1.875rem;
   /* 배경색·블러 없음: 뒤의 화면(홈의 별가루 등)이 그대로 비친다. 안쪽 효과는 알약 모양으로 잘린다 */
   overflow: hidden;
-  animation: nav-drift-a 12s ease-in-out infinite, nav-drift-b 9s ease-in-out infinite,
-    nav-drift-f 5s ease-in-out infinite;
-}
-
-/* 가장자리에서 번지는 글로우. 원본의 위치·색을 따르고, 천천히 흐른다 */
-.nav-pill::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background:
-    radial-gradient(ellipse 4.375rem 2.1875rem at calc(33% + var(--drift-ax) + var(--drift-fx) * var(--hover-boost)) calc(-7% + var(--drift-ay) + var(--drift-fy) * var(--hover-boost)), var(--glow-tan), transparent),
-    radial-gradient(ellipse 3.75rem 1.875rem at calc(12% + var(--drift-bx) - var(--drift-fx) * var(--hover-boost)) calc(-5% + var(--drift-by) + var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
-    radial-gradient(ellipse 2.5rem 2.5rem at calc(2% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(68% + var(--drift-ay) + var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent),
-    radial-gradient(ellipse 1.25rem 1.75rem at calc(2% + var(--drift-ax) + var(--drift-fx) * var(--hover-boost)) calc(68% + var(--drift-by) - var(--drift-fy) * var(--hover-boost)), var(--glow-green), transparent),
-    radial-gradient(ellipse 11.25rem 1.875rem at calc(74% + var(--drift-ax) - var(--drift-fx) * var(--hover-boost)) calc(100% + var(--drift-ay) + var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
-    radial-gradient(ellipse 5.3125rem 1.5625rem at calc(55% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(100% + var(--drift-by) - var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent),
-    radial-gradient(ellipse 4.625rem 1.875rem at calc(94% + var(--drift-bx) + var(--drift-fx) * var(--hover-boost)) calc(0% + var(--drift-ay) - var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
-    radial-gradient(ellipse 1.625rem 2.1875rem at calc(100% + var(--drift-ax) - var(--drift-fx) * var(--hover-boost)) calc(27% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)), var(--glow-red), transparent);
-  box-shadow: inset 0 0 0.3125rem 0.0625rem rgba(0, 0, 0, 0.14);
-  opacity: 0.55;
-  pointer-events: none;
-  transition:
-    opacity 0.3s var(--ease-custom),
-    filter 0.3s var(--ease-custom),
-    --hover-boost 0.6s var(--ease-custom);
 }
 
 .nav-list {
@@ -142,26 +108,6 @@
   to { --hub-spin: 90deg; }
 }
 
-@keyframes nav-drift-a {
-  0%, 100% { --drift-ax: 0px; --drift-ay: 0px; }
-  25% { --drift-ax: 8px; --drift-ay: -4px; }
-  50% { --drift-ax: -5px; --drift-ay: 6px; }
-  75% { --drift-ax: 4px; --drift-ay: 7px; }
-}
-
-@keyframes nav-drift-b {
-  0%, 100% { --drift-bx: 0px; --drift-by: 0px; }
-  33% { --drift-bx: -6px; --drift-by: 5px; }
-  66% { --drift-bx: 7px; --drift-by: -6px; }
-}
-
-@keyframes nav-drift-f {
-  0%, 100% { --drift-fx: 0px; --drift-fy: 0px; }
-  25% { --drift-fx: 12px; --drift-fy: -8px; }
-  50% { --drift-fx: -10px; --drift-fy: 10px; }
-  75% { --drift-fx: 9px; --drift-fy: -7px; }
-}
-
 /* ───────── 데스크톱(마우스): 위 가운데에 떠 있는 알약 ───────── */
 @media (min-width: 641px) and (hover: hover) {
   .nav {
@@ -178,7 +124,6 @@
   .nav:hover,
   .nav:focus-within {
     width: var(--nav-w-open);
-    --hover-boost: 1;
   }
 
   .nav-pill {
@@ -186,12 +131,6 @@
     padding-inline: 1.25rem;
     /* 가운데 허브 자리를 비운다 */
     mask: radial-gradient(circle, transparent 0.9375rem, #000 1rem);
-  }
-
-  .nav:hover .nav-pill::before,
-  .nav:focus-within .nav-pill::before {
-    opacity: 1;
-    filter: brightness(1.15) saturate(1.3);
   }
 
   .nav-list {
@@ -253,7 +192,7 @@
   .nav-hub span:nth-child(4) { top: calc(50% + 0.09375rem); left: calc(50% + 0.09375rem); }
 
   /* 글자 밑에서 은은하게 올라오는 하얀 빛. 알약 안쪽 아래 가장자리에서 윗부분 1/5만 보이고, 알약 밖으로는 나가지 않는다.
-   * 5rem 높이 중 1rem만 알약 안으로 들어온다(top: 100% - 1rem). 색은 테마의 입자색(--particle: 어두운 테마 흰색) */
+   * 5rem 높이 중 1rem만 알약 안으로 들어온다(top: 100% - 1rem). 색은 어두운 테마에서 순백, 밝은 테마에서는 보이도록 어두운 색(--nav-light) */
   .nav-blob {
     position: absolute;
     top: calc(100% - 1rem);
@@ -264,9 +203,9 @@
     height: 5rem;
     border-radius: 50%;
     background:
-      radial-gradient(circle 1.75rem at 35% 35%, rgba(var(--particle), 0.85), transparent),
-      radial-gradient(circle 1.625rem at 70% 40%, rgba(var(--particle), 0.7), transparent),
-      radial-gradient(circle 1.875rem at 45% 70%, rgba(var(--particle), 0.8), transparent);
+      radial-gradient(circle 1.75rem at 35% 35%, rgba(var(--nav-light), 0.85), transparent),
+      radial-gradient(circle 1.625rem at 70% 40%, rgba(var(--nav-light), 0.7), transparent),
+      radial-gradient(circle 1.875rem at 45% 70%, rgba(var(--nav-light), 0.8), transparent);
     filter: blur(0.625rem);
     opacity: 0;
     transform: translateX(-50%);

@@ -51,8 +51,9 @@ const VERT = /* glsl */ `
     xy *= mix(1.0 - uIntroSpread, 1.0, onset);
     gl_Position = vec4(xy, 0.0, 1.0);
     float t = dist / uDepth;
-    float size = (0.9 + aSize * 3.2) * mix(2.4, 0.6, t) * uDpr;
-    gl_PointSize = min(size, uMaxPx * uDpr) * onset;
+    // 원근법: 점의 크기는 거리에 반비례한다. 멀리서는 티끌, 다가올수록 점점 커진다
+    float size = (0.75 + aSize * 1.6) * (uD0 / dist) * uDpr;
+    gl_PointSize = clamp(size, 0.9 * uDpr, uMaxPx * uDpr) * onset;
     // 먼 쪽과 바로 눈앞에서는 흐려진다
     float far = 1.0 - smoothstep(0.55, 1.0, t);
     float near = smoothstep(0.0, 0.08, t);
@@ -188,7 +189,7 @@ function start(canvas: HTMLCanvasElement): void {
       uIntro: { value: 1 },
       uIntroSpread: { value: 0 },
       uDpr: { value: 1 },
-      uMaxPx: { value: 3.5 },
+      uMaxPx: { value: 8 },
       uColor: { value: new Color(0xc2c2c2) },
       uOpacity: { value: 0.95 },
     },

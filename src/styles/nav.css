@@ -55,8 +55,10 @@
   justify-content: center;
   padding-inline: 1.375rem;
   border-radius: 1.875rem;
-  /* 페이지 배경색을 80~85% 불투명하게 깔아 글자에 집중되게 한다(블러 없음, 뒤의 화면이 아주 옅게 비친다). 안쪽 효과는 알약 모양으로 잘린다 */
-  background: color-mix(in srgb, var(--bg) var(--nav-bg-opacity), transparent);
+  /* 원래 배경: 글자색 7%의 옅은 막 + 뒤 화면 블러. 안쪽 효과는 알약 모양으로 잘린다 */
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  -webkit-backdrop-filter: blur(var(--nav-blur));
+  backdrop-filter: blur(var(--nav-blur));
   overflow: hidden;
 }
 
@@ -193,7 +195,7 @@
   .nav-hub span:nth-child(4) { top: calc(50% + 0.09375rem); left: calc(50% + 0.09375rem); }
 
   /* 글자 밑에서 은은하게 올라오는 하얀 빛. 알약 안쪽 아래 가장자리에서 윗부분 1/5만 보이고, 알약 밖으로는 나가지 않는다.
-   * 5rem 높이 중 1rem만 알약 안으로 들어온다(top: 100% - 1rem). 색은 어두운 테마에서 순백, 밝은 테마에서는 보이도록 어두운 색(--nav-light) */
+   * 5rem 높이 중 1rem만 알약 안으로 들어온다(top: 100% - 1rem). 색은 두 테마 모두 순백(--nav-light) */
   .nav-blob {
     position: absolute;
     top: calc(100% - 1rem);

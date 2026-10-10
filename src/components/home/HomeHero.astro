@@ -152,7 +152,7 @@ const words = title.flatMap((seg) =>
     line-height: var(--lh-m);
   }
 
-  /* 별이 먼저 보이고 그 사이로 다가온다. 메인 문장이 나타나 천천히 커지고, 3초 뒤 아래에 작은 문장이 나타나 같이 커진다.
+  /* 별이 먼저 보이고 그 사이로 다가온다. 메인 문장이 나타나 천천히 커지고, 2초 뒤 아래에 작은 문장이 나타나 같이 커진다.
    * 크기와 사라짐은 home-intro.ts가 --zoom·--hero-fade로 준다. */
   :global(:root[data-intro='play']) .hero-title,
   :global(:root[data-intro='play']) .hero-sub {
@@ -165,7 +165,7 @@ const words = title.flatMap((seg) =>
   }
 
   :global(:root[data-intro='play']) .hero-sub {
-    animation-delay: 5s; /* 메인 문장이 나타나고 3초 뒤 */
+    animation-delay: 4s; /* 메인 문장이 나타나고 2초 뒤 (intro-timeline.ts의 T_SUB) */
   }
 
   @keyframes appear {

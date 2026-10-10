@@ -55,7 +55,7 @@ if (root.dataset.intro === 'play' && hero && inner) {
     const f = introFrame(clock);
     inner!.style.setProperty('--zoom', f.scale.toFixed(4));
     hero!.style.setProperty('--hero-fade', f.fade.toFixed(3));
-    scene?.update(flySpeed(f.rate), f.climax, Math.min(elapsed, 0.1), clock, f.stars);
+    scene?.update(flySpeed(f.rate), f.boost, Math.min(elapsed, 0.1), clock, f.stars);
     if (clock >= T_END) {
       finish();
       return;

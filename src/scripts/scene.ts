@@ -51,8 +51,8 @@ const VERT = /* glsl */ `
     xy *= mix(1.0 - uIntroSpread, 1.0, onset);
     gl_Position = vec4(xy, 0.0, 1.0);
     float t = dist / uDepth;
-    // 원근법: 점의 크기는 거리에 반비례한다. 멀리서는 티끌, 다가올수록 점점 커진다
-    float size = (0.75 + aSize * 1.6) * (uD0 / dist) * uDpr;
+    // 원근법: 처음(먼 곳)의 크기에서 시작해, 다가올수록 거리에 반비례하는 쪽으로 점점 커진다
+    float size = (0.9 + aSize * 3.2) * 0.6 * pow(uDepth / dist, 0.55) * uDpr;
     gl_PointSize = clamp(size, 0.9 * uDpr, uMaxPx * uDpr) * onset;
     // 먼 쪽과 바로 눈앞에서는 흐려진다
     float far = 1.0 - smoothstep(0.55, 1.0, t);
@@ -61,8 +61,11 @@ const VERT = /* glsl */ `
     float ph = aSeed * 40.0;
     float sp = 1.0 + fract(aSeed * 7.31) * 3.0;
     float tw = 0.35 + 0.65 * (0.5 + 0.5 * sin(uTime * 1.6 * sp + ph) * sin(uTime * 1.1 * sp + ph * 1.7));
-    float edge = smoothstep(0.35, 1.1, length(xy));
-    vAlpha = far * near * tw * onset * (1.0 - 0.7 * edge);
+    float rr = length(xy);
+    float edge = smoothstep(0.35, 1.1, rr);
+    // 별들이 한 점으로 모이는 한가운데는 비워서, 가운데에 점이 생기지 않고 효과가 자연스럽게 번져 나오게 한다
+    float hole = smoothstep(0.06, 0.34, rr);
+    vAlpha = far * near * tw * onset * (1.0 - 0.7 * edge) * hole;
   }
 `;
 
@@ -74,14 +77,14 @@ const STREAK_VERT = /* glsl */ `
   uniform vec2 uPan;
   uniform float uRoll;
   uniform float uTime;
-  uniform float uStreak;     // 꼬리 길이(깊이 단위)
+  uniform float uStreak;     // 꼬리 길이(거리 비율. 화면 위치에 비례해 테두리 쪽일수록 길다)
   uniform float uAb;         // 색수차 방향(-1, 0, +1)
   attribute float aEnd;      // 0 = 머리(현재 위치), 1 = 꼬리(조금 먼 위치)
   attribute float aSeed;
   attribute float aZ;
   varying float vAlpha;
   void main() {
-    float dist = uNear + mod(aZ - uFly, uDepth) + aEnd * uStreak;
+    float dist = (uNear + mod(aZ - uFly, uDepth)) * (1.0 + aEnd * uStreak);
     float c = cos(uRoll), s = sin(uRoll);
     vec2 p = vec2(position.x * c - position.y * s, position.x * s + position.y * c);
     vec2 xy = p * (uD0 / dist) + uPan * vec2(0.05, 0.035) * (uD0 / dist);
@@ -217,7 +220,7 @@ function start(canvas: HTMLCanvasElement): void {
   sGeo.setAttribute('aSeed', new BufferAttribute(sSeed, 1));
   sGeo.setAttribute('aZ', new BufferAttribute(sZ, 1));
   const streakMats = [
-    { ab: 0, color: new Color(0xc2c2c2), opacity: 0.4 },
+    { ab: 0, color: new Color(0xc2c2c2), opacity: 0.3 },
     { ab: 1, color: new Color(1.0, 0.25, 0.2), opacity: 0.16 },
     { ab: -1, color: new Color(0.25, 0.45, 1.0), opacity: 0.16 },
   ].map((m, i) => {
@@ -236,7 +239,7 @@ function start(canvas: HTMLCanvasElement): void {
         uPan: material.uniforms.uPan,
         uRoll: material.uniforms.uRoll,
         uTime: material.uniforms.uTime,
-        uStreak: { value: 0.16 },
+        uStreak: { value: 0.045 },
         uAb: { value: m.ab },
         uColor: { value: m.color },
         uOpacity: { value: m.opacity },

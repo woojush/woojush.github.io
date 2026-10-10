@@ -8,10 +8,9 @@ export const site = {
   name: 'Shin WooJu', // 실명 공개 확정 (2026-10-10)
   tagline: 'AI Engineering student', // 학교/정체성 표현은 허용
   defaultLang: 'ko',
-  // 메뉴는 5개 고정. 추가 조건은 docs/01_information_architecture.md 7절. UI 표기는 소문자, 라벨은 영어.
-  // 순서: 외부 방문자가 projects를 먼저 보도록 두 번째에 둔다 (2026-10-10). 탭 디자인은 향후 수정 예정.
+  // 메뉴는 4개 고정(home은 메뉴에서 뺐다: 이름과 탭 바 가운데 허브가 홈 링크, 2026-10-10). 추가 조건은 docs/01_information_architecture.md 7절.
+  // UI 표기는 소문자, 라벨은 영어. 순서: 외부 방문자가 projects를 먼저 보도록 첫 번째에 둔다. 탭 바는 4개를 가운데 허브 양쪽에 둘씩 나눈다.
   nav: [
-    { label: 'home', href: '/' },
     { label: 'projects', href: '/projects/' },
     { label: 'about', href: '/about/' },
     { label: 'knowledge', href: '/knowledge/' },

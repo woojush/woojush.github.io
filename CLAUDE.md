@@ -7,9 +7,9 @@
 
 - **Phase 0 완료** (배포 가능한 최소 기반 검증), **Phase 1 완료·승인됨** (2026-10-10, 디자인 토큰과 사이트 틀).
 - **디자인 방향 v2 적용됨** (2026-10-10, `docs/07`): 어두운 기본 테마, 탭 바, 메인 별가루 히어로. Phase 2 전에 하위 페이지별 디자인을 구체화한다.
-- **정보 구조 논의 반영 완료** (2026-10-10): 메뉴 순서 `home projects about knowledge writing`(외부 방문자가 projects를 먼저 보도록), HOME은 NOW + 최근 활동만 유지하되 Selected projects를 Recent보다 위에, ABOUT은 소개 → 학력/스킬 → … → Links 순서(`docs/01` §2·§4). 탭 디자인은 향후 수정 예정(순서·이름은 유지).
+- **정보 구조 논의 반영 완료** (2026-10-10): 메뉴 순서 `projects about knowledge writing`(외부 방문자가 projects를 먼저 보도록, home은 메뉴에서 제외), HOME은 NOW + 최근 활동만 유지하되 Selected projects를 Recent보다 위에, ABOUT은 `docs/01` §4.2. 탭 바 디자인은 사용자가 직접 수정할 수 있다(순서·이름은 유지).
 - **한국어만 지원**한다. UI 라벨은 영어를 유지한다. 영어 글·UI 작업은 하지 않는다.
-- **탭 바 캡슐 구현됨** (2026-10-10, `tabbar-v3` 브랜치): 사용자가 Figma 시안으로 지시한 유리 알약·스프링 캡슐·앰버 글로우·입자를 코드로 옮겼다. `docs/07` §3 c와 `DESIGN.md`에 예외로 기록했다. 값은 `tokens.css`의 탭 바 토큰, 동작은 `src/scripts/nav-capsule.ts`.
+- **탭 바 v4 구현됨** (2026-10-10, `tabbar-v4` 브랜치): 사용자 지시로 lifestories.org의 상단 알약을 그대로 따랐다. 평소에는 화면 위 가운데에 떠 있는 작은 알약(가운데 허브)이고, 마우스가 올라가면 스프링으로 늘어나며 글자가 모인다. 글자에 마우스를 올리면 알약 아래쪽에서 은은한 빛이 따라온다. **home은 메뉴에서 뺐고** 이름과 허브가 홈 링크다. 모양은 `src/styles/nav.css`, 값은 `tokens.css`의 탭 바 토큰, 동작은 `src/scripts/nav.ts`. 이 효과는 `docs/07` §3 c·`DESIGN.md`의 승인된 예외다.
 - **About 구현됨** (2026-10-10, `about-page` 브랜치): 구성은 Intro → Interests → Why this site → Path(Timeline) → Elsewhere. 문구는 사용자가 직접 쓴 것이다. Intro의 "Robot AI 엔지니어"는 사용자의 표현이며, 사이트 전체의 주제를 한 분야로 제한하지 않는 §1 원칙은 그대로다.
 - GitHub·이메일·LinkedIn은 공개 확정, `site.ts`의 `links`에 추가했다(푸터와 About의 Elsewhere가 같이 쓴다).
 - 다음은 **하위 페이지별 디자인 설계** 단계이고, 그 뒤에 **Phase 2** (글 읽기 파이프라인)다. 사용자 승인 전에는 Phase 2로 넘어가지 않는다.
@@ -32,7 +32,7 @@ Learn → Build → Explain → Reflect 과정을 쌓는 개인 아카이브다.
 
 ## 2. 정보 구조
 
-메뉴는 **5개 고정**, UI 표기는 **소문자·영어 라벨**: `home` `projects` `about` `knowledge` `writing`.
+메뉴는 **4개 고정**, UI 표기는 **소문자·영어 라벨**: `projects` `about` `knowledge` `writing`. 홈은 메뉴가 아니라 사이트 이름(헤더 왼쪽)과 탭 바 가운데 허브로 간다.
 새 메뉴는 `docs/01` 7절 조건(기존 type에 안 담기는 콘텐츠 10개 이상 + 찾기 어려움)을 둘 다 만족할 때만 추가한다.
 
 | URL | 역할 |

@@ -104,8 +104,8 @@ const words = title.flatMap((seg) =>
     line-height: var(--lh-m);
   }
 
-  /* 별이 먼저 보이고 그 사이로 다가온다. 메인 문장이 한 번에 나타나 천천히 작아지고,
-   * 3초 뒤 아래에 작은 문장이 나타나 같이 작아진다. 움직임을 줄이는 설정이면 처음부터 보이고 커지지 않는다. */
+  /* 별이 먼저 보이고 그 사이로 다가온다. 메인 문장이 한 번에 나타나면서 천천히 커지고(별이 다가오는 것과 같은 방향),
+   * 3초 뒤 아래에 작은 문장이 나타나 같이 커진다. 움직임을 줄이는 설정이면 처음부터 보이고 커지지 않는다. */
   @media (prefers-reduced-motion: no-preference) {
     .hero-inner {
       animation: approach 18s cubic-bezier(0.2, 0.6, 0.3, 1) 2s both;
@@ -128,10 +128,10 @@ const words = title.flatMap((seg) =>
 
   @keyframes approach {
     from {
-      transform: scale(1.1);
+      transform: scale(0.94);
     }
     to {
-      transform: scale(0.94);
+      transform: scale(1.1);
     }
   }
 

@@ -82,8 +82,8 @@ const FRAG = /* glsl */ `
 `;
 
 export interface SceneHandle {
-  /** 한 프레임 그린다. flySpeed: 앞으로 날아오는 속도(깊이 단위/초), boost: 마지막 확대의 진행(0~1), clock: 장면이 시작한 뒤의 초 */
-  update(flySpeed: number, boost: number, dt: number, clock: number): void;
+  /** 한 프레임 그린다. flySpeed: 앞으로 날아오는 속도(깊이 단위/초), boost: 마지막 확대의 진행(0~1), clock: 장면이 시작한 뒤의 초, alpha: 장면 전체의 투명도 배수(0~1) */
+  update(flySpeed: number, boost: number, dt: number, clock: number, alpha: number): void;
 }
 
 export function startScene(canvas: HTMLCanvasElement): SceneHandle {
@@ -216,7 +216,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
     render();
   }
 
-  function update(flySpeed: number, boost: number, dt: number, clock: number): void {
+  function update(flySpeed: number, boost: number, dt: number, clock: number, alpha: number): void {
     if (reduce.matches) return;
     intro = Math.min(1, intro + dt / FADE_SECONDS);
     px += (tx - px) * Math.min(1, dt * 2.2);
@@ -228,7 +228,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
     u.uBoost.value = boost;
     u.uPan.value = [px, py];
     u.uRoll.value = clock * 0.004;
-    canvas.style.opacity = String(ease(intro));
+    canvas.style.opacity = String(ease(intro) * alpha);
     render();
   }
 

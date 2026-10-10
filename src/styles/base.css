@@ -198,25 +198,6 @@ a {
   animation-duration: var(--duration-slow);
 }
 
-/* 메인 인트로가 끝나 자동으로 넘어올 때만(home-intro.ts가 home-zoom을 붙인다): 별이 쏟아져 지나간 화면 위로
- * 새 화면이 살짝 크게 시작해 제자리로 들어온다. 타입을 못 쓰는 브라우저는 위의 크로스페이드만 쓴다. */
-@media (prefers-reduced-motion: no-preference) {
-  :root:active-view-transition-type(home-zoom)::view-transition-new(root) {
-    animation: zoom-arrive var(--duration-zoom) cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  :root:active-view-transition-type(home-zoom)::view-transition-old(root) {
-    animation-duration: var(--duration-zoom);
-  }
-}
-
-@keyframes zoom-arrive {
-  from {
-    opacity: 0;
-    transform: scale(1.08);
-  }
-}
-
 /* 떠 있는 탭 바는 페이지를 옮겨도 그대로 둔다 (두 페이지의 같은 요소끼리 교차 페이드하지 않는다) */
 ::view-transition-old(site-nav),
 ::view-transition-new(site-nav) {

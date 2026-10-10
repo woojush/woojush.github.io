@@ -24,8 +24,11 @@ export const site = {
       { text: '쌓아 가는 기록.', strong: true },
     ],
     sub: '지식, 프로젝트, 글이 함께 자라는 개인 아카이브.',
-    // 인트로(확대)가 끝나면 자동으로 넘어가는 화면. 프로필 성격의 ABOUT으로 연결한다 (2026-10-10)
-    next: '/about/',
+  },
+  // 홈 화면(인트로가 끝난 뒤)의 프로필. 한 줄 소개는 About의 lead를 그대로 쓴다. 사진은 public/images/profile.(jpg|jpeg|png|webp)에
+  // 사용자가 직접 올린 경우에만 보인다 (src/lib/profile.ts).
+  profile: {
+    summary: '가천대학교에서 인공지능을 공부하며 Robot AI 엔지니어를 목표로 합니다. 배우고 만들고 쓴 것을 이곳에 쌓아 갑니다.',
   },
   // 푸터와 About의 Elsewhere가 같이 쓰는 링크. 비어 있으면 두 곳 모두 그리지 않는다.
   // GitHub·이메일·LinkedIn은 사용자가 공개를 확인했다 (2026-10-10). LinkedIn 주소는 한글 슬러그라 퍼센트 인코딩했다.

@@ -27,3 +27,38 @@ export async function getTimeline() {
   if (!entry) throw new Error('src/data/timeline.yaml 이 없다.');
   return entry.data.entries;
 }
+
+export async function getNow() {
+  const entry = await getEntry('now', 'now');
+  if (!entry) throw new Error('src/data/now.yaml 이 없다.');
+  return entry.data;
+}
+
+export interface ContentRow {
+  href: string;
+  title: string;
+  /** 제목 아래/오른쪽에 붙는 설명 (프로젝트는 summary, 글은 종류) */
+  meta?: string;
+  date?: Date;
+}
+
+// HOME의 Projects: 진행 중(active)인 것만. featured가 먼저, 그다음 최신순
+export async function getActiveProjects(limit: number): Promise<ContentRow[]> {
+  const entries = (await getEntries('projects')).filter((e) => e.data.status === 'active');
+  entries.sort((a, b) => Number(b.data.featured) - Number(a.data.featured));
+  return entries.slice(0, limit).map((e) => ({
+    href: `/projects/${e.id}/`,
+    title: e.data.title,
+    meta: e.data.summary,
+  }));
+}
+
+// HOME의 Recent: writing과 knowledge를 합쳐 최신순. projects는 위 Projects에 있으므로 넣지 않는다
+export async function getRecentPosts(limit: number): Promise<ContentRow[]> {
+  const [writing, knowledge] = await Promise.all([getEntries('writing'), getEntries('knowledge')]);
+  const rows: ContentRow[] = [
+    ...writing.map((e) => ({ href: `/writing/${e.id}/`, title: e.data.title, meta: 'writing', date: e.data.date })),
+    ...knowledge.map((e) => ({ href: `/knowledge/${e.id}/`, title: e.data.title, meta: 'knowledge', date: e.data.date })),
+  ];
+  return rows.sort((a, b) => b.date!.valueOf() - a.date!.valueOf()).slice(0, limit);
+}

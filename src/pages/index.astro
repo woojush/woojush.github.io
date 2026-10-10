@@ -1,10 +1,45 @@
 ---
-// HOME. 지금은 첫 화면(히어로)만 있다. NOW/Recent/Selected는 Phase 4에서 구현한다.
+// HOME. 첫 방문에는 인트로(HomeHero)가 먼저 돌고, 끝나면 같은 화면에서 프로필·NOW·프로젝트·최근 글이 나타난다.
+// 비어 있는 섹션은 그리지 않는다 (CLAUDE.md 8절).
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import HomeHero from '@/components/home/HomeHero.astro';
+import HomeProfile from '@/components/home/HomeProfile.astro';
+import HomeNow from '@/components/home/HomeNow.astro';
+import HomeList from '@/components/home/HomeList.astro';
+import { getAbout, getActiveProjects, getNow, getRecentPosts } from '@/lib/content';
+import { getProfilePhoto } from '@/lib/profile';
 import { site } from '@/data/site';
+
+const about = await getAbout();
+const now = await getNow();
+const projects = await getActiveProjects(3);
+const recent = await getRecentPosts(5);
 ---
 
 <BaseLayout title={site.name}>
-  <HomeHero title={site.hero.title} sub={site.hero.sub} next={site.hero.next} />
+  <HomeHero title={site.hero.title} sub={site.hero.sub} />
+  <div class="home">
+    <HomeProfile name={site.name} lead={about.data.lead} summary={site.profile.summary} photo={getProfilePhoto()} />
+    <HomeNow items={now.items} />
+    <HomeList id="projects" heading="Projects" rows={projects} moreHref="/projects/" />
+    <HomeList id="recent" heading="Recent" rows={recent} />
+  </div>
 </BaseLayout>
+
+<style>
+  /* 인트로가 끝나면(data-intro="done") 어둠 속에서 나타난다. 인트로가 도는 동안은 감춘다 */
+  :global(:root[data-intro='play']) .home {
+    visibility: hidden;
+  }
+
+  :global(:root[data-intro='done']) .home {
+    animation: home-in var(--duration-reveal) cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes home-in {
+    from {
+      opacity: 0;
+      transform: scale(0.985);
+    }
+  }
+</style>

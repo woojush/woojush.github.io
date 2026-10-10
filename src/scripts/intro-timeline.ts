@@ -13,13 +13,13 @@ export const T_TITLE = 2;
 export const T_SUB = 5;
 export const SUB_ZOOM_SECONDS = 3; // 작은 문장이 나타난 뒤 이만큼 커지고 나서 마지막 확대가 시작된다
 export const T_CLIMAX = T_SUB + SUB_ZOOM_SECONDS;
-export const CLIMAX_SECONDS = 2.4;
+export const CLIMAX_SECONDS = 4.5; // 마지막 확대의 길이(4~5초)
 export const T_END = T_CLIMAX + CLIMAX_SECONDS;
 
-const SCALE_START = 0.9; // 문장이 나타날 때의 크기(배)
+const SCALE_START = 1; // 문장이 나타날 때의 크기(배). 1에서 시작해 커지기만 한다(글자를 한 번 그린 크기보다 작아지지 않는다)
 const SCALE_END = 24; // 마지막 확대가 끝날 때의 크기(배). 이때 문구는 이미 투명하다
-const RATE_START = 0.03; // 문장이 나타날 때의 확대 비율(로그, 1/s)
-const RATE_CLIMAX = 0.1; // 마지막 확대 직전의 확대 비율. 여기서 끊김 없이 이어서 빨라진다
+const RATE_START = 0.02; // 문장이 나타날 때의 확대 비율(로그, 1/s)
+const RATE_CLIMAX = 0.066; // 마지막 확대 직전의 확대 비율. 여기서 끊김 없이 이어서 빨라진다
 
 const GROW_SECONDS = T_CLIMAX - T_TITLE;
 const LOG_AT_CLIMAX = RATE_START * GROW_SECONDS + ((RATE_CLIMAX - RATE_START) * GROW_SECONDS) / 2;
@@ -40,7 +40,9 @@ export interface IntroFrame {
   fade: number;
   /** 마지막 확대의 진행(0~1). 별을 더 밝고 크게 하는 데 쓴다 */
   climax: number;
-  /** 다음 화면으로 넘어갈 때가 되었는가 */
+  /** 별 장면의 투명도 배수(0~1). 마지막 확대의 끝에서 어둠 속으로 사라진다 */
+  stars: number;
+  /** 인트로가 끝나 홈 화면을 보여줄 때가 되었는가 */
   done: boolean;
 }
 
@@ -51,20 +53,20 @@ const smoothstep = (a: number, b: number, x: number) => {
 
 /**
  * 시각 t(초)의 인트로 상태. hold가 참이면 마지막 확대 직전(T_CLIMAX)에서 멈춘 채로 둔다
- * (뒤로 가기로 돌아온 경우처럼 자동으로 넘어가면 안 될 때).
+ * (필요하면 마지막 확대 없이 머무르게 하는 용도).
  */
 export function introFrame(t: number, hold = false): IntroFrame {
   const held = hold && t >= T_CLIMAX;
   const time = held ? T_CLIMAX : t;
 
   if (time <= T_TITLE) {
-    return { scale: SCALE_START, rate: 0, fade: 1, climax: 0, done: false };
+    return { scale: SCALE_START, rate: 0, fade: 1, climax: 0, stars: 1, done: false };
   }
   if (time <= T_CLIMAX) {
     const u = time - T_TITLE;
     const log = RATE_START * u + ((RATE_CLIMAX - RATE_START) * u * u) / (2 * GROW_SECONDS);
     const rate = held ? RATE_CLIMAX : RATE_START + ((RATE_CLIMAX - RATE_START) * u) / GROW_SECONDS;
-    return { scale: SCALE_START * Math.exp(log), rate, fade: 1, climax: 0, done: false };
+    return { scale: SCALE_START * Math.exp(log), rate, fade: 1, climax: 0, stars: 1, done: false };
   }
 
   const tau = Math.min(1, (time - T_CLIMAX) / CLIMAX_SECONDS);
@@ -75,6 +77,7 @@ export function introFrame(t: number, hold = false): IntroFrame {
     scale: SCALE_START * Math.exp(log),
     rate,
     fade: 1 - smoothstep(0.45, 0.95, tau),
+    stars: 1 - smoothstep(0.72, 1, tau),
     climax: tau,
     done: time >= T_END,
   };

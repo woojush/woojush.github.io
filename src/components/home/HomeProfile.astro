@@ -1,0 +1,60 @@
+---
+// 홈의 프로필: 사진(있을 때만) + 이름 + 한 줄 소개 + 짧은 설명. 데이터를 받아 그리기만 한다.
+interface Props {
+  name: string;
+  lead?: string;
+  summary: string;
+  photo: string | null;
+}
+
+const { name, lead, summary, photo } = Astro.props;
+---
+
+<section class="profile" aria-labelledby="home-name">
+  {photo && <img class="photo" src={photo} alt={name} width="120" height="150" decoding="async" />}
+  <div class="text">
+    <h1 id="home-name">{name}</h1>
+    {lead && <p class="lead">{lead}</p>}
+    <p class="summary">{summary}</p>
+  </div>
+</section>
+
+<style>
+  .profile {
+    display: flex;
+    gap: var(--space-6);
+    align-items: flex-start;
+  }
+
+  /* 사진은 세로로 긴 4:5 한 장. 장식 그림자 없이 얇은 선만 둔다 */
+  .photo {
+    flex: none;
+    width: 120px;
+    height: 150px;
+    object-fit: cover;
+    border: 1px solid var(--rule);
+  }
+
+  h1 {
+    margin-bottom: var(--space-2);
+  }
+
+  .lead {
+    margin-bottom: var(--space-4);
+    font-size: var(--fs-m);
+    line-height: var(--lh-m);
+    font-weight: var(--fw-strong);
+  }
+
+  .summary {
+    margin-bottom: 0;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 480px) {
+    .profile {
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+  }
+</style>

@@ -1,0 +1,97 @@
+---
+// 홈의 행 목록(Projects, Recent). 카드가 아니라 행이다. 데이터가 없으면 아무것도 그리지 않는다.
+import { formatDate } from '@/lib/format';
+import type { ContentRow } from '@/lib/content';
+
+interface Props {
+  id: string;
+  heading: string;
+  rows: readonly ContentRow[];
+  /** 목록 전체로 가는 링크 (선택) */
+  moreHref?: string;
+}
+
+const { id, heading, rows, moreHref } = Astro.props;
+---
+
+{
+  rows.length > 0 && (
+    <section aria-labelledby={`home-${id}`}>
+      <h2 id={`home-${id}`}>{heading}</h2>
+      <ul>
+        {rows.map((row) => (
+          <li class:list={['row', { dated: !!row.date }]}>
+            {row.date && <time datetime={row.date.toISOString().slice(0, 10)}>{formatDate(row.date)}</time>}
+            <a href={row.href}>{row.title}</a>
+            {row.meta && <span class="meta">{row.meta}</span>}
+          </li>
+        ))}
+      </ul>
+      {moreHref && (
+        <p class="more">
+          <a href={moreHref}>전체 보기</a>
+        </p>
+      )}
+    </section>
+  )
+}
+
+<style>
+  h2 {
+    margin-top: var(--space-7);
+    font-size: var(--fs-l);
+    line-height: var(--lh-l);
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* 프로젝트: 제목 | 설명 */
+  .row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-4);
+    align-items: baseline;
+    padding-block: var(--space-2);
+    border-top: 1px solid var(--rule);
+  }
+
+  /* 글: 날짜 | 제목 | 종류 */
+  .row.dated {
+    grid-template-columns: 6.5rem 1fr auto;
+  }
+
+  .row a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .row a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  time,
+  .meta {
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  .more {
+    margin: var(--space-3) 0 0;
+    font-size: var(--fs-s);
+  }
+
+  @media (max-width: 480px) {
+    .row,
+    .row.dated {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+</style>

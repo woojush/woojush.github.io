@@ -1,6 +1,8 @@
 ---
-// 주 메뉴. 항목은 data/site.ts의 nav(5개 고정)를 받아 그리기만 한다.
-// 현재 위치 표시: 굵기를 올리고 aria-current를 둔다 (색만으로 표시하지 않는다).
+// 주 메뉴(탭 바). 항목은 data/site.ts의 nav(5개 고정)를 받아 그리기만 한다.
+// 현재 위치 표시: 활성 탭 뒤의 표시(.nav-indicator) + 굵기 + aria-current (색만으로 표시하지 않는다).
+// 탭처럼 보이지만 각각 별도 페이지의 일반 링크다 (ARIA tabs 아님). 페이지를 옮기면 .nav-indicator가
+// 같은 view-transition-name 덕분에 이전 탭에서 새 탭으로 미끄러진다 (base.css의 @view-transition).
 //   정확히 그 페이지   → aria-current="page"
 //   그 섹션의 하위 글  → aria-current="true"
 interface Props {
@@ -20,61 +22,87 @@ function currentState(href: string): 'page' | 'true' | undefined {
 <nav class="nav" aria-label="Main">
   <ul class="nav-list">
     {
-      items.map((item) => (
-        <li>
-          <a class="nav-link" href={item.href} aria-current={currentState(item.href)}>
-            {item.label}
-          </a>
-        </li>
-      ))
+      items.map((item) => {
+        const state = currentState(item.href);
+        return (
+          <li>
+            <a class="nav-link" href={item.href} aria-current={state}>
+              {state && <span class="nav-indicator" aria-hidden="true" />}
+              <span class="nav-text">{item.label}</span>
+            </a>
+          </li>
+        );
+      })
     }
   </ul>
 </nav>
 
 <style>
-  /* 모바일: 이름·토글 아래 한 줄을 통째로 차지한다. 첫 링크의 글자가 .page의 왼쪽 선과 맞도록 패딩만큼 당긴다 */
+  /* 모바일: 이름·토글 아래 한 줄을 통째로 차지한다. 탭 5개가 320px에서도 한 줄에 들어간다 */
   .nav {
     flex: 1 0 100%;
-    margin-inline-start: calc(var(--space-2) * -1);
   }
 
   .nav-list {
     display: flex;
-    flex-wrap: wrap;
+    justify-content: space-between;
     margin: 0;
-    padding: 0;
+    padding: var(--space-1);
     list-style: none;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+  }
+
+  .nav-list li {
+    flex: 1 1 auto;
+    display: flex;
   }
 
   .nav-link {
+    position: relative;
+    flex: 1 1 auto;
     display: inline-flex;
     align-items: center;
-    min-height: var(--tap);
+    justify-content: center;
+    min-height: 40px;
     padding: 0 var(--space-2);
-    color: var(--text);
+    color: var(--text-muted);
     font-size: var(--fs-s);
     line-height: var(--lh-s);
     text-decoration: none;
+    transition: color var(--duration) var(--ease);
   }
 
-  .nav-link:hover {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
+  .nav-link:hover,
+  .nav-link[aria-current] {
+    color: var(--text);
   }
 
   .nav-link[aria-current] {
     font-weight: var(--fw-strong);
   }
 
+  .nav-text {
+    position: relative; /* 표시 위로 올린다 */
+  }
+
+  .nav-indicator {
+    position: absolute;
+    inset: 0;
+    background: var(--surface);
+    border-radius: var(--radius);
+    view-transition-name: nav-indicator;
+  }
+
   /* 데스크톱: 이름과 같은 줄, 오른쪽 */
   @media (min-width: 641px) {
     .nav {
       flex: 0 1 auto;
-      margin-inline-start: 0;
     }
 
     .nav-link {
+      min-width: 88px;
+      padding: 0 var(--space-4);
       font-size: var(--fs-base);
     }
   }

@@ -112,7 +112,9 @@ Phase 1에서 추가됨: `src/components/layout/`(Header, Nav, Footer, ThemeTogg
 - import는 `@/` 별칭(= `src/`)을 쓴다.
 - 내부 링크는 trailing slash로 통일한다 (`/about/`). `trailingSlash: 'always'`.
 
-## 8. 디자인 원칙 (기준: `docs/04`, 구현은 Phase 1부터)
+## 8. 디자인 원칙 (기준: `docs/07` 우선, 그다음 `docs/04`)
+
+**2026-10-10 방향 변경 (로컬 작업 중, 사용자 승인 전):** 어두운 테마 기본(dark ↔ light, system 없음), 상단 탭 바 + View Transitions, 메인 한정 별가루·문구 등장. 아래 목록은 이에 맞게 완화됐다: 모션은 `docs/07` §3의 허용 범위만 쓴다. 카드 그리드·장식 그림자/그라디언트·CTA 히어로·eyebrow 라벨 금지는 유지.
 
 Minimal · Technical · Editorial · Calm · Personal · Typography-driven · 여백 많음.
 
@@ -191,7 +193,8 @@ npm run preview      # 빌드 결과 미리보기
 
 ## 13-1. Phase 1에서 확정한 구현 사실
 
-- **테마**: `<html data-theme="system|light|dark">`. 첫 페인트 전에 `src/scripts/theme-init.js`를 BaseLayout이 `?raw`로 읽어 `<script is:inline>`으로 박는다(번들되지 않으므로 짧게 유지). 저장 키는 `theme`(system은 저장하지 않음). dark 토큰 값은 `tokens.css`의 두 곳(명시적 dark / system일 때의 OS dark)에 있으니 **항상 같이 고친다.**
+- **테마(2026-10-10 변경: dark 기본, dark ↔ light)**: `<html data-theme="light|dark">`, 저장은 light일 때만. 아래 system 관련 서술은 옛 방식.
+- **(옛)테마**: `<html data-theme="system|light|dark">`. 첫 페인트 전에 `src/scripts/theme-init.js`를 BaseLayout이 `?raw`로 읽어 `<script is:inline>`으로 박는다(번들되지 않으므로 짧게 유지). 저장 키는 `theme`(system은 저장하지 않음). dark 토큰 값은 `tokens.css`의 두 곳(명시적 dark / system일 때의 OS dark)에 있으니 **항상 같이 고친다.**
 - **테마 전환 순간**: `theme-toggle.ts`가 `<html data-theme-switching>`을 잠깐 붙여 transition을 끈다(배경은 즉시, 링크 색만 140ms 늦게 바뀌는 프레임 방지). 새 transition을 넣어도 이 규칙(`base.css`)이 덮는다.
 - **토글 2개**: 헤더가 ThemeToggle을 두 번 렌더링(`placement=mobile|desktop`)하고 640px 경계에서 하나만 보인다. Tab 순서를 화면 순서와 맞추기 위한 것이므로 하나로 합치지 않는다. 토글 라벨은 JS가 아니라 CSS가 `data-theme`를 보고 표시한다.
 - **레이아웃**: header/main/footer 안쪽 컨테이너는 모두 `.page`(`--page-max` 880px)를 쓴다. 본문 폭 680px(`--measure`)은 `main`의 제목·p·목록에만 적용되며, 코드·표·Embed 같은 넓은 요소는 거기에 넣지 않는다.

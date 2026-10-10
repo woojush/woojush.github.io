@@ -1,0 +1,102 @@
+---
+// 메인(/)의 첫 화면: 배경 별가루 + 단어가 차례로 떠오르는 큰 문구 (한 번만, docs/07).
+// 문구는 data/site.ts의 hero를 받아 그리기만 한다. 배경 동작은 src/scripts/starfield.ts.
+interface Segment {
+  text: string;
+  strong?: boolean;
+}
+interface Props {
+  title: readonly Segment[];
+  sub: string;
+}
+
+const { title, sub } = Astro.props;
+
+// 문구를 어절 단위로 쪼개 단어마다 등장 순서(--i)를 준다. 강조는 굵기로만 한다 (색 아님)
+const words = title.flatMap((seg) =>
+  seg.text
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => ({ w, strong: !!seg.strong })),
+);
+---
+
+<canvas class="starfield" data-starfield aria-hidden="true"></canvas>
+
+<section class="hero">
+  <h1 class="hero-title">
+    {
+      words.map((item, i) => (
+        <>
+          <span class:list={['word', { strong: item.strong }]} style={`--i:${i}`}>
+            {item.w}
+          </span>{' '}
+        </>
+      ))
+    }
+  </h1>
+  <p class="hero-sub" style={`--i:${words.length}`}>{sub}</p>
+</section>
+
+<script>
+  import '@/scripts/starfield.ts';
+</script>
+
+<style>
+  .starfield {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 62dvh;
+  }
+
+  .hero-title {
+    max-width: var(--page-max);
+    margin: 0 0 var(--space-6);
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    font-weight: var(--fw-regular);
+  }
+
+  .word.strong {
+    font-weight: var(--fw-strong);
+  }
+
+  .hero-sub {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--fs-m);
+    line-height: var(--lh-m);
+  }
+
+  /* 움직임을 줄이는 설정이 아닐 때만, 처음엔 숨겨 두었다가 순서대로 떠오른다 */
+  @media (prefers-reduced-motion: no-preference) {
+    .word,
+    .hero-sub {
+      opacity: 0;
+      transform: translateY(0.35em);
+      animation: rise var(--duration-slow) var(--ease-out) forwards;
+    }
+
+    .word,
+    .hero-sub {
+      animation-delay: calc(300ms + var(--i) * 90ms);
+    }
+  }
+
+  @keyframes rise {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

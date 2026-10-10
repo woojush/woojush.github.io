@@ -182,3 +182,38 @@ a {
     scroll-behavior: auto !important;
   }
 }
+
+/* ───────── 페이지 전환 (docs/07) ─────────
+ * 같은 사이트 안에서 링크를 따라가면 브라우저가 이전/새 페이지를 크로스페이드하고,
+ * 이름이 붙은 요소(헤더, 탭 표시)는 따로 이동시킨다. 미지원 브라우저는 평소처럼 이동한다.
+ * 움직임을 줄이는 설정이면 켜지 않는다.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+::view-transition-group(root) {
+  animation-duration: var(--duration-slow);
+}
+
+::view-transition-group(nav-indicator) {
+  animation-duration: var(--duration-slow);
+  animation-timing-function: var(--ease-out);
+}
+
+/* 헤더는 두 페이지의 같은 요소끼리 교차 페이드하지 않고 그대로 둔다 */
+::view-transition-old(site-header),
+::view-transition-new(site-header) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* 캔버스가 있는 메인 위로 헤더·본문·푸터가 올라오게 한다 */
+.site-header,
+main,
+.site-footer {
+  position: relative;
+  z-index: 1;
+}

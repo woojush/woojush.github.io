@@ -1,5 +1,5 @@
 ---
-// 사이트 헤더: 이름(좌) + 메뉴 + 테마 토글. 스크롤해도 고정하지 않는다 (MVP).
+// 사이트 헤더: 이름(좌) + 탭 바 + 테마 토글. 스크롤해도 고정하지 않는다. 선 대신 탭 바 자체가 구분선 역할.
 // DOM 순서가 곧 Tab 순서다: 이름 → [모바일 토글] → 메뉴 → [데스크톱 토글].
 // 두 토글 중 화면 폭에 맞는 하나만 보인다 (ThemeToggle.astro 참고).
 import Nav from './Nav.astro';
@@ -24,8 +24,9 @@ const { name, items, currentPath } = Astro.props;
 </header>
 
 <style>
+  /* 페이지를 옮겨도 헤더는 제자리에 있고 탭 표시만 움직이게 따로 분리한다 (view transition) */
   .site-header {
-    border-bottom: 1px solid var(--rule);
+    view-transition-name: site-header;
   }
 
   .header-inner {

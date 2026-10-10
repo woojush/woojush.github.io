@@ -16,6 +16,15 @@ export const site = {
     { label: 'projects', href: '/projects/' },
     { label: 'writing', href: '/writing/' },
   ],
+  // 메인 첫 화면 문구. 강조(strong)는 굵기로만 표시한다. 개인정보 없이 방향만 쓴다.
+  hero: {
+    title: [
+      { text: '배우고', strong: true },
+      { text: '만들고 설명하고 돌아본 것을' },
+      { text: '쌓아 가는 기록.', strong: true },
+    ],
+    sub: '지식, 프로젝트, 글이 함께 자라는 개인 아카이브.',
+  },
   // 푸터 링크 (GitHub 등 외부 링크). 비어 있으면 푸터에 링크 영역을 그리지 않는다.
   // 새 외부 링크/개인정보를 넣기 전에는 사용자에게 확인한다 (CLAUDE.md 4절).
   links: [] as readonly SiteLink[],

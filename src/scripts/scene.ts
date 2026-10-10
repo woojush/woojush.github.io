@@ -53,7 +53,7 @@ const VERT = /* glsl */ `
     float t = dist / uDepth;
     // 원근법: 처음(먼 곳)의 크기에서 시작해, 다가올수록 거리에 반비례하는 쪽으로 점점 커진다
     float size = (0.9 + aSize * 3.2) * 0.6 * pow(uDepth / dist, 0.55) * uDpr;
-    gl_PointSize = clamp(size, 0.9 * uDpr, uMaxPx * uDpr) * onset;
+    gl_PointSize = clamp(size, 1.0, uMaxPx * uDpr) * onset;
     // 먼 쪽과 바로 눈앞에서는 흐려진다
     float far = 1.0 - smoothstep(0.55, 1.0, t);
     float near = smoothstep(0.0, 0.08, t);
@@ -64,7 +64,7 @@ const VERT = /* glsl */ `
     float rr = length(xy);
     float edge = smoothstep(0.35, 1.1, rr);
     // 별들이 한 점으로 모이는 한가운데는 비워서, 가운데에 점이 생기지 않고 효과가 자연스럽게 번져 나오게 한다
-    float hole = smoothstep(0.06, 0.34, rr);
+    float hole = smoothstep(0.1, 0.5, rr);
     vAlpha = far * near * tw * onset * (1.0 - 0.7 * edge) * hole;
   }
 `;
@@ -77,6 +77,7 @@ const STREAK_VERT = /* glsl */ `
   uniform vec2 uPan;
   uniform float uRoll;
   uniform float uTime;
+  uniform float uMotion;     // 1 = 비행 중, 0 = 멈춤(줄무늬가 사라진다)
   uniform float uStreak;     // 꼬리 길이(거리 비율. 화면 위치에 비례해 테두리 쪽일수록 길다)
   uniform float uAb;         // 색수차 방향(-1, 0, +1)
   attribute float aEnd;      // 0 = 머리(현재 위치), 1 = 꼬리(조금 먼 위치)
@@ -94,13 +95,15 @@ const STREAK_VERT = /* glsl */ `
     gl_Position = vec4(xy, 0.0, 1.0);
     float t = dist / uDepth;
     float far = 1.0 - smoothstep(0.55, 1.0, t);
-    float near = smoothstep(0.0, 0.08, t);
+    float near = smoothstep(0.06, 0.2, t);
     float ph = aSeed * 40.0;
     float sp = 1.0 + fract(aSeed * 7.31) * 3.0;
     float tw = 0.45 + 0.55 * (0.5 + 0.5 * sin(uTime * 1.6 * sp + ph) * sin(uTime * 1.1 * sp + ph * 1.7));
     // 중앙에서는 점, 테두리 쪽에서만 줄무늬가 보인다. 꼬리 끝은 투명
     float edge = smoothstep(0.55, 1.15, r);
-    vAlpha = far * near * tw * edge * (1.0 - aEnd);
+    // 화면 밖으로 크게 벗어난 별(눈앞을 지나가는 별)의 긴 선은 그리지 않는다
+    float inside = 1.0 - smoothstep(1.3, 2.0, r);
+    vAlpha = far * near * tw * edge * inside * uMotion * (1.0 - aEnd);
   }
 `;
 
@@ -192,7 +195,7 @@ function start(canvas: HTMLCanvasElement): void {
       uIntro: { value: 1 },
       uIntroSpread: { value: 0 },
       uDpr: { value: 1 },
-      uMaxPx: { value: 8 },
+      uMaxPx: { value: 6 },
       uColor: { value: new Color(0xc2c2c2) },
       uOpacity: { value: 0.95 },
     },
@@ -239,6 +242,7 @@ function start(canvas: HTMLCanvasElement): void {
         uPan: material.uniforms.uPan,
         uRoll: material.uniforms.uRoll,
         uTime: material.uniforms.uTime,
+        uMotion: { value: 1 },
         uStreak: { value: 0.045 },
         uAb: { value: m.ab },
         uColor: { value: m.color },
@@ -287,6 +291,9 @@ function start(canvas: HTMLCanvasElement): void {
   let last = 0;
   let intro = 0;
   const FADE_SECONDS = 1.6; // 캔버스가 나타나는 시간(별의 위치·크기는 그대로)
+  const FLIGHT_HOLD = 14; // 초: 이 시간까지 계속 날아간다
+  const FLIGHT_STOP = 20; // 초: 이때 완전히 멈춘다(문구의 움직임이 끝나는 때)
+  let fly = 0;
   const FLY_SPEED = 0.8; // 초당 깊이 이동량(36 중): 이미 있는 별이 천천히 앞으로 다가온다
   const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 
@@ -303,7 +310,12 @@ function start(canvas: HTMLCanvasElement): void {
     py += (ty - py) * Math.min(1, dt * 2.2);
     const u = material.uniforms;
     u.uTime.value = clock;
-    u.uFly.value = clock * FLY_SPEED;
+    // 문구가 다 움직인 뒤에는 비행이 서서히 멈추고, 가운데에서 퍼지는 줄무늬도 함께 사라진다
+    const k = Math.min(1, Math.max(0, (clock - FLIGHT_HOLD) / (FLIGHT_STOP - FLIGHT_HOLD)));
+    const motion = 1 - k * k * (3 - 2 * k);
+    fly += FLY_SPEED * motion * dt;
+    u.uFly.value = fly;
+    streakMats.forEach((m) => (m.mat.uniforms.uMotion.value = motion));
     u.uPan.value = [px, py];
     u.uRoll.value = clock * 0.004;
     canvas.style.opacity = String(ease(intro));
@@ -323,6 +335,7 @@ function start(canvas: HTMLCanvasElement): void {
       u.uIntro.value = 1;
       u.uFly.value = 0;
       u.uTime.value = 1.7;
+      streakMats.forEach((m) => (m.mat.uniforms.uMotion.value = 0));
       canvas.style.opacity = '1';
       render();
     } else if (!document.hidden) {

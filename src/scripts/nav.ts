@@ -12,7 +12,7 @@ if (nav && blob) {
     const n = nav!.getBoundingClientRect();
     const r = link.getBoundingClientRect();
     // 빛이 안 보이는 상태에서 처음 나타날 때는 이동 전환 없이 그 자리에 놓는다
-    if (blob!.style.opacity !== '1') {
+    if (blob!.style.opacity !== '0.5') {
       blob!.style.transition = 'none';
       blob!.style.translate = `${r.left - n.left + r.width / 2}px 0`;
       void blob!.offsetWidth;
@@ -20,7 +20,7 @@ if (nav && blob) {
     } else {
       blob!.style.translate = `${r.left - n.left + r.width / 2}px 0`;
     }
-    blob!.style.opacity = '1';
+    blob!.style.opacity = '0.5';
   }
 
   function hide() {

@@ -6,6 +6,7 @@
 ## 0. 현재 상태
 
 - **Phase 0 완료** (배포 가능한 최소 기반 검증), **Phase 1 완료·승인됨** (2026-10-10, 디자인 토큰과 사이트 틀).
+- **디자인 방향 v2 적용됨** (2026-10-10, `docs/07`): 어두운 기본 테마, 탭 바, 메인 별가루 히어로. Phase 2 전에 하위 페이지별 디자인을 구체화한다.
 - 다음은 **Phase 2** (글 읽기 파이프라인). 사용자 승인 전에는 Phase 2로 넘어가지 않는다.
 - 진행 순서와 각 Phase의 완료 기준: `docs/06_implementation_plan.md`
 - 한 번에 **한 Phase만** 구현하고, 끝나면 완료 기준별 결과를 보고한 뒤 승인을 기다린다.
@@ -86,6 +87,7 @@ src/
   pages/                       라우팅. 얇게 유지
 ```
 
+디자인 v2에서 추가됨: `docs/07`, `src/components/home/HomeHero.astro`, `src/scripts/starfield.ts`.
 Phase 1에서 추가됨: `src/components/layout/`(Header, Nav, Footer, ThemeToggle), `src/styles/{tokens,fonts,base}.css`, `src/scripts/{theme-init.js,theme-toggle.ts}`, `public/fonts/pretendard/`.
 이후에 추가될 것: `src/components/{content,home,about,mdx}/`, `src/styles/prose.css`, `src/lib/{topics,links,format}.ts`, `public/labs/`. 구조 명세는 `docs/05`.
 
@@ -114,7 +116,7 @@ Phase 1에서 추가됨: `src/components/layout/`(Header, Nav, Footer, ThemeTogg
 
 ## 8. 디자인 원칙 (기준: `docs/07` 우선, 그다음 `docs/04`)
 
-**2026-10-10 방향 변경 (로컬 작업 중, 사용자 승인 전):** 어두운 테마 기본(dark ↔ light, system 없음), 상단 탭 바 + View Transitions, 메인 한정 별가루·문구 등장. 아래 목록은 이에 맞게 완화됐다: 모션은 `docs/07` §3의 허용 범위만 쓴다. 카드 그리드·장식 그림자/그라디언트·CTA 히어로·eyebrow 라벨 금지는 유지.
+**2026-10-10 방향 변경 (사용자 승인·적용됨):** 어두운 테마 기본(dark ↔ light, system 없음), 상단 탭 바 + View Transitions, 메인 한정 별가루·문구 등장. 아래 목록은 이에 맞게 완화됐다: 모션은 `docs/07` §3의 허용 범위만 쓴다. 카드 그리드·장식 그림자/그라디언트·CTA 히어로·eyebrow 라벨 금지는 유지.
 
 Minimal · Technical · Editorial · Calm · Personal · Typography-driven · 여백 많음.
 
@@ -193,8 +195,7 @@ npm run preview      # 빌드 결과 미리보기
 
 ## 13-1. Phase 1에서 확정한 구현 사실
 
-- **테마(2026-10-10 변경: dark 기본, dark ↔ light)**: `<html data-theme="light|dark">`, 저장은 light일 때만. 아래 system 관련 서술은 옛 방식.
-- **(옛)테마**: `<html data-theme="system|light|dark">`. 첫 페인트 전에 `src/scripts/theme-init.js`를 BaseLayout이 `?raw`로 읽어 `<script is:inline>`으로 박는다(번들되지 않으므로 짧게 유지). 저장 키는 `theme`(system은 저장하지 않음). dark 토큰 값은 `tokens.css`의 두 곳(명시적 dark / system일 때의 OS dark)에 있으니 **항상 같이 고친다.**
+- **테마**: `<html data-theme="dark|light">`, **dark가 기본**(system 없음, JS가 꺼져도 dark). 첫 페인트 전에 `src/scripts/theme-init.js`를 BaseLayout이 `?raw`로 읽어 `<script is:inline>`으로 박는다(번들되지 않으므로 짧게 유지). 저장 키는 `theme`이고 light일 때만 저장한다. 토큰 값은 `tokens.css`의 `:root`(dark)와 `:root[data-theme='light']` 두 블록에만 있다.
 - **테마 전환 순간**: `theme-toggle.ts`가 `<html data-theme-switching>`을 잠깐 붙여 transition을 끈다(배경은 즉시, 링크 색만 140ms 늦게 바뀌는 프레임 방지). 새 transition을 넣어도 이 규칙(`base.css`)이 덮는다.
 - **토글 2개**: 헤더가 ThemeToggle을 두 번 렌더링(`placement=mobile|desktop`)하고 640px 경계에서 하나만 보인다. Tab 순서를 화면 순서와 맞추기 위한 것이므로 하나로 합치지 않는다. 토글 라벨은 JS가 아니라 CSS가 `data-theme`를 보고 표시한다.
 - **레이아웃**: header/main/footer 안쪽 컨테이너는 모두 `.page`(`--page-max` 880px)를 쓴다. 본문 폭 680px(`--measure`)은 `main`의 제목·p·목록에만 적용되며, 코드·표·Embed 같은 넓은 요소는 거기에 넣지 않는다.

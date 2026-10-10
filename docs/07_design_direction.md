@@ -34,7 +34,7 @@ Phase 1의 결과가 "정적이고 AI 느낌"이라는 피드백. 원인은 (1) 
 
 ## 5. 구성
 
-- **상단 탭 바:** 메뉴 5개(home/about/knowledge/projects/writing)를 알약형 탭 바로 표시. 각각 별도 URL의 일반 링크(ARIA tabs 아님).
+- **상단 탭 바:** 메뉴 5개(home/projects/about/knowledge/writing, 2026-10-10 순서 변경)를 알약형 탭 바로 표시. 각각 별도 URL의 일반 링크(ARIA tabs 아님). **탭 디자인은 사용자가 향후 수정할 예정**이므로 현재 모양은 임시안이며, 순서와 이름만 유지한다.
 - **메인(`/`):** 배경 별가루 + 큰 문구 + 한 줄 설명. NOW·최근 활동은 Phase 4에서 아래에 추가.
 - **읽는 페이지(knowledge, writing, about):** 조용하게 유지. 별가루 등 메인 전용 효과 없음.
 

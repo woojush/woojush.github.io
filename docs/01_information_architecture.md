@@ -23,7 +23,7 @@
 
 ## 2. 사이트맵
 
-내비게이션은 **5개 고정**이며 UI 표기는 소문자다: `home` `about` `knowledge` `projects` `writing` (최종 결정).
+내비게이션은 **5개 고정**이며 UI 표기는 소문자, UI 라벨은 영어다: `home` `projects` `about` `knowledge` `writing` (최종 결정, 2026-10-10 순서 변경: 외부 방문자가 projects를 먼저 보도록 projects를 두 번째로 올림. 탭 디자인은 향후 수정 예정이며 순서·이름은 그대로 유지).
 
 | URL | 메뉴 | 역할 | 내용의 출처 |
 |-----|------|------|------------|
@@ -62,7 +62,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│ WooJu          about  knowledge  projects  writing ◐ │   ← header
+│ WooJu          projects  about  knowledge  writing ◐ │   ← header
 ├─────────────────────────────────────────────────────┤
 │                                                     │
 │ WooJu                                               │
@@ -74,6 +74,9 @@
 │   Exploring   (자유 문장)                             │
 │   Thinking    (자유 문장)                             │
 │                                                     │
+│ Selected projects                                   │
+│   Projection Visualizer — 한 줄 요약          active │
+│                                                     │
 │ Recent knowledge                                    │
 │   2026-09-24  Projection                    growing │
 │   2026-09-10  Orthogonality                    seed │
@@ -81,15 +84,13 @@
 │ Recent writing                                      │
 │   2026-09-30  (제목)                       reflection │
 │                                                     │
-│ Selected projects                                   │
-│   Projection Visualizer — 한 줄 요약          active │
-│                                                     │
 └─────────────────────────────────────────────────────┘
 ```
 
 규칙:
 
-- **NOW만 손으로 편집**한다 (`data/now.yaml`). 나머지(Recent …)는 자동 집계.
+- **NOW만 손으로 편집**한다 (`data/now.yaml`). 나머지(Selected projects, Recent …)는 자동 집계. HOME은 NOW + 최근 활동만 유지한다(2026-10-10 확정).
+- **표시 순서: NOW → Selected projects → Recent knowledge → Recent writing.** 외부 방문자에게 만든 것이 먼저 보여야 하기 때문이다(2026-10-10 결정).
 - NOW는 `Learning / Building / Exploring / Thinking` 4행으로 시작하되, **행 목록 자체가 데이터**라서 행을 추가/삭제/이름 변경해도 코드를 건드리지 않는다.
 - `Selected projects`는 프로젝트 파일의 `featured: true`로 선택한다 (최대 3개 표시).
 - 콘텐츠가 아직 없는 섹션은 **섹션 전체를 숨긴다**. 빈 상자나 "Coming soon"을 두지 않는다. (초기에는 NOW와 소개만 보이는 것이 정상)
@@ -100,20 +101,24 @@
 ```
 About
   Who I am                  짧은 소개
+  Education / Skills        학력과 현재 가능한 것 (간결한 목록)
   What I'm interested in    관심사 (확정이 아니라 "현재 관심")
   How I learn               공부 방식
   What I build              만드는 것의 성격
   Career direction          방향 (미확정이면 미확정이라고 씀)
-  Philosophy                가치관
   Timeline                  data/timeline.yaml
-  Education / Experience / Skills   하단에 간결한 목록
+  Philosophy                가치관
+  Links                     GitHub, 이메일 (페이지 완성 후 추가, 비어 있으면 숨김)
 ```
+
+순서의 이유 (2026-10-10 결정): 일반적인 개인 사이트·포트폴리오의 About은 소개 → 학력·스킬 → 연락·링크 같은 사실 정보를 앞에 두고 성찰적 내용을 뒤에 둔다. 교수·채용 담당자가 먼저 찾는 정보를 앞에 배치한다.
 
 규칙:
 
 - About은 **연 1~2회** 고치는 페이지다. 자주 바뀌는 내용은 NOW로 보낸다.
 - Timeline은 시간 축의 *방향*을 보여준다. 군 복무는 타임라인의 한 항목일 뿐, 사이트의 주제가 아니다. (브리프 17번 항목 준수)
 - Skills는 "현재 가능한 것"만 적고, 레벨 바/퍼센트 같은 시각화는 하지 않는다.
+- Links(GitHub, 이메일)는 공개하기로 했으나 **페이지 완성 후** 추가한다. 추가 전에는 섹션을 숨기고 `site.ts`의 `links`도 비워 둔다. 푸터 링크와 같은 데이터를 쓴다.
 
 ### 4.3 KNOWLEDGE
 

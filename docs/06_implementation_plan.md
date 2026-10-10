@@ -15,7 +15,7 @@
 | 정보 구조 | 5개 메뉴, 세 컬렉션(knowledge/projects/writing), `/tags/[tag]` | 구조가 곧 이 프로젝트의 본체 |
 | 콘텐츠 모델 | frontmatter 스키마 검증, `links` + 자동 backlink, `topic` 트리 자동 생성 | 이후 모든 글이 이 모델 위에 쌓이므로 처음에 맞아야 함 |
 | HOME | 정체성 소개 + NOW + Recent knowledge/writing + Selected projects (비어 있으면 숨김) | |
-| ABOUT | 본문 + Timeline | |
+| ABOUT | 본문 + Timeline (순서: 소개 → 학력/스킬 → 관심사 → … → Links, `docs/01` §4.2) | |
 | 글 읽기 | Markdown, KaTeX, Shiki, TOC, Mermaid(지연 로드), `<Embed>`(iframe) | 브리프 14번이 "반드시"로 요구한 확장 포인트가 실제로 동작함을 증명 |
 | 디자인 | 토큰 시스템, 다크/라이트(3상태, flash 없음), 반응형 헤더, 포커스·키보드 기본 | |
 | 배포 | GitHub Actions → GitHub Pages | |
@@ -88,7 +88,7 @@
 | **만드는 것** | `NowBlock`, `Timeline`, Home 페이지, About 페이지, `data/now.yaml`, `data/timeline.yaml`, `data/site.ts` |
 | **무엇이 가능해지나** | 사이트의 입구가 완성된다. `now.yaml`만 고치면 Home이 현재의 나를 보여준다 |
 | **왜 이 순서인가** | Home은 다른 영역을 **요약해서 보여주는** 페이지라서 요약할 대상(목록, 관계)이 완성된 뒤에 만든다. 또한 Home과 About의 소개 문구는 사용자의 직접적인 입력이 필요한데, 앞 단계가 진행되는 동안 문구를 준비할 시간이 생긴다 |
-| **완료 기준** | ① `now.yaml`에 행을 하나 추가하면 코드 수정 없이 Home에 반영 ② 콘텐츠가 비어 있는 섹션은 숨겨지고 NOW와 소개만으로도 어색하지 않음 ③ Timeline이 모바일에서도 읽힘 |
+| **완료 기준** | ① `now.yaml`에 행을 하나 추가하면 코드 수정 없이 Home에 반영 ② 콘텐츠가 비어 있는 섹션은 숨겨지고 NOW와 소개만으로도 어색하지 않음 ③ Timeline이 모바일에서도 읽힘 ④ Home의 섹션 순서가 NOW → Selected projects → Recent knowledge/writing이고, 프로젝트가 없으면 Selected projects가 숨겨짐 ⑤ About의 Links는 비어 있으면 숨겨짐 |
 
 ### Phase 5. 마감
 
@@ -134,7 +134,7 @@
 
 | # | 질문 | 선택지 | 추천 | 추천 이유 |
 |---|------|--------|------|-----------|
-| 1 | **사이트 언어** | (a) 한국어 중심 (b) 영어 중심 (c) 글마다 `lang`으로 지정, UI 문구는 영어 | **(c)** | 글의 언어를 글 단위로 고르면 이후 방향이 바뀌어도 사이트 구조를 건드리지 않음 |
+| 1 | **사이트 언어** | (a) 한국어 중심 (b) 영어 중심 (c) 글마다 `lang`으로 지정, UI 문구는 영어 | **(c)** → **2026-10-10 갱신: 한국어만 지원, UI 라벨은 영어 유지** | 글마다 `lang`(기본 `ko`)은 구조만 열어 두고, 영어 글·영어 UI 작업은 하지 않는다 |
 | 2 | **저장소 이름 / 도메인** | (a) `<username>.github.io` (b) 다른 이름의 프로젝트 사이트 (c) 커스텀 도메인 | **(a) 또는 (c)** | 루트 경로가 되어 `base` 설정 문제가 없음 |
 | 3 | **저장소 공개 여부** | public / private | **public** | 무료 플랜에서 Pages 사용에 일반적으로 필요. 단, 초안 글은 소스에서 보임 |
 | 4 | **About에 공개할 정보 범위** | 이름, 사진, 학교, 군 복무 언급 여부, 연락처 | 사용자가 결정 | 공개 후 되돌리기 어려운 정보라서 설계가 아니라 본인의 판단이 필요 |

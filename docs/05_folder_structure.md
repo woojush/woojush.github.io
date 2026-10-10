@@ -179,7 +179,7 @@ MDX 계층         Embed, Callout, Figure             (글 본문 안에서만 �
 | `Related` | 관계 목록(`rel`, `type`, `title`, `href`) | `rel`별로 묶어 표시. 비면 렌더링하지 않음 | 관계 계산 |
 | `TableOfContents` | 헤딩 배열 | 목차 + 현재 섹션 강조 | |
 | `Embed` | `src`, `title`, `height`, `caption?` | iframe + 프레임 + 캡션 | 시각화 내용 |
-| `ThemeToggle` | 없음 | system→light→dark 순환 | |
+| `ThemeToggle` | 없음 | dark↔light 전환 (2026-10-10 이후, system 없음) | |
 
 ### 4.3 이름 규칙
 

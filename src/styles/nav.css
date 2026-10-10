@@ -4,6 +4,13 @@
  */
 @property --beam-angle { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
 @property --hub-spin { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
+@property --drift-ax { syntax: '<length>'; inherits: true; initial-value: 0; }
+@property --drift-ay { syntax: '<length>'; inherits: true; initial-value: 0; }
+@property --drift-bx { syntax: '<length>'; inherits: true; initial-value: 0; }
+@property --drift-by { syntax: '<length>'; inherits: true; initial-value: 0; }
+@property --drift-fx { syntax: '<length>'; inherits: true; initial-value: 0; }
+@property --drift-fy { syntax: '<length>'; inherits: true; initial-value: 0; }
+@property --hover-boost { syntax: '<number>'; inherits: true; initial-value: 0; }
 
 /* ───────── 모바일·터치 기본: 이름 아래 한 줄, 글자가 보인다 ───────── */
 .nav {
@@ -11,24 +18,43 @@
   flex: 1 0 100%;
   height: var(--nav-h);
   border-radius: 1.875rem;
-  animation: nav-beam 32s linear infinite;
+  animation: nav-beam 8s linear infinite;
 }
 
-/* 알약 테두리를 따라 아주 천천히 도는 붉은 빛과 푸른 빛. 각각 둘레의 1/6(60°)만 보이고 서로 반대편에서 돈다.
- * 선이 아니라 알약 안쪽으로 번지는 은은한 빛(.nav-pill::before)이다. */
-.nav-pill::before {
+/* 알약 테두리를 도는 빛줄기 (lifestories.org 그대로: 검은 빛줄기, 8초, 1px 테두리 + blur) */
+.nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 0.0625rem;
+  border-radius: inherit;
   background: conic-gradient(
     from var(--beam-angle, 0deg),
     transparent 0%,
-    rgba(var(--glitter-red), 0.9) 8.33%,
-    transparent 16.67%,
-    transparent 50%,
-    rgba(var(--glitter-blue), 0.9) 58.33%,
-    transparent 66.67%,
-    transparent 100%
+    transparent 58%,
+    rgba(0, 0, 0, 0.02) 62%,
+    rgba(0, 0, 0, 0.08) 65%,
+    rgba(0, 0, 0, 0.2) 67%,
+    rgba(0, 0, 0, 0.4) 69%,
+    rgba(0, 0, 0, 0.6) 70%,
+    rgba(0, 0, 0, 0.6) 70.5%,
+    rgba(0, 0, 0, 0.4) 71.5%,
+    rgba(0, 0, 0, 0.2) 73%,
+    rgba(0, 0, 0, 0.08) 75%,
+    rgba(0, 0, 0, 0.02) 78%,
+    transparent 82%
   );
+  mask:
+    linear-gradient(#fff, #fff) content-box,
+    linear-gradient(#fff, #fff);
+  mask-composite: exclude;
+  filter: blur(0.5rem) brightness(1.3) saturate(1.4);
+  pointer-events: none;
+  will-change: transform;
 }
 
+/* 알약 면: 반투명 배경 + 뒤 화면 블러 (lifestories.org 그대로) */
 .nav-pill {
   position: absolute;
   inset: 0;
@@ -38,27 +64,40 @@
   justify-content: center;
   padding-inline: 1.375rem;
   border-radius: 1.875rem;
-  /* 옅은 회색빛(배경+글자색 7%)을 82% 불투명하게 깔고 뒤 화면 블러를 더한다. 그 위로 붉은·푸른 빛이 번진다. 안쪽 효과는 알약 모양으로 잘린다 */
-  background: color-mix(in srgb, color-mix(in srgb, var(--text) var(--nav-bg-tint), var(--bg)) var(--nav-bg-opacity), transparent);
-  -webkit-backdrop-filter: blur(var(--nav-blur));
-  backdrop-filter: blur(var(--nav-blur));
+  background: var(--nav-pill-bg);
+  -webkit-backdrop-filter: blur(0.9375rem);
+  backdrop-filter: blur(0.9375rem);
   overflow: hidden;
 }
 
+/* 알약 안쪽 가장자리에서 천천히 떠도는 색 빛 (lifestories.org 그대로: 8개 타원 + 안쪽 그림자, drift 3종) */
 .nav-pill::before {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 0;
-  padding: 0.5rem;
+  z-index: -1;
   border-radius: inherit;
-  mask:
-    linear-gradient(#fff, #fff) content-box,
-    linear-gradient(#fff, #fff);
-  mask-composite: exclude;
-  filter: blur(0.75rem);
-  opacity: 1;
+  background:
+    radial-gradient(ellipse 4.375rem 2.1875rem at calc(33% + var(--drift-ax) + var(--drift-fx) * var(--hover-boost)) calc(-7% + var(--drift-ay) + var(--drift-fy) * var(--hover-boost)), var(--glow-tan), transparent),
+    radial-gradient(ellipse 3.75rem 1.875rem at calc(12% + var(--drift-bx) - var(--drift-fx) * var(--hover-boost)) calc(-5% + var(--drift-by) + var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
+    radial-gradient(ellipse 2.5rem 2.5rem at calc(2% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(68% + var(--drift-ay) + var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent),
+    radial-gradient(ellipse 1.25rem 1.75rem at calc(2% + var(--drift-ax) + var(--drift-fx) * var(--hover-boost)) calc(68% + var(--drift-by) - var(--drift-fy) * var(--hover-boost)), var(--glow-green), transparent),
+    radial-gradient(ellipse 11.25rem 1.875rem at calc(74% + var(--drift-ax) - var(--drift-fx) * var(--hover-boost)) calc(100% + var(--drift-ay) + var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
+    radial-gradient(ellipse 5.3125rem 1.5625rem at calc(55% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(100% + var(--drift-by) - var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent),
+    radial-gradient(ellipse 4.625rem 1.875rem at calc(94% + var(--drift-bx) + var(--drift-fx) * var(--hover-boost)) calc(0% + var(--drift-ay) - var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
+    radial-gradient(ellipse 1.625rem 2.1875rem at calc(100% + var(--drift-ax) - var(--drift-fx) * var(--hover-boost)) calc(27% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)), var(--glow-blue), transparent),
+    radial-gradient(ellipse 3.25rem 2.5rem at calc(100% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(27% + var(--drift-ay) - var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent);
+  box-shadow: inset 0 0 0.3125rem 0.0625rem rgba(0, 0, 0, 0.14);
+  opacity: 0.9;
   pointer-events: none;
+  transition:
+    opacity 0.3s var(--ease-custom),
+    filter 0.3s var(--ease-custom),
+    --hover-boost 0.6s var(--ease-custom);
+  animation:
+    nav-drift-a 12s ease-in-out infinite,
+    nav-drift-b 9s ease-in-out infinite,
+    nav-drift-fast 5s ease-in-out infinite;
 }
 
 .nav-list {
@@ -105,6 +144,29 @@
   to { --beam-angle: 360deg; }
 }
 
+@keyframes nav-drift-a {
+  0% { --drift-ax: 0px; --drift-ay: 0px; }
+  25% { --drift-ax: 8px; --drift-ay: -4px; }
+  50% { --drift-ax: -5px; --drift-ay: 6px; }
+  75% { --drift-ax: 4px; --drift-ay: 7px; }
+  100% { --drift-ax: 0px; --drift-ay: 0px; }
+}
+
+@keyframes nav-drift-b {
+  0% { --drift-bx: 0px; --drift-by: 0px; }
+  33% { --drift-bx: -6px; --drift-by: 5px; }
+  66% { --drift-bx: 7px; --drift-by: -6px; }
+  100% { --drift-bx: 0px; --drift-by: 0px; }
+}
+
+@keyframes nav-drift-fast {
+  0% { --drift-fx: 0px; --drift-fy: 0px; }
+  25% { --drift-fx: 12px; --drift-fy: -8px; }
+  50% { --drift-fx: -10px; --drift-fy: 10px; }
+  75% { --drift-fx: 9px; --drift-fy: -7px; }
+  100% { --drift-fx: 0px; --drift-fy: 0px; }
+}
+
 @keyframes nav-spin {
   from { --hub-spin: 0deg; }
   to { --hub-spin: 90deg; }
@@ -126,6 +188,13 @@
   .nav:hover,
   .nav:focus-within {
     width: var(--nav-w-open);
+    --hover-boost: 1;
+  }
+
+  .nav:hover .nav-pill::before,
+  .nav:focus-within .nav-pill::before {
+    opacity: 1;
+    filter: brightness(1.15) saturate(1.3);
   }
 
   .nav-pill {
@@ -185,7 +254,7 @@
     position: absolute;
     width: 0.1875rem;
     height: 0.1875rem;
-    background: color-mix(in srgb, var(--text) 75%, transparent);
+    background: var(--nav-dot);
   }
 
   .nav-hub span:nth-child(1) { top: calc(50% - 0.28125rem); left: calc(50% - 0.28125rem); }
@@ -193,11 +262,10 @@
   .nav-hub span:nth-child(3) { top: calc(50% + 0.09375rem); left: calc(50% - 0.28125rem); }
   .nav-hub span:nth-child(4) { top: calc(50% + 0.09375rem); left: calc(50% + 0.09375rem); }
 
-  /* 글자 밑에서 은은하게 올라오는 하얀 빛. 알약 안쪽 아래 가장자리에서 윗부분 1/5만 보이고, 알약 밖으로는 나가지 않는다.
-   * 5rem 높이 중 1rem만 알약 안으로 들어온다(top: 100% - 1rem). 색은 두 테마 모두 순백(--nav-light) */
+  /* 글자 밑에서 올라오는 하얀 빛 (lifestories.org의 hover-blob 그대로). 알약 안쪽으로 25px만 들어오고, 알약 밖으로는 나가지 않는다 */
   .nav-blob {
     position: absolute;
-    top: calc(100% - 1rem);
+    top: calc(100% - 1.5625rem);
     left: 0;
     z-index: 0;
     display: block;
@@ -205,9 +273,11 @@
     height: 5rem;
     border-radius: 50%;
     background:
-      radial-gradient(circle 1.75rem at 35% 12%, rgba(var(--nav-light), 0.95), transparent),
-      radial-gradient(circle 1.625rem at 70% 18%, rgba(var(--nav-light), 0.8), transparent),
-      radial-gradient(circle 1.875rem at 50% 8%, rgba(var(--nav-light), 0.9), transparent);
+      radial-gradient(circle 1.75rem at calc(30% + var(--drift-ax) * 0.6) calc(30% + var(--drift-ay) * 0.6), rgba(255, 248, 240, 0.85), transparent),
+      radial-gradient(circle 1.625rem at calc(72% - var(--drift-bx) * 0.6) calc(32% + var(--drift-by) * 0.6), rgba(244, 248, 255, 0.8), transparent),
+      radial-gradient(circle 1.875rem at calc(32% + var(--drift-fy) * 0.5) calc(72% - var(--drift-fx) * 0.5), rgba(248, 252, 246, 0.8), transparent),
+      radial-gradient(circle 1.75rem at calc(70% - var(--drift-ay) * 0.6) calc(70% + var(--drift-ax) * 0.6), rgba(252, 246, 240, 0.8), transparent),
+      radial-gradient(circle 1.5rem at calc(50% + var(--drift-fx) * 0.4) calc(50% + var(--drift-fy) * 0.4), rgba(255, 252, 246, 0.7), transparent);
     filter: blur(0.625rem);
     opacity: 0;
     transform: translateX(-50%);
@@ -215,5 +285,13 @@
     transition:
       opacity 0.45s var(--ease-custom),
       translate 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation:
+      nav-drift-a 12s ease-in-out infinite paused,
+      nav-drift-b 9s ease-in-out infinite,
+      nav-drift-fast 5s ease-in-out infinite;
+  }
+
+  .nav:hover .nav-blob {
+    animation-play-state: running;
   }
 }

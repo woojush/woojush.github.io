@@ -4,6 +4,7 @@
 //  - 입자마다 제 박자로 반짝이고(twinkle), 멀리·아주 가까이에서는 흐려지며, 화면에서 최대 크기가 제한된다.
 //  - 별은 처음부터 이미 자리에 있고, 화면 전체가 부드럽게 나타난 뒤 별들이 점차 앞으로 다가온다(터져 나오는 연출 없음).
 //  - 비행 속도와 마지막 확대의 강도는 밖(home-intro.ts)이 정한다. 문구가 커지는 속도와 같은 곡선이다(intro-timeline.ts).
+//  - 마지막 확대(블랙홀로 빨려 들어가는 구간)에서는 별이 짧은 줄(streak)로 늘어나 가운데에서 쏟아지고 장면이 점점 빠르게 회전한다.
 //  - 색은 CSS 토큰 --particle(rgb 채널). 테마가 바뀌면 다시 읽는다.
 //  - prefers-reduced-motion이면 한 장면만 그린다. WebGL이 없으면 startScene이 던지고, 부르는 쪽이 캔버스를 숨긴다.
 import {
@@ -11,6 +12,7 @@ import {
   BufferAttribute,
   BufferGeometry,
   Color,
+  LineSegments,
   NormalBlending,
   OrthographicCamera,
   Points,
@@ -33,6 +35,10 @@ const VERT = /* glsl */ `
   uniform float uDpr;
   uniform float uMaxPx;
   uniform float uBoost;      // 마지막 확대의 진행(0~1): 별이 더 크고 밝게 지나간다
+  #ifdef STREAK
+  uniform float uTrail;      // 줄의 길이(깊이 단위): 꼬리는 그만큼 먼 곳(가운데에 더 가까운 쪽)에 있다
+  attribute float aEnd;      // 0 = 머리, 1 = 꼬리
+  #endif
   attribute float aSize;
   attribute float aSeed;
   attribute float aZ;
@@ -40,12 +46,19 @@ const VERT = /* glsl */ `
   void main() {
     // 깊이: 날아온 만큼 가까워지고, 범위를 넘으면 먼 쪽으로 되돌아간다(끝없는 비행)
     float dist = uNear + mod(aZ - uFly, uDepth);
+    float distP = dist; // 화면에 놓는 깊이(줄의 꼬리는 더 멀다)
+    float tailKeep = 1.0;
+    #ifdef STREAK
+    distP = dist + uTrail * aEnd;
+    // 꼬리가 깊이 범위를 넘어 되돌아간 별은 그리지 않는다(화면을 가로지르는 줄이 생기지 않게). 꼬리 쪽은 점점 옅어진다
+    tailKeep = (1.0 - aEnd * 0.9) * step(distP, uNear + uDepth);
+    #endif
     float c = cos(uRoll), s = sin(uRoll);
     vec2 p = vec2(position.x * c - position.y * s, position.x * s + position.y * c);
     // 원근: 화면 위치는 p * D0 / dist. 멀리 있을 땐 중앙에 모여 있다가, 다가올수록 가속하며 테두리 쪽으로 퍼져 나간다
-    vec2 xy = p * (uD0 / dist);
+    vec2 xy = p * (uD0 / distP);
     // 가까운 별일수록 포인터에 크게 반응한다
-    xy += uPan * vec2(0.05, 0.035) * (uD0 / dist);
+    xy += uPan * vec2(0.05, 0.035) * (uD0 / distP);
     float onset = smoothstep(aSeed * 0.65, aSeed * 0.65 + 0.35, uIntro);
     xy *= mix(1.0 - uIntroSpread, 1.0, onset);
     gl_Position = vec4(xy, 0.0, 1.0);
@@ -65,7 +78,7 @@ const VERT = /* glsl */ `
     // 가운데에도 별이 있되, 한 점으로 뭉쳐 보이지 않도록 가장 안쪽만 아주 옅게 한다
     float hole = smoothstep(0.02, 0.16, rr);
     // 마지막 확대에서는 가장자리로 쏟아지는 별도 흐려지지 않고 오히려 밝아진다
-    vAlpha = far * near * tw * onset * (1.0 - 0.7 * edge * (1.0 - uBoost)) * hole * (1.0 + 0.35 * uBoost);
+    vAlpha = far * near * tw * onset * (1.0 - 0.7 * edge * (1.0 - uBoost)) * hole * (1.0 + 0.35 * uBoost) * tailKeep;
   }
 `;
 
@@ -78,6 +91,16 @@ const FRAG = /* glsl */ `
     if (r > 1.0) discard;
     float a = pow(1.0 - r, 0.9);
     gl_FragColor = vec4(uColor, a * vAlpha * uOpacity);
+  }
+`;
+
+// 줄(streak)은 점과 같은 별 데이터를 쓰되 한 별이 머리·꼬리 두 꼭짓점이다. 색만 칠한다
+const FRAG_LINE = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uOpacity;
+  varying float vAlpha;
+  void main() {
+    gl_FragColor = vec4(uColor, vAlpha * uOpacity);
   }
 `;
 
@@ -170,6 +193,37 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
   points.frustumCulled = false;
   scene.add(points);
 
+  // 별마다 머리·꼬리 두 꼭짓점. 마지막 확대에서만 보인다
+  const dup = (src: Float32Array, n: number) => {
+    const out = new Float32Array(src.length * 2);
+    for (let i = 0; i < src.length / n; i++) {
+      out.set(src.subarray(i * n, i * n + n), i * n * 2);
+      out.set(src.subarray(i * n, i * n + n), i * n * 2 + n);
+    }
+    return out;
+  };
+  const lineGeo = new BufferGeometry();
+  lineGeo.setAttribute('position', new BufferAttribute(dup(pos, 3), 3));
+  lineGeo.setAttribute('aSize', new BufferAttribute(dup(size, 1), 1));
+  lineGeo.setAttribute('aSeed', new BufferAttribute(dup(seed, 1), 1));
+  lineGeo.setAttribute('aZ', new BufferAttribute(dup(zs, 1), 1));
+  lineGeo.setAttribute('aEnd', new BufferAttribute(Float32Array.from({ length: COUNT * 2 }, (_, i) => i % 2), 1));
+  material.uniforms.uTrail = { value: 0 };
+  const lineMaterial = new ShaderMaterial({
+    vertexShader: VERT,
+    fragmentShader: FRAG_LINE,
+    defines: { STREAK: '' },
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+    blending: AdditiveBlending,
+    uniforms: material.uniforms, // 점과 같은 값을 같이 쓴다
+  });
+  const streaks = new LineSegments(lineGeo, lineMaterial);
+  streaks.frustumCulled = false;
+  streaks.visible = false;
+  scene.add(streaks);
+
   function readTheme(): void {
     const rgb = css('--particle').split(',').map((n) => Number(n.trim()));
     if (rgb.length === 3 && rgb.every((n) => !Number.isNaN(n))) material.uniforms.uColor.value = new Color(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
@@ -177,7 +231,9 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
     const light = root.getAttribute('data-theme') === 'light';
     material.blending = light ? NormalBlending : AdditiveBlending;
     material.uniforms.uOpacity.value = light ? 0.7 : 0.95;
+    lineMaterial.blending = material.blending;
     material.needsUpdate = true;
+    lineMaterial.needsUpdate = true;
     if (reduce.matches) render();
   }
 
@@ -199,6 +255,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
   let intro = 0;
   const FADE_SECONDS = 1.6; // 캔버스가 나타나는 시간(별의 위치·크기는 그대로)
   let fly = 0;
+  let swirl = 0;
   const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 
   function render(): void {
@@ -212,6 +269,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
     u.uFly.value = 0;
     u.uTime.value = 1.7;
     u.uBoost.value = 0;
+    streaks.visible = false;
     canvas.style.opacity = '1';
     render();
   }
@@ -227,7 +285,11 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
     u.uFly.value = fly;
     u.uBoost.value = boost;
     u.uPan.value = [px, py];
-    u.uRoll.value = clock * 0.004;
+    // 마지막 확대에서는 줄이 길어지고 장면이 점점 빨리 소용돌이친다
+    swirl += boost * boost * 2.5 * dt;
+    u.uRoll.value = clock * 0.004 + swirl;
+    u.uTrail.value = boost > 0.02 ? Math.min(flySpeed * 0.06, 5) : 0;
+    streaks.visible = u.uTrail.value > 0.05;
     canvas.style.opacity = String(ease(intro) * alpha);
     render();
   }

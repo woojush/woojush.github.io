@@ -1,5 +1,5 @@
 // 메인(/)의 인트로를 한 시계로 움직인다: 문구가 점점 커지고, 그 확대 속도에 맞춰 별이 날아오고,
-// 작은 문장이 3초 커진 뒤에는 별들의 중심을 향한 마지막 확대(약 4.5초)가 시작되어 화면이 어둠 속으로 사라진다.
+// 작은 문장이 다 나타나고 2초 뒤에는 별들의 중심을 향한 블랙홀식 마지막 확대(4초)가 시작되어 화면이 어둠 속으로 사라진다.
 // 끝나면 같은 페이지의 홈 화면(.home)이 나타난다(<html data-intro="done">). 다른 페이지로 이동하지 않는다.
 // 곡선은 intro-timeline.ts, 별 그리기는 scene.ts. 여기서는 시계·문구(CSS 변수)·상태 전환만 맡는다.
 //
@@ -12,6 +12,7 @@ const root = document.documentElement;
 const hero = document.querySelector<HTMLElement>('[data-hero]');
 const inner = hero?.querySelector<HTMLElement>('[data-hero-inner]');
 const canvas = document.querySelector<HTMLCanvasElement>('[data-scene]');
+const hole = document.querySelector<HTMLElement>('[data-blackhole]');
 
 if (root.dataset.intro === 'play' && hero && inner) {
   root.dataset.introStarted = ''; // 인라인 스크립트의 안전장치(스크립트가 안 뜨면 홈 화면을 보여준다)에 알린다
@@ -55,6 +56,7 @@ if (root.dataset.intro === 'play' && hero && inner) {
     const f = introFrame(clock);
     inner!.style.setProperty('--zoom', f.scale.toFixed(4));
     hero!.style.setProperty('--hero-fade', f.fade.toFixed(3));
+    hole?.style.setProperty('--blackhole', f.blackhole.toFixed(3));
     scene?.update(flySpeed(f.rate), f.boost, Math.min(elapsed, 0.1), clock, f.stars);
     if (clock >= T_END) {
       finish();

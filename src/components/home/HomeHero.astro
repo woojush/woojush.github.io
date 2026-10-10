@@ -38,6 +38,7 @@ const words = title.flatMap((seg) =>
 
 <canvas class="scene" data-scene aria-hidden="true"></canvas>
 <div class="vignette" aria-hidden="true"></div>
+<div class="blackhole" aria-hidden="true" data-blackhole></div>
 
 <section class="hero" data-hero>
   <div class="hero-inner" data-hero-inner>
@@ -62,12 +63,14 @@ const words = title.flatMap((seg) =>
   /* 인트로 층은 인트로가 도는 동안(data-intro="play")에만 있다. 끝나거나 하지 않으면 통째로 숨긴다 */
   .scene,
   .vignette,
+  .blackhole,
   .hero {
     display: none;
   }
 
   :global(:root[data-intro='play']) .scene,
   :global(:root[data-intro='play']) .vignette,
+  :global(:root[data-intro='play']) .blackhole,
   :global(:root[data-intro='play']) .hero {
     display: block;
   }
@@ -106,6 +109,21 @@ const words = title.flatMap((seg) =>
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.2 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
     background-size: auto, 180px 180px;
     background-repeat: no-repeat, repeat;
+  }
+
+  /* 마지막 확대에서 가운데에서 번져 나오는 어둠(블랙홀). 0이면 보이지 않고, 1이면 화면 전체가 배경색이다.
+   * 별(캔버스) 위, 문구 아래에 둔다. 가장자리는 부드럽게 풀어 번지는 것처럼 보이게 한다 */
+  .blackhole {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: min(1, calc(var(--blackhole, 0) * 30));
+    background: radial-gradient(
+      circle farthest-corner at 50% 50%,
+      var(--bg) calc(var(--blackhole, 0) * 115% - 12%),
+      transparent calc(var(--blackhole, 0) * 115% + 22%)
+    );
   }
 
   /* 화면 정중앙, 가운데 정렬 */
@@ -152,7 +170,7 @@ const words = title.flatMap((seg) =>
     line-height: var(--lh-m);
   }
 
-  /* 별이 먼저 보이고 그 사이로 다가온다. 메인 문장이 나타나 천천히 커지고, 2초 뒤 아래에 작은 문장이 나타나 같이 커진다.
+  /* 별이 먼저 보이고 그 사이로 다가온다. 메인 문장이 나타나 천천히 커지고, 1.8초 뒤 아래에 작은 문장이 나타나 같이 커진다.
    * 크기와 사라짐은 home-intro.ts가 --zoom·--hero-fade로 준다. */
   :global(:root[data-intro='play']) .hero-title,
   :global(:root[data-intro='play']) .hero-sub {
@@ -165,7 +183,7 @@ const words = title.flatMap((seg) =>
   }
 
   :global(:root[data-intro='play']) .hero-sub {
-    animation-delay: 4s; /* 메인 문장이 나타나고 2초 뒤 (intro-timeline.ts의 T_SUB) */
+    animation-delay: 3.8s; /* 메인 문장이 나타나고 1.8초 뒤 (intro-timeline.ts의 T_SUB) */
   }
 
   @keyframes appear {

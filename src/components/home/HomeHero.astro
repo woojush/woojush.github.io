@@ -1,6 +1,7 @@
 ---
-// 메인(/)의 첫 화면: 배경 별가루 + 단어가 차례로 떠오르는 큰 문구 (한 번만, docs/07).
-// 문구는 data/site.ts의 hero를 받아 그리기만 한다. 배경(별 입자 장면)은 src/scripts/scene.ts.
+// 메인(/)의 첫 화면: 배경 별가루 + 점점 커지는 큰 문구 (한 번만, docs/07).
+// 문구는 data/site.ts의 hero를 받아 그리기만 한다. 확대 곡선과 화면 이동은 src/scripts/home-intro.ts,
+// 배경(별 입자 장면)은 src/scripts/scene.ts. 여기서는 모양만 정하고 확대(--zoom)·사라짐(--hero-fade)은 그 스크립트가 CSS 변수로 넣는다.
 interface Segment {
   text: string;
   strong?: boolean;
@@ -8,9 +9,11 @@ interface Segment {
 interface Props {
   title: readonly Segment[];
   sub: string;
+  /** 인트로가 끝나면 넘어갈 화면 (data/site.ts의 hero.next) */
+  next: string;
 }
 
-const { title, sub } = Astro.props;
+const { title, sub, next } = Astro.props;
 
 // 문구를 어절 단위로 쪼개 단어마다 등장 순서(--i)를 준다. 강조는 굵기로만 한다 (색 아님)
 const words = title.flatMap((seg) =>
@@ -24,8 +27,8 @@ const words = title.flatMap((seg) =>
 <canvas class="scene" data-scene aria-hidden="true"></canvas>
 <div class="vignette" aria-hidden="true"></div>
 
-<section class="hero">
-  <div class="hero-inner">
+<section class="hero" data-hero data-next={next}>
+  <div class="hero-inner" data-hero-inner>
     <h1 class="hero-title">
       {
         words.map((item) => (
@@ -40,7 +43,7 @@ const words = title.flatMap((seg) =>
 </section>
 
 <script>
-  import '@/scripts/scene.ts';
+  import '@/scripts/home-intro.ts';
 </script>
 
 <style>
@@ -77,11 +80,13 @@ const words = title.flatMap((seg) =>
     justify-content: center;
     padding-inline: var(--space-5);
     pointer-events: none;
+    opacity: var(--hero-fade, 1); /* 마지막 확대에서 문구가 지나가며 사라진다 */
   }
 
   .hero-inner {
     max-width: var(--page-max);
     text-align: center;
+    transform: scale(var(--zoom, 1)); /* 가운데(별의 소실점)를 기준으로 커진다 */
   }
 
   .hero-title {
@@ -104,13 +109,10 @@ const words = title.flatMap((seg) =>
     line-height: var(--lh-m);
   }
 
-  /* 별이 먼저 보이고 그 사이로 다가온다. 메인 문장이 한 번에 나타나 천천히 커지고,
-   * 3초 뒤 아래에 작은 문장이 나타나 같이 커진다. 움직임을 줄이는 설정이면 처음부터 보이고 움직이지 않는다. */
+  /* 별이 먼저 보이고 그 사이로 다가온다. 메인 문장이 나타나 천천히 커지고, 3초 뒤 아래에 작은 문장이 나타나 같이 커진다.
+   * 작은 문장이 3초 커진 뒤에는 확대가 급격히 빨라져 다음 화면으로 넘어간다(크기는 home-intro.ts가 --zoom으로 준다).
+   * 움직임을 줄이는 설정이면 처음부터 보이고 움직이지 않는다. */
   @media (prefers-reduced-motion: no-preference) {
-    .hero-inner {
-      animation: approach 18s cubic-bezier(0.2, 0.6, 0.3, 1) 2s both;
-    }
-
     .hero-title,
     .hero-sub {
       opacity: 0;
@@ -123,15 +125,6 @@ const words = title.flatMap((seg) =>
 
     .hero-sub {
       animation-delay: 5s; /* 메인 문장이 나타나고 3초 뒤 */
-    }
-  }
-
-  @keyframes approach {
-    from {
-      transform: scale(0.94);
-    }
-    to {
-      transform: scale(1.1);
     }
   }
 

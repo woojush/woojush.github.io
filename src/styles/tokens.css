@@ -105,6 +105,7 @@
 :root {
   --duration: 140ms; /* 120~160ms. 색·밑줄·투명도 전환(마이크로 인터랙션) */
   --duration-slow: 600ms; /* 메인 문구 등장, 탭 표시 이동 같은 한 번짜리 움직임 */
+  --duration-zoom: 1000ms; /* 메인 인트로에서 넘어온 화면이 확대되며 자리 잡는 시간 (페이지 전환 home-zoom) */
   --ease: ease;
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   --radius: 999px; /* 탭 활성 표시 */

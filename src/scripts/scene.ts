@@ -3,8 +3,9 @@
 //  - 입자는 한 덩어리의 점구름(Points). 대부분 아주 작고 가끔 큰 별, 일부는 성단처럼 뭉친다.
 //  - 입자마다 제 박자로 반짝이고(twinkle), 멀리·아주 가까이에서는 흐려지며, 화면에서 최대 크기가 제한된다.
 //  - 별은 처음부터 이미 자리에 있고, 화면 전체가 부드럽게 나타난 뒤 별들이 점차 앞으로 다가온다(터져 나오는 연출 없음).
+//  - 비행 속도와 마지막 확대의 강도는 밖(home-intro.ts)이 정한다. 문구가 커지는 속도와 같은 곡선이다(intro-timeline.ts).
 //  - 색은 CSS 토큰 --particle(rgb 채널). 테마가 바뀌면 다시 읽는다.
-//  - prefers-reduced-motion이면 한 장면만 그린다. 탭이 숨겨지면 멈춘다. WebGL이 없으면 캔버스를 숨긴다.
+//  - prefers-reduced-motion이면 한 장면만 그린다. WebGL이 없으면 startScene이 던지고, 부르는 쪽이 캔버스를 숨긴다.
 import {
   AdditiveBlending,
   BufferAttribute,
@@ -17,8 +18,6 @@ import {
   ShaderMaterial,
   WebGLRenderer,
 } from 'three';
-
-const canvas = document.querySelector<HTMLCanvasElement>('[data-scene]');
 
 const VERT = /* glsl */ `
   uniform float uFly;        // 지금까지 날아온 거리(깊이 방향)
@@ -33,6 +32,7 @@ const VERT = /* glsl */ `
   uniform float uIntroSpread;
   uniform float uDpr;
   uniform float uMaxPx;
+  uniform float uBoost;      // 마지막 확대의 진행(0~1): 별이 더 크고 밝게 지나간다
   attribute float aSize;
   attribute float aSeed;
   attribute float aZ;
@@ -51,8 +51,8 @@ const VERT = /* glsl */ `
     gl_Position = vec4(xy, 0.0, 1.0);
     float t = dist / uDepth;
     // 원근법: 처음(먼 곳)의 크기에서 시작해, 다가올수록 거리에 반비례하는 쪽으로 점점 커진다
-    float size = (0.9 + aSize * 3.2) * 0.6 * pow(uDepth / dist, 0.55) * uDpr;
-    gl_PointSize = clamp(size, 3.0 * uDpr, uMaxPx * uDpr) * onset; // 최소 3px(discover의 1px보다 2px 크게)
+    float size = (0.9 + aSize * 3.2) * 0.6 * pow(uDepth / dist, 0.55) * (1.0 + 0.6 * uBoost) * uDpr;
+    gl_PointSize = clamp(size, 3.0 * uDpr, uMaxPx * (1.0 + uBoost) * uDpr) * onset; // 최소 3px(discover의 1px보다 2px 크게)
     // 먼 쪽과 바로 눈앞에서는 흐려진다
     float far = 1.0 - smoothstep(0.55, 1.0, t);
     float near = smoothstep(0.0, 0.08, t);
@@ -64,7 +64,8 @@ const VERT = /* glsl */ `
     float edge = smoothstep(0.35, 1.1, rr);
     // 가운데에도 별이 있되, 한 점으로 뭉쳐 보이지 않도록 가장 안쪽만 아주 옅게 한다
     float hole = smoothstep(0.02, 0.16, rr);
-    vAlpha = far * near * tw * onset * (1.0 - 0.7 * edge) * hole;
+    // 마지막 확대에서는 가장자리로 쏟아지는 별도 흐려지지 않고 오히려 밝아진다
+    vAlpha = far * near * tw * onset * (1.0 - 0.7 * edge * (1.0 - uBoost)) * hole * (1.0 + 0.35 * uBoost);
   }
 `;
 
@@ -80,7 +81,12 @@ const FRAG = /* glsl */ `
   }
 `;
 
-function start(canvas: HTMLCanvasElement): void {
+export interface SceneHandle {
+  /** 한 프레임 그린다. flySpeed: 앞으로 날아오는 속도(깊이 단위/초), boost: 마지막 확대의 진행(0~1), clock: 장면이 시작한 뒤의 초 */
+  update(flySpeed: number, boost: number, dt: number, clock: number): void;
+}
+
+export function startScene(canvas: HTMLCanvasElement): SceneHandle {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const small = matchMedia('(max-width: 640px)');
   const root = document.documentElement;
@@ -155,6 +161,7 @@ function start(canvas: HTMLCanvasElement): void {
       uIntroSpread: { value: 0 },
       uDpr: { value: 1 },
       uMaxPx: { value: 9 },
+      uBoost: { value: 0 },
       uColor: { value: new Color(0xc2c2c2) },
       uOpacity: { value: 0.95 },
     },
@@ -189,59 +196,40 @@ function start(canvas: HTMLCanvasElement): void {
   let py = 0;
   let tx = 0;
   let ty = 0;
-  let clock = 0;
-  let last = 0;
   let intro = 0;
   const FADE_SECONDS = 1.6; // 캔버스가 나타나는 시간(별의 위치·크기는 그대로)
-  const FLIGHT_HOLD = 14; // 초: 이 시간까지 계속 날아간다
-  const FLIGHT_STOP = 20; // 초: 이때 완전히 멈춘다(문구의 움직임이 끝나는 때)
   let fly = 0;
-  const FLY_SPEED = 0.8; // 초당 깊이 이동량(36 중): 이미 있는 별이 천천히 앞으로 다가온다
   const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 
   function render(): void {
     renderer.render(scene, camera);
   }
 
-  function frame(now: number): void {
-    const dt = Math.min((now - last) / 1000 || 0, 0.05);
-    last = now;
-    clock += dt;
+  // 움직임을 줄이는 설정이면 한 장면만 그린다
+  function still(): void {
+    const u = material.uniforms;
+    u.uIntro.value = 1;
+    u.uFly.value = 0;
+    u.uTime.value = 1.7;
+    u.uBoost.value = 0;
+    canvas.style.opacity = '1';
+    render();
+  }
+
+  function update(flySpeed: number, boost: number, dt: number, clock: number): void {
+    if (reduce.matches) return;
     intro = Math.min(1, intro + dt / FADE_SECONDS);
     px += (tx - px) * Math.min(1, dt * 2.2);
     py += (ty - py) * Math.min(1, dt * 2.2);
+    fly += flySpeed * dt;
     const u = material.uniforms;
     u.uTime.value = clock;
-    // 문구가 다 움직인 뒤에는 비행이 서서히 멈추고, 
-    const k = Math.min(1, Math.max(0, (clock - FLIGHT_HOLD) / (FLIGHT_STOP - FLIGHT_HOLD)));
-    const motion = 1 - k * k * (3 - 2 * k);
-    fly += FLY_SPEED * motion * dt;
     u.uFly.value = fly;
+    u.uBoost.value = boost;
     u.uPan.value = [px, py];
     u.uRoll.value = clock * 0.004;
     canvas.style.opacity = String(ease(intro));
     render();
-  }
-
-  let raf = 0;
-  function loop(now: number): void {
-    frame(now);
-    raf = requestAnimationFrame(loop);
-  }
-
-  function play(): void {
-    cancelAnimationFrame(raf);
-    if (reduce.matches) {
-      const u = material.uniforms;
-      u.uIntro.value = 1;
-      u.uFly.value = 0;
-      u.uTime.value = 1.7;
-      canvas.style.opacity = '1';
-      render();
-    } else if (!document.hidden) {
-      last = performance.now();
-      raf = requestAnimationFrame(loop);
-    }
   }
 
   addEventListener('pointermove', (e) => {
@@ -249,19 +237,11 @@ function start(canvas: HTMLCanvasElement): void {
     ty = -((e.clientY / innerHeight) * 2 - 1);
   });
   addEventListener('resize', resize);
-  document.addEventListener('visibilitychange', play);
-  reduce.addEventListener('change', play);
+  reduce.addEventListener('change', () => reduce.matches && still());
   new MutationObserver(readTheme).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
   resize();
   readTheme();
-  play();
-}
-
-if (canvas) {
-  try {
-    start(canvas);
-  } catch {
-    canvas.hidden = true; // WebGL을 못 쓰면 배경 없이 문구만 보인다
-  }
+  if (reduce.matches) still();
+  return { update };
 }

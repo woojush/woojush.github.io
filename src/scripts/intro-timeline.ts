@@ -1,0 +1,86 @@
+// 메인 인트로의 시간표. 문구의 확대와 별의 움직임이 같은 곡선에서 나온다 (DOM·WebGL 없는 순수 함수만 둔다).
+//
+//   0s      별이 먼저 나타난다
+//   2s      메인 문장이 나타나 천천히 커지기 시작한다 (T_TITLE)
+//   5s      작은 문장이 나타나 같이 커진다 (T_SUB)
+//   8s      작은 문장이 3초 동안 커진 뒤, 확대가 급격히 빨라진다 (T_CLIMAX)
+//   10.4s   문구가 화면 밖으로 지나가고 별이 쏟아져 지나간 뒤 다음 화면으로 넘어간다 (T_END)
+//
+// "확대 속도 → 별의 속도": 문구가 로그 척도로 커지는 비율(rate, 1/s)이 곧 별이 날아오는 속도를 정한다.
+// 카메라가 앞으로 날아갈 때 가까운 물체는 비례해서 빠르게 커지므로, 문구와 별이 한 장면 안에서 맞물려 보인다.
+
+export const T_TITLE = 2;
+export const T_SUB = 5;
+export const SUB_ZOOM_SECONDS = 3; // 작은 문장이 나타난 뒤 이만큼 커지고 나서 마지막 확대가 시작된다
+export const T_CLIMAX = T_SUB + SUB_ZOOM_SECONDS;
+export const CLIMAX_SECONDS = 2.4;
+export const T_END = T_CLIMAX + CLIMAX_SECONDS;
+
+const SCALE_START = 0.9; // 문장이 나타날 때의 크기(배)
+const SCALE_END = 24; // 마지막 확대가 끝날 때의 크기(배). 이때 문구는 이미 투명하다
+const RATE_START = 0.03; // 문장이 나타날 때의 확대 비율(로그, 1/s)
+const RATE_CLIMAX = 0.1; // 마지막 확대 직전의 확대 비율. 여기서 끊김 없이 이어서 빨라진다
+
+const GROW_SECONDS = T_CLIMAX - T_TITLE;
+const LOG_AT_CLIMAX = RATE_START * GROW_SECONDS + ((RATE_CLIMAX - RATE_START) * GROW_SECONDS) / 2;
+// 마지막 확대에서 SCALE_END에 정확히 닿도록 정점의 비율을 역산한다 (상수를 바꿔도 끝 크기가 유지된다)
+const RATE_PEAK =
+  RATE_CLIMAX +
+  (3 * (Math.log(SCALE_END / SCALE_START) - LOG_AT_CLIMAX - RATE_CLIMAX * CLIMAX_SECONDS)) / CLIMAX_SECONDS;
+
+const FLY_BASE = 0.4; // 확대가 없을 때도 별이 천천히 앞으로 다가오는 속도(깊이 단위/초)
+const FLY_PER_RATE = 6; // 확대 비율 1(1/s)당 더해지는 별의 속도
+
+export interface IntroFrame {
+  /** 문구의 크기(배) */
+  scale: number;
+  /** 문구가 커지는 비율(로그, 1/s) */
+  rate: number;
+  /** 문구의 투명도 배수(0~1). 마지막 확대에서 지나가며 사라진다 */
+  fade: number;
+  /** 마지막 확대의 진행(0~1). 별을 더 밝고 크게 하는 데 쓴다 */
+  climax: number;
+  /** 다음 화면으로 넘어갈 때가 되었는가 */
+  done: boolean;
+}
+
+const smoothstep = (a: number, b: number, x: number) => {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
+
+/**
+ * 시각 t(초)의 인트로 상태. hold가 참이면 마지막 확대 직전(T_CLIMAX)에서 멈춘 채로 둔다
+ * (뒤로 가기로 돌아온 경우처럼 자동으로 넘어가면 안 될 때).
+ */
+export function introFrame(t: number, hold = false): IntroFrame {
+  const held = hold && t >= T_CLIMAX;
+  const time = held ? T_CLIMAX : t;
+
+  if (time <= T_TITLE) {
+    return { scale: SCALE_START, rate: 0, fade: 1, climax: 0, done: false };
+  }
+  if (time <= T_CLIMAX) {
+    const u = time - T_TITLE;
+    const log = RATE_START * u + ((RATE_CLIMAX - RATE_START) * u * u) / (2 * GROW_SECONDS);
+    const rate = held ? RATE_CLIMAX : RATE_START + ((RATE_CLIMAX - RATE_START) * u) / GROW_SECONDS;
+    return { scale: SCALE_START * Math.exp(log), rate, fade: 1, climax: 0, done: false };
+  }
+
+  const tau = Math.min(1, (time - T_CLIMAX) / CLIMAX_SECONDS);
+  const log =
+    LOG_AT_CLIMAX + RATE_CLIMAX * CLIMAX_SECONDS * tau + ((RATE_PEAK - RATE_CLIMAX) * CLIMAX_SECONDS * tau ** 3) / 3;
+  const rate = RATE_CLIMAX + (RATE_PEAK - RATE_CLIMAX) * tau * tau;
+  return {
+    scale: SCALE_START * Math.exp(log),
+    rate,
+    fade: 1 - smoothstep(0.45, 0.95, tau),
+    climax: tau,
+    done: time >= T_END,
+  };
+}
+
+/** 문구의 확대 비율에 맞춘 별의 비행 속도(깊이 단위/초) */
+export function flySpeed(rate: number): number {
+  return FLY_BASE + FLY_PER_RATE * rate;
+}

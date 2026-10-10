@@ -11,6 +11,7 @@
 - **한국어만 지원**한다. UI 라벨은 영어를 유지한다. 영어 글·UI 작업은 하지 않는다.
 - **탭 바 v4 구현됨** (2026-10-10, `tabbar-v4` 브랜치): 사용자 지시로 lifestories.org의 상단 알약을 그대로 따랐다. 평소에는 화면 위 가운데에 떠 있는 작은 알약(가운데 허브)이고, 마우스가 올라가면 스프링으로 늘어나며 글자가 모인다. 글자에 마우스를 올리면 알약 아래쪽에서 은은한 빛이 따라온다. **home은 메뉴에서 뺐고** 이름과 허브가 홈 링크다. 모양은 `src/styles/nav.css`, 값은 `tokens.css`의 탭 바 토큰, 동작은 `src/scripts/nav.ts`. 이 효과는 `docs/07` §3 c·`DESIGN.md`의 승인된 예외다.
 - **About 구현됨** (2026-10-10, `about-page` 브랜치): 구성은 Intro → Interests → Why this site → Path(Timeline) → Elsewhere. 문구는 사용자가 직접 쓴 것이다. Intro의 "Robot AI 엔지니어"는 사용자의 표현이며, 사이트 전체의 주제를 한 분야로 제한하지 않는 §1 원칙은 그대로다.
+- **메인 인트로 확대·전환 구현됨** (2026-10-10): 메인 문구와 작은 문장이 점점 커지고, 그 확대 속도에 맞춰 별이 날아온다. 작은 문장이 3초 커진 뒤(약 8초) 확대가 최대로 빨라지며 약 10초에 `site.hero.next`(`/about/`)로 자동 이동한다(자동 이동은 메인 한정 예외, `prefers-reduced-motion`·뒤로 가기에서는 넘어가지 않음). 세부는 `docs/07` "메인 인트로", 시간표는 `src/scripts/intro-timeline.ts`.
 - GitHub·이메일·LinkedIn은 공개 확정, `site.ts`의 `links`에 추가했다(푸터와 About의 Elsewhere가 같이 쓴다).
 - 다음은 **하위 페이지별 디자인 설계** 단계이고, 그 뒤에 **Phase 2** (글 읽기 파이프라인)다. 사용자 승인 전에는 Phase 2로 넘어가지 않는다.
 - 사용자는 대부분의 기능·디자인을 Claude가 맥락과 취향을 반영해 먼저 결정하고, 결과물을 보고 사용자가 판단하는 방식을 원한다. 질문은 꼭 필요한 것만 한다.
@@ -95,7 +96,7 @@ src/
   pages/                       라우팅. 얇게 유지
 ```
 
-디자인 v2에서 추가됨: `docs/07`, `src/components/home/HomeHero.astro`, `src/scripts/scene.ts`.
+디자인 v2에서 추가됨: `docs/07`, `src/components/home/HomeHero.astro`, `src/scripts/scene.ts`(별 장면), `src/scripts/home-intro.ts`(시계·화면 이동), `src/scripts/intro-timeline.ts`(확대 곡선).
 About에서 추가됨: `src/components/about/Timeline.astro`, `src/lib/content.ts`의 `getAbout`·`getTimeline`, about 스키마의 선택 필드 `lead`.
 Phase 1에서 추가됨: `src/components/layout/`(Header, Nav, Footer, ThemeToggle), `src/styles/{tokens,fonts,base}.css`, `src/scripts/{theme-init.js,theme-toggle.ts}`, `public/fonts/pretendard/`.
 이후에 추가될 것: `src/components/{content,home,about,mdx}/`, `src/styles/prose.css`, `src/lib/{topics,links,format}.ts`, `public/labs/`. 구조 명세는 `docs/05`.

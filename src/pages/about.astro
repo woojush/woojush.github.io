@@ -1,13 +1,77 @@
 ---
-import { getEntry, render } from 'astro:content';
+// ABOUT. 순서: Intro → Interests → Why this site (about.md) → Path (timeline.yaml) → Elsewhere (site.links).
+// 사용자가 승인한 구성 (2026-10-10). Elsewhere는 링크가 비어 있으면 숨긴다.
+import { render } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Timeline from '@/components/about/Timeline.astro';
+import { getAbout, getTimeline } from '@/lib/content';
+import { site } from '@/data/site';
 
-const entry = await getEntry('about', 'about');
-if (!entry) throw new Error('src/content/about.md 가 없다.');
+const entry = await getAbout();
+const timeline = await getTimeline();
 const { Content } = await render(entry);
 ---
 
 <BaseLayout title={entry.data.title}>
   <h1>{entry.data.title}</h1>
-  <Content />
+  {entry.data.lead && <p class="lead">{entry.data.lead}</p>}
+  <div class="about-body">
+    <Content />
+  </div>
+
+  {
+    timeline.length > 0 && (
+      <section aria-labelledby="path">
+        <h2 id="path">Path</h2>
+        <Timeline entries={timeline} />
+      </section>
+    )
+  }
+
+  {
+    site.links.length > 0 && (
+      <section aria-labelledby="elsewhere">
+        <h2 id="elsewhere">Elsewhere</h2>
+        <ul class="elsewhere">
+          {site.links.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
 </BaseLayout>
+
+<style>
+  /* 제목 아래 한 줄 소개. 리드 문장 크기(--fs-m), 굵기·크기로만 위계를 만든다 */
+  .lead {
+    margin-bottom: var(--space-6);
+    font-size: var(--fs-m);
+    line-height: var(--lh-m);
+    font-weight: var(--fw-strong);
+  }
+
+  /* 마크다운 본문의 목록: 불릿 없이 행으로 쌓는다 */
+  .about-body :global(ul) {
+    padding: 0;
+    list-style: none;
+  }
+
+  .about-body :global(li) {
+    margin-bottom: var(--space-3);
+  }
+
+  .elsewhere {
+    padding: 0;
+    list-style: none;
+  }
+
+  /* 터치 영역 최소 44px */
+  .elsewhere a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+  }
+</style>

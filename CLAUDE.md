@@ -9,7 +9,8 @@
 - **디자인 방향 v2 적용됨** (2026-10-10, `docs/07`): 어두운 기본 테마, 탭 바, 메인 별가루 히어로. Phase 2 전에 하위 페이지별 디자인을 구체화한다.
 - **정보 구조 논의 반영 완료** (2026-10-10): 메뉴 순서 `home projects about knowledge writing`(외부 방문자가 projects를 먼저 보도록), HOME은 NOW + 최근 활동만 유지하되 Selected projects를 Recent보다 위에, ABOUT은 소개 → 학력/스킬 → … → Links 순서(`docs/01` §2·§4). 탭 디자인은 향후 수정 예정(순서·이름은 유지).
 - **한국어만 지원**한다. UI 라벨은 영어를 유지한다. 영어 글·UI 작업은 하지 않는다.
-- GitHub·이메일은 공개하기로 했으나 **페이지 완성 후** 추가한다(`site.ts`의 `links`, About의 Links).
+- **About 구현됨** (2026-10-10, `about-page` 브랜치): 구성은 Intro → Interests → Why this site → Path(Timeline) → Elsewhere. 문구는 사용자가 직접 쓴 것이다. Intro의 "Robot AI 엔지니어"는 사용자의 표현이며, 사이트 전체의 주제를 한 분야로 제한하지 않는 §1 원칙은 그대로다.
+- GitHub·이메일·LinkedIn은 공개 확정, `site.ts`의 `links`에 추가했다(푸터와 About의 Elsewhere가 같이 쓴다).
 - 다음은 **하위 페이지별 디자인 설계** 단계이고, 그 뒤에 **Phase 2** (글 읽기 파이프라인)다. 사용자 승인 전에는 Phase 2로 넘어가지 않는다.
 - 사용자는 대부분의 기능·디자인을 Claude가 맥락과 취향을 반영해 먼저 결정하고, 결과물을 보고 사용자가 판단하는 방식을 원한다. 질문은 꼭 필요한 것만 한다.
 - 진행 순서와 각 Phase의 완료 기준: `docs/06_implementation_plan.md`
@@ -65,7 +66,7 @@ Learn → Build → Explain → Reflect 과정을 쌓는 개인 아카이브다.
 ## 4. 공개 정보 원칙 (저장소가 public이다)
 
 - **실명 'Shin WooJu'는 공개하기로 확정**했다(2026-10-10, `src/data/site.ts`의 `name`). 사진은 아직 확정 전이라 placeholder/미사용이다.
-- GitHub·이메일은 공개하기로 했으나 페이지 완성 후 추가한다. 추가 전에는 `links`를 비우고 관련 섹션은 숨긴다.
+- GitHub·이메일·LinkedIn은 공개 확정이며 `site.ts`의 `links`에 있다(2026-10-10). `links`가 비면 푸터 링크와 About의 Elsewhere는 숨긴다. About의 "1학년 성적 4.4 / 4.5"도 사용자가 공개를 확인했다.
 - 학교와 "AI Engineering student"라는 정체성은 표현해도 된다.
 - 군 복무는 필요하면 **현재 상태를 설명하는 정도**로만. 군 생활 자체를 콘텐츠로 만들지 않는다.
 - **군 내부 정보, 민감한 개인정보는 콘텐츠·코드·커밋 메시지 어디에도 넣지 않는다.** git 히스토리도 공개되므로 한 번 커밋하면 지워도 남는다.
@@ -94,6 +95,7 @@ src/
 ```
 
 디자인 v2에서 추가됨: `docs/07`, `src/components/home/HomeHero.astro`, `src/scripts/starfield.ts`.
+About에서 추가됨: `src/components/about/Timeline.astro`, `src/lib/content.ts`의 `getAbout`·`getTimeline`, about 스키마의 선택 필드 `lead`.
 Phase 1에서 추가됨: `src/components/layout/`(Header, Nav, Footer, ThemeToggle), `src/styles/{tokens,fonts,base}.css`, `src/scripts/{theme-init.js,theme-toggle.ts}`, `public/fonts/pretendard/`.
 이후에 추가될 것: `src/components/{content,home,about,mdx}/`, `src/styles/prose.css`, `src/lib/{topics,links,format}.ts`, `public/labs/`. 구조 명세는 `docs/05`.
 
@@ -206,7 +208,7 @@ npm run preview      # 빌드 결과 미리보기
 - **토글 2개**: 헤더가 ThemeToggle을 두 번 렌더링(`placement=mobile|desktop`)하고 640px 경계에서 하나만 보인다. Tab 순서를 화면 순서와 맞추기 위한 것이므로 하나로 합치지 않는다. 토글 라벨은 JS가 아니라 CSS가 `data-theme`를 보고 표시한다.
 - **레이아웃**: header/main/footer 안쪽 컨테이너는 모두 `.page`(`--page-max` 880px)를 쓴다. 본문 폭 680px(`--measure`)은 `main`의 제목·p·목록에만 적용되며, 코드·표·Embed 같은 넓은 요소는 거기에 넣지 않는다.
 - **폰트**: `pretendard@1.3.9`(OFL)의 dynamic subset woff2를 `public/fonts/pretendard/`에 복사했고(dependency 아님), `src/styles/fonts.css`는 그 패키지 CSS에서 url 경로만 바꾼 것이다. 폰트를 바꾸면 `tokens.css`의 `--font-sans`와 이 두 곳을 같이 본다.
-- **푸터 링크**: `site.ts`의 `links`가 비어 있으면 푸터는 저작권 줄만 그린다. GitHub·이메일은 페이지 완성 후 추가한다(§4). 그 밖의 외부 링크는 넣기 전에 사용자에게 확인한다.
+- **푸터 링크**: `site.ts`의 `links`가 비어 있으면 푸터는 저작권 줄만 그린다. 링크는 §4의 공개 확정 항목이 들어 있다. 그 밖의 외부 링크는 넣기 전에 사용자에게 확인한다.
 - **현재 메뉴 표시**: 정확히 그 페이지면 `aria-current="page"`, 그 섹션의 하위 글이면 `"true"`. 둘 다 굵기 600.
 
 ## 14. Phase 0에서 의도적으로 하지 않은 것

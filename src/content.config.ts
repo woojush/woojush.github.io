@@ -85,6 +85,8 @@ const about = defineCollection({
   loader: glob({ pattern: 'about.md', base: './src/content' }),
   schema: z.object({
     title: z.string(),
+    // 페이지 제목 아래 한 줄 소개 (선택)
+    lead: z.string().optional(),
     updated: z.coerce.date().optional(),
   }),
 });

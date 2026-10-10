@@ -1,10 +1,9 @@
 # ABOUT의 Timeline. 순서 = 표시 순서. period는 문자열이다 ("2030+" 같은 표기 허용).
+# 사용자가 승인한 Path 3줄 (2026-10-10). 이전의 2028 복학 / 2030+ 항목은 이 승인본에서 빠졌다.
 entries:
+  - period: "2025.03"
+    title: 가천대학교 인공지능 전공 입학
+  - period: "2026.03"
+    title: 1학년 성적 4.4 / 4.5, 군 입대
   - period: "2026"
-    title: 수학 · 프로그래밍 · AI 기초 (군 복무 중)
-    items: [Mathematics, Programming, AI fundamentals]
-  - period: "2028"
-    title: 대학 복학
-    items: [AI Engineering, Projects, Research]
-  - period: "2030+"
-    title: AI Engineering career
+    title: 군 복무 중, AI·로보틱스 공부와 이 사이트 제작 진행

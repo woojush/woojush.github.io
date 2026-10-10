@@ -26,8 +26,12 @@ export const site = {
     ],
     sub: '지식, 프로젝트, 글이 함께 자라는 개인 아카이브.',
   },
-  // 푸터 링크 (GitHub 등 외부 링크). 비어 있으면 푸터에 링크 영역을 그리지 않는다.
-  // GitHub·이메일은 공개하기로 했고 페이지 완성 후 추가한다 (2026-10-10). 그때까지 비워 둔다.
+  // 푸터와 About의 Elsewhere가 같이 쓰는 링크. 비어 있으면 두 곳 모두 그리지 않는다.
+  // GitHub·이메일·LinkedIn은 사용자가 공개를 확인했다 (2026-10-10). LinkedIn 주소는 한글 슬러그라 퍼센트 인코딩했다.
   // 그 밖의 새 외부 링크/개인정보를 넣기 전에는 사용자에게 확인한다 (CLAUDE.md 4절).
-  links: [] as readonly SiteLink[],
+  links: [
+    { label: 'GitHub', href: 'https://github.com/woojush' },
+    { label: 'Email', href: 'mailto:tlsdntjr1121@naver.com' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/%EC%9A%B0%EC%A3%BC-%EC%8B%A0-346341344' },
+  ] as readonly SiteLink[],
 } as const;

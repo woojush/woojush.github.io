@@ -15,7 +15,7 @@
 | 정보 구조 | 5개 메뉴, 세 컬렉션(knowledge/projects/writing), `/tags/[tag]` | 구조가 곧 이 프로젝트의 본체 |
 | 콘텐츠 모델 | frontmatter 스키마 검증, `links` + 자동 backlink, `topic` 트리 자동 생성 | 이후 모든 글이 이 모델 위에 쌓이므로 처음에 맞아야 함 |
 | HOME | 정체성 소개 + NOW + Recent knowledge/writing + Selected projects (비어 있으면 숨김) | |
-| ABOUT | 본문 + Timeline (순서: 소개 → 학력/스킬 → 관심사 → … → Links, `docs/01` §4.2) | |
+| ABOUT | 본문 + Timeline (순서: Intro → Interests → Why this site → Path → Elsewhere, `docs/01` §4.2, 2026-10-10 개정) | |
 | 글 읽기 | Markdown, KaTeX, Shiki, TOC, Mermaid(지연 로드), `<Embed>`(iframe) | 브리프 14번이 "반드시"로 요구한 확장 포인트가 실제로 동작함을 증명 |
 | 디자인 | 토큰 시스템, 다크/라이트(3상태, flash 없음), 반응형 헤더, 포커스·키보드 기본 | |
 | 배포 | GitHub Actions → GitHub Pages | |

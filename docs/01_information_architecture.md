@@ -100,25 +100,22 @@
 
 ```
 About
-  Who I am                  짧은 소개
-  Education / Skills        학력과 현재 가능한 것 (간결한 목록)
-  What I'm interested in    관심사 (확정이 아니라 "현재 관심")
-  How I learn               공부 방식
-  What I build              만드는 것의 성격
-  Career direction          방향 (미확정이면 미확정이라고 씀)
-  Timeline                  data/timeline.yaml
-  Philosophy                가치관
-  Links                     GitHub, 이메일 (페이지 완성 후 추가, 비어 있으면 숨김)
+  (lead)                    제목 아래 한 줄 소개 (frontmatter `lead`)
+  Intro                     이름, 학교·전공, 목표, 현재 상태 (제목 없이 본문 첫 문단)
+  Interests                 관심사 묶음 (확정이 아니라 "현재 관심")
+  Why this site             이 사이트의 철학
+  Path                      data/timeline.yaml (방향이 보이는 이정표)
+  Elsewhere                 GitHub, 이메일, LinkedIn (site.ts의 links, 비어 있으면 숨김)
 ```
 
-순서의 이유 (2026-10-10 결정): 일반적인 개인 사이트·포트폴리오의 About은 소개 → 학력·스킬 → 연락·링크 같은 사실 정보를 앞에 두고 성찰적 내용을 뒤에 둔다. 교수·채용 담당자가 먼저 찾는 정보를 앞에 배치한다.
+구성은 2026-10-10에 사용자가 승인한 안으로 바꿨다. 이전 안(Who I am / Education·Skills / How I learn / What I build / Career direction / Philosophy)은 이력서에 가까워서, "이 사이트를 만든 사람이 누구이고 무엇을 쌓아가는 중인지"를 1분 안에 보여준다는 역할에 맞춰 줄였다. 학력·스킬은 projects와 knowledge가 증거로 대신한다.
 
 규칙:
 
 - About은 **연 1~2회** 고치는 페이지다. 자주 바뀌는 내용은 NOW로 보낸다.
 - Timeline은 시간 축의 *방향*을 보여준다. 군 복무는 타임라인의 한 항목일 뿐, 사이트의 주제가 아니다. (브리프 17번 항목 준수)
-- Skills는 "현재 가능한 것"만 적고, 레벨 바/퍼센트 같은 시각화는 하지 않는다.
-- Links(GitHub, 이메일)는 공개하기로 했으나 **페이지 완성 후** 추가한다. 추가 전에는 섹션을 숨기고 `site.ts`의 `links`도 비워 둔다. 푸터 링크와 같은 데이터를 쓴다.
+- 스킬 막대그래프·퍼센트 같은 시각화는 하지 않는다. 상세 이력서도 두지 않는다.
+- Elsewhere는 푸터 링크와 같은 데이터(`site.ts`의 `links`)를 쓴다.
 
 ### 4.3 KNOWLEDGE
 

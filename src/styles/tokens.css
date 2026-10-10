@@ -24,7 +24,6 @@
   --rule: #2e2c28;
   --accent: #e0a96d;
   --code-bg: #1c1b19;
-  --card-rgb: 38, 37, 34; /* 장면의 카드 면(rgb) */
   --particle: 235, 231, 223; /* 메인 별가루 색 (rgb 채널) */
 }
 
@@ -38,7 +37,6 @@
   --rule: #d6d6d1;
   --accent: #86561f;
   --code-bg: #ebebe7;
-  --card-rgb: 232, 232, 228;
   --particle: 28, 27, 25;
   --nav-pill-bg: rgba(234, 234, 227, 0.4); /* lifestories.org 밝은 화면 값 */
   --nav-dot: rgba(234, 234, 227, 0.7);

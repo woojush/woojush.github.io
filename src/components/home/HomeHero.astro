@@ -1,21 +1,16 @@
 ---
 // 메인(/)의 첫 화면: 배경 별가루 + 단어가 차례로 떠오르는 큰 문구 (한 번만, docs/07).
-// 문구는 data/site.ts의 hero를 받아 그리기만 한다. 배경(3D 카드 장면)은 src/scripts/scene.ts.
+// 문구는 data/site.ts의 hero를 받아 그리기만 한다. 배경(별 입자 장면)은 src/scripts/scene.ts.
 interface Segment {
   text: string;
   strong?: boolean;
 }
-interface Card {
-  label: string;
-  title: string;
-}
 interface Props {
   title: readonly Segment[];
   sub: string;
-  cards: readonly Card[];
 }
 
-const { title, sub, cards } = Astro.props;
+const { title, sub } = Astro.props;
 
 // 문구를 어절 단위로 쪼개 단어마다 등장 순서(--i)를 준다. 강조는 굵기로만 한다 (색 아님)
 const words = title.flatMap((seg) =>
@@ -26,7 +21,7 @@ const words = title.flatMap((seg) =>
 );
 ---
 
-<canvas class="scene" data-scene data-cards={JSON.stringify(cards)} aria-hidden="true"></canvas>
+<canvas class="scene" data-scene aria-hidden="true"></canvas>
 <div class="vignette" aria-hidden="true"></div>
 
 <section class="hero">
@@ -59,13 +54,13 @@ const words = title.flatMap((seg) =>
     pointer-events: none;
   }
 
-  /* 가장자리를 배경색으로 어둡게(lifestories의 vignette: 50%에서 시작, 0.75) */
+  /* 가장자리를 배경색으로 살짝 어둡게(lifestories의 vignette 기본값: 65%에서 시작, 0.4) */
   .vignette {
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 50%, color-mix(in srgb, var(--bg) 75%, transparent) 100%);
+    background: radial-gradient(ellipse at center, transparent 65%, color-mix(in srgb, var(--bg) 40%, transparent) 100%);
   }
 
   .hero {
@@ -96,6 +91,12 @@ const words = title.flatMap((seg) =>
 
   /* 움직임을 줄이는 설정이 아닐 때만, 처음엔 숨겨 두었다가 순서대로 떠오른다 */
   @media (prefers-reduced-motion: no-preference) {
+    /* lifestories의 intro 문구처럼 문구 전체가 아주 천천히 물러난다(scale 1 → 0.94, 왼쪽 정렬 기준) */
+    .hero {
+      transform-origin: left center;
+      animation: recede 24s var(--ease-out) forwards;
+    }
+
     .word,
     .hero-sub {
       opacity: 0;
@@ -106,6 +107,12 @@ const words = title.flatMap((seg) =>
     .word,
     .hero-sub {
       animation-delay: calc(300ms + var(--i) * 90ms);
+    }
+  }
+
+  @keyframes recede {
+    to {
+      transform: scale(0.94);
     }
   }
 

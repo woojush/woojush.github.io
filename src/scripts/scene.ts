@@ -1,168 +1,173 @@
-// 메인 히어로 배경: 3D 공간에 카드가 떠다니고, 가는 입자가 흐르며, 포인터를 따라 카메라가 살짝 움직인다 (three.js).
-// 모양의 기준은 lifestories.org/discover의 장면이다(코드는 복사하지 않고 직접 구현했다). docs/07 §3 참고.
-// - 카드 내용은 index.astro가 data-cards(JSON)로 넘긴다. 내용이 없는 카드는 빈 액자(깊이감용)다.
-// - 색은 CSS 토큰(--bg, --surface, --text, --text-muted, --particle)에서 읽고, 테마가 바뀌면 다시 읽는다.
-// - prefers-reduced-motion이면 한 장면만 그린다. 탭이 숨겨지면 멈춘다. WebGL이 없으면 캔버스를 숨긴다.
+// 메인 히어로 배경: 별(먼지) 입자가 깊이감 있게 반짝이며 천천히 다가오고, 포인터를 따라 시차가 생긴다 (three.js).
+// 기준은 lifestories.org/discover의 별 장면이다(코드는 복사하지 않고 원리만 보고 직접 구현했다). docs/07 §3.
+//  - 입자는 한 덩어리의 점구름(Points). 대부분 아주 작고 가끔 큰 별, 일부는 성단처럼 뭉친다.
+//  - 입자마다 제 박자로 반짝이고(twinkle), 멀리·아주 가까이에서는 흐려지며, 화면에서 최대 크기가 제한된다.
+//  - 처음 한 번 입자들이 중앙에서 순서대로 터져 나오며 자리 잡는다(genesis intro).
+//  - 색은 CSS 토큰 --particle(rgb 채널). 테마가 바뀌면 다시 읽는다.
+//  - prefers-reduced-motion이면 한 장면만 그린다. 탭이 숨겨지면 멈춘다. WebGL이 없으면 캔버스를 숨긴다.
 import {
   AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
-  CanvasTexture,
   Color,
-  Fog,
-  Group,
-  Mesh,
-  MeshBasicMaterial,
-  PerspectiveCamera,
-  PlaneGeometry,
+  NormalBlending,
+  OrthographicCamera,
   Points,
-  PointsMaterial,
   Scene,
-  SRGBColorSpace,
+  ShaderMaterial,
   WebGLRenderer,
 } from 'three';
 
-interface CardData {
-  label: string;
-  title: string;
-}
-
 const canvas = document.querySelector<HTMLCanvasElement>('[data-scene]');
 
+const VERT = /* glsl */ `
+  uniform float uFly;        // 지금까지 날아온 거리(깊이 방향)
+  uniform float uDepth;      // 깊이 범위
+  uniform float uNear;
+  uniform vec2 uPan;         // 포인터 시차(-1~1)
+  uniform float uRoll;       // 아주 느린 회전
+  uniform vec2 uTan;         // 화면 반폭/깊이 비율(x), 반높이/깊이 비율(y)
+  uniform float uTime;
+  uniform float uIntro;      // 0 → 1
+  uniform float uIntroSpread;
+  uniform float uDpr;
+  uniform float uMaxPx;
+  attribute float aSize;
+  attribute float aSeed;
+  attribute float aZ;
+  varying float vAlpha;
+  void main() {
+    // 깊이: 날아온 만큼 가까워지고, 범위를 넘으면 먼 쪽으로 되돌아간다(끝없는 비행)
+    float dist = uNear + mod(aZ - uFly, uDepth);
+    float c = cos(uRoll), s = sin(uRoll);
+    vec2 p = vec2(position.x * c - position.y * s, position.x * s + position.y * c);
+    vec2 xy = p * dist * uTan;
+    // 가까운 별일수록 포인터에 크게 반응한다
+    xy += uPan * vec2(1.2, 0.8) * (uNear * 6.0) / dist * 2.2;
+    // genesis: 입자마다 시차를 두고 중앙에서 퍼져 나온다
+    float onset = smoothstep(aSeed * 0.65, aSeed * 0.65 + 0.35, uIntro);
+    xy *= mix(1.0 - uIntroSpread, 1.0, onset);
+    gl_Position = vec4(xy / (dist * uTan), 0.0, 1.0);
+    float t = dist / uDepth;
+    float size = (0.7 + aSize * 2.6) * mix(1.7, 0.55, t) * uDpr;
+    gl_PointSize = min(size, uMaxPx * uDpr) * onset;
+    // 먼 쪽과 바로 눈앞에서는 흐려진다
+    float far = 1.0 - smoothstep(0.55, 1.0, t);
+    float near = smoothstep(0.0, 0.08, t);
+    // 입자마다 제 박자의 반짝임(두 사인이 겹쳐 불규칙하게)
+    float ph = aSeed * 40.0;
+    float sp = 1.0 + fract(aSeed * 7.31) * 3.0;
+    float tw = 0.35 + 0.65 * (0.5 + 0.5 * sin(uTime * 1.6 * sp + ph) * sin(uTime * 1.1 * sp + ph * 1.7));
+    vAlpha = far * near * tw * onset;
+  }
+`;
+
+const FRAG = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uOpacity;
+  varying float vAlpha;
+  void main() {
+    float r = length(gl_PointCoord - 0.5) * 2.0;
+    if (r > 1.0) discard;
+    float a = pow(1.0 - r, 1.6);
+    gl_FragColor = vec4(uColor, a * vAlpha * uOpacity);
+  }
+`;
+
 function start(canvas: HTMLCanvasElement): void {
-  const cards: CardData[] = JSON.parse(canvas.dataset.cards || '[]');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const small = matchMedia('(max-width: 640px)');
   const root = document.documentElement;
   const css = (name: string) => getComputedStyle(root).getPropertyValue(name).trim();
 
-  const renderer = new WebGLRenderer({ canvas, alpha: true, antialias: true });
+  const renderer = new WebGLRenderer({ canvas, alpha: true, antialias: false });
   renderer.setClearColor(0x000000, 0);
   const scene = new Scene();
-  const camera = new PerspectiveCamera(50, 1, 0.1, 60);
-  camera.position.set(0, 0, 8);
+  const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1); // 정점 셰이더가 직접 화면 좌표를 만든다
 
-  const world = new Group();
-  scene.add(world);
+  const DEPTH = 36;
+  const COUNT = small.matches ? 6000 : 14000;
+  const FOV_TAN = Math.tan((60 * Math.PI) / 360); // fov 60°
 
-  const CARD_W = 1.7;
-  const CARD_H = 1.05;
-  const geometry = new PlaneGeometry(CARD_W, CARD_H);
-
-  interface Floater {
-    mesh: Mesh<PlaneGeometry, MeshBasicMaterial>;
-    data: CardData | null;
-    base: [number, number, number];
-    phase: number;
-    speed: number;
-  }
-  const floaters: Floater[] = [];
-
-  // 카드 한 장의 그림: 어두운 면 + 얇은 테두리 + 라벨/제목. 내용이 없으면 면과 테두리만 그린다.
-  function paint(data: CardData | null): CanvasTexture {
-    const c = document.createElement('canvas');
-    c.width = 680;
-    c.height = 420;
-    const g = c.getContext('2d')!;
-    const r = 28;
-    g.fillStyle = `rgb(${css('--card-rgb') || '28, 27, 25'})`;
-    g.beginPath();
-    g.roundRect(4, 4, c.width - 8, c.height - 8, r);
-    g.fill();
-    g.strokeStyle = `rgba(${css('--particle') || '235, 231, 223'}, 0.3)`;
-    g.lineWidth = 3;
-    g.stroke();
-    if (data) {
-      const family = getComputedStyle(root).getPropertyValue('--font-sans') || 'sans-serif';
-      g.fillStyle = css('--text-muted') || '#a09b90';
-      g.font = `500 30px ${family}`;
-      g.fillText(data.label, 44, 78);
-      g.fillStyle = css('--text') || '#ebe7df';
-      g.font = `600 56px ${family}`;
-      const words = data.title.split(' ');
-      let line = '';
-      let y = 190;
-      for (const w of words) {
-        const next = line ? `${line} ${w}` : w;
-        if (g.measureText(next).width > c.width - 88 && line) {
-          g.fillText(line, 44, y);
-          line = w;
-          y += 70;
-        } else line = next;
-      }
-      g.fillText(line, 44, y);
-    }
-    const t = new CanvasTexture(c);
-    t.colorSpace = SRGBColorSpace;
-    t.anisotropy = 4;
-    return t;
-  }
-
-  function buildCards(): void {
-    for (const f of floaters) {
-      f.mesh.material.map?.dispose();
-      f.mesh.material.dispose();
-      world.remove(f.mesh);
-    }
-    floaters.length = 0;
-    const total = small.matches ? 9 : 16;
-    for (let i = 0; i < total; i++) {
-      const data = cards[i] ?? null;
-      const mat = new MeshBasicMaterial({ map: paint(data), transparent: true, opacity: data ? 1 : 0.8, fog: true });
-      const mesh = new Mesh(geometry, mat);
-      // 보이는 영역 안에 겹치지 않게 흩뿌린다: 격자 칸마다 한 장, 칸 안에서 흔든다
-      const cols = small.matches ? 3 : 5;
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      const rows = Math.ceil(total / cols);
-      const x = ((col + 0.5) / cols - 0.5) * (small.matches ? 7 : 17) + (Math.random() - 0.5) * 2;
-      const y = (0.5 - (row + 0.5) / rows) * (small.matches ? 11 : 8.5) + (Math.random() - 0.5) * 1.4;
-      const z = -6 + Math.random() * 6;
-      mesh.position.set(x, y, z);
-      mesh.rotation.set((Math.random() - 0.5) * 0.25, (Math.random() - 0.5) * 0.45, (Math.random() - 0.5) * 0.12);
-      world.add(mesh);
-      floaters.push({ mesh, data, base: [x, y, z], phase: Math.random() * Math.PI * 2, speed: 0.12 + Math.random() * 0.18 });
-    }
-  }
-
-  // 가는 입자 층
-  const COUNT = small.matches ? 260 : 520;
+  // 입자 생성: 화면 전체에 고르게 + 일부는 성단처럼 뭉친다. x,y는 깊이 1일 때 화면 비율(-1~1)
   const pos = new Float32Array(COUNT * 3);
+  const size = new Float32Array(COUNT);
+  const seed = new Float32Array(COUNT);
+  const zs = new Float32Array(COUNT);
+  const CLUSTERS = 90;
+  const centers = Array.from({ length: CLUSTERS }, () => [Math.random() * 2.4 - 1.2, Math.random() * 2.4 - 1.2, Math.random() * DEPTH]);
+  const gauss = () => Math.sqrt(-2 * Math.log(Math.max(1e-6, Math.random()))) * Math.cos(2 * Math.PI * Math.random());
   for (let i = 0; i < COUNT; i++) {
-    pos[i * 3] = (Math.random() - 0.5) * 24;
-    pos[i * 3 + 1] = (Math.random() - 0.5) * 14;
-    pos[i * 3 + 2] = -10 + Math.random() * 16;
+    let x: number, y: number, z: number, big = 0.11 + Math.random() * 0.28;
+    if (Math.random() < 0.55) {
+      const c = centers[(Math.random() * CLUSTERS) | 0];
+      x = c[0] + gauss() * 0.08;
+      y = c[1] + gauss() * 0.08;
+      z = c[2] + gauss() * 1.4;
+      big = 0.13 + Math.random() * 0.5;
+    } else {
+      x = Math.random() * 2.4 - 1.2;
+      y = Math.random() * 2.4 - 1.2;
+      z = Math.random() * DEPTH;
+    }
+    if (Math.random() < 0.02) big = 0.9 + Math.random() * 0.8; // 가끔 큰 별
+    pos.set([x, y, 0], i * 3);
+    size[i] = big;
+    seed[i] = Math.random();
+    zs[i] = ((z % DEPTH) + DEPTH) % DEPTH;
   }
-  const pGeo = new BufferGeometry();
-  pGeo.setAttribute('position', new BufferAttribute(pos, 3));
-  const dot = document.createElement('canvas');
-  dot.width = dot.height = 64;
-  const dg = dot.getContext('2d')!;
-  const grad = dg.createRadialGradient(32, 32, 0, 32, 32, 32);
-  grad.addColorStop(0, 'rgba(255,255,255,1)');
-  grad.addColorStop(1, 'rgba(255,255,255,0)');
-  dg.fillStyle = grad;
-  dg.fillRect(0, 0, 64, 64);
-  const pMat = new PointsMaterial({ size: 0.07, map: new CanvasTexture(dot), transparent: true, opacity: 0.7, depthWrite: false, blending: AdditiveBlending, sizeAttenuation: true });
-  const points = new Points(pGeo, pMat);
+  const geo = new BufferGeometry();
+  geo.setAttribute('position', new BufferAttribute(pos, 3));
+  geo.setAttribute('aSize', new BufferAttribute(size, 1));
+  geo.setAttribute('aSeed', new BufferAttribute(seed, 1));
+  geo.setAttribute('aZ', new BufferAttribute(zs, 1));
+
+  const material = new ShaderMaterial({
+    vertexShader: VERT,
+    fragmentShader: FRAG,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+    blending: AdditiveBlending,
+    uniforms: {
+      uFly: { value: 0 },
+      uDepth: { value: DEPTH },
+      uNear: { value: 0.3 },
+      uPan: { value: [0, 0] },
+      uRoll: { value: 0 },
+      uTan: { value: [FOV_TAN, FOV_TAN] },
+      uTime: { value: 0 },
+      uIntro: { value: 1 },
+      uIntroSpread: { value: 0.55 },
+      uDpr: { value: 1 },
+      uMaxPx: { value: 3.5 },
+      uColor: { value: new Color(0xc2c2c2) },
+      uOpacity: { value: 0.75 },
+    },
+  });
+  const points = new Points(geo, material);
+  points.frustumCulled = false;
   scene.add(points);
 
   function readTheme(): void {
     const rgb = css('--particle').split(',').map((n) => Number(n.trim()));
-    pMat.color = new Color(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
-    // 가까운 카드는 또렷하게, 먼 카드는 배경 색으로 묻히게
-    scene.fog = new Fog(new Color(css('--bg') || '#121211'), 9, 24);
-    buildCards();
+    if (rgb.length === 3 && rgb.every((n) => !Number.isNaN(n))) material.uniforms.uColor.value = new Color(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
+    // 어두운 배경에서는 빛으로 더하고, 밝은 배경에서는 어두운 점으로 얹는다
+    const light = root.getAttribute('data-theme') === 'light';
+    material.blending = light ? NormalBlending : AdditiveBlending;
+    material.uniforms.uOpacity.value = light ? 0.55 : 0.75;
+    material.needsUpdate = true;
     if (reduce.matches) render();
   }
 
   function resize(): void {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(dpr);
     renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
+    material.uniforms.uDpr.value = dpr;
+    material.uniforms.uTan.value = [FOV_TAN * (w / h), FOV_TAN];
     if (reduce.matches) render();
   }
 
@@ -172,7 +177,10 @@ function start(canvas: HTMLCanvasElement): void {
   let ty = 0;
   let clock = 0;
   let last = 0;
-  let intro = 0; // 0 → 1: 처음 한 번 천천히 나타난다
+  let intro = 0;
+  const INTRO_SECONDS = 3.4;
+  const FLY_SPEED = 0.9; // 초당 깊이 이동량 (36 중)
+  const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 
   function render(): void {
     renderer.render(scene, camera);
@@ -182,24 +190,18 @@ function start(canvas: HTMLCanvasElement): void {
     const dt = Math.min((now - last) / 1000 || 0, 0.05);
     last = now;
     clock += dt;
-    intro = Math.min(1, intro + dt / 2.2);
-    px += (tx - px) * Math.min(1, dt * 2.5);
-    py += (ty - py) * Math.min(1, dt * 2.5);
-    // 카메라: 아주 느린 떠다님 + 포인터 시차
-    camera.position.x = Math.sin(clock * 0.07) * 0.6 + px * 0.9;
-    camera.position.y = Math.cos(clock * 0.05) * 0.35 + py * 0.55;
-    camera.position.z = 8 - (1 - ease(intro)) * 2.5;
-    camera.lookAt(0, 0, 0);
-    for (const f of floaters) {
-      const t = clock * f.speed + f.phase;
-      f.mesh.position.set(f.base[0] + Math.sin(t) * 0.35, f.base[1] + Math.cos(t * 1.3) * 0.28, f.base[2] + Math.sin(t * 0.7) * 0.4);
-      f.mesh.rotation.z += Math.sin(t) * 0.0004;
-    }
-    points.rotation.y = clock * 0.012;
-    canvas.style.opacity = String(ease(intro));
+    intro = Math.min(1, intro + dt / INTRO_SECONDS);
+    px += (tx - px) * Math.min(1, dt * 2.2);
+    py += (ty - py) * Math.min(1, dt * 2.2);
+    const u = material.uniforms;
+    u.uTime.value = clock;
+    u.uIntro.value = ease(intro);
+    u.uFly.value = clock * FLY_SPEED;
+    u.uPan.value = [px, py];
+    u.uRoll.value = clock * 0.004;
+    canvas.style.opacity = '1';
     render();
   }
-  const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 
   let raf = 0;
   function loop(now: number): void {
@@ -210,10 +212,11 @@ function start(canvas: HTMLCanvasElement): void {
   function play(): void {
     cancelAnimationFrame(raf);
     if (reduce.matches) {
-      intro = 1;
+      const u = material.uniforms;
+      u.uIntro.value = 1;
+      u.uFly.value = 0;
+      u.uTime.value = 1.7;
       canvas.style.opacity = '1';
-      camera.position.set(0, 0, 8);
-      camera.lookAt(0, 0, 0);
       render();
     } else if (!document.hidden) {
       last = performance.now();
@@ -232,8 +235,6 @@ function start(canvas: HTMLCanvasElement): void {
 
   resize();
   readTheme();
-  // 글꼴이 준비된 뒤 카드 글자를 다시 그린다
-  document.fonts?.ready.then(readTheme);
   play();
 }
 

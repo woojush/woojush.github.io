@@ -34,7 +34,6 @@ const VERT = /* glsl */ `
   uniform float uIntroSpread;
   uniform float uDpr;
   uniform float uMaxPx;
-  uniform float uAb;         // 색수차 방향(0 = 흰 본체, ±1 = 붉은/푸른 가장자리 겹)
   attribute float aSize;
   attribute float aSeed;
   attribute float aZ;
@@ -50,9 +49,6 @@ const VERT = /* glsl */ `
     xy += uPan * vec2(0.05, 0.035) * (uD0 / dist);
     float onset = smoothstep(aSeed * 0.65, aSeed * 0.65 + 0.35, uIntro);
     xy *= mix(1.0 - uIntroSpread, 1.0, onset);
-    // 테두리로 갈수록 색이 갈라진다(색수차): 붉은 겹은 바깥으로, 푸른 겹은 안쪽으로 밀린다
-    float r0 = length(xy);
-    xy *= 1.0 + uAb * 0.06 * r0 * r0;
     gl_Position = vec4(xy, 0.0, 1.0);
     float t = dist / uDepth;
     // 원근법: 처음(먼 곳)의 크기에서 시작해, 다가올수록 거리에 반비례하는 쪽으로 점점 커진다
@@ -65,12 +61,11 @@ const VERT = /* glsl */ `
     float ph = aSeed * 40.0;
     float sp = 1.0 + fract(aSeed * 7.31) * 3.0;
     float tw = 0.35 + 0.65 * (0.5 + 0.5 * sin(uTime * 1.6 * sp + ph) * sin(uTime * 1.1 * sp + ph * 1.7));
-    float rr = r0;
+    float rr = length(xy);
     float edge = smoothstep(0.35, 1.1, rr);
-    // 색이 갈라진 겹(uAb != 0)은 테두리에서만 보인다. 흰 본체는 가운데에도 별이 있되, 한 점으로 뭉쳐 보이지 않도록 가장 안쪽만 아주 옅게 한다
-    float tint = abs(uAb);
-    float hole = mix(smoothstep(0.02, 0.16, rr), smoothstep(0.3, 0.9, rr), tint);
-    vAlpha = far * near * tw * onset * hole * mix(1.0 - 0.5 * edge, 0.9, tint);
+    // 가운데에도 별이 있되, 한 점으로 뭉쳐 보이지 않도록 가장 안쪽만 아주 옅게 한다
+    float hole = smoothstep(0.02, 0.16, rr);
+    vAlpha = far * near * tw * onset * (1.0 - 0.7 * edge) * hole;
   }
 `;
 
@@ -96,7 +91,7 @@ const STREAK_VERT = /* glsl */ `
     vec2 xy = p * (uD0 / dist) + uPan * vec2(0.05, 0.035) * (uD0 / dist);
     float r = length(xy);
     // 테두리 쪽으로 갈수록 색이 갈라진다(색수차)
-    xy *= 1.0 + uAb * 0.05 * r * r;
+    xy *= 1.0 + uAb * 0.028 * r * r;
     gl_Position = vec4(xy, 0.0, 1.0);
     float t = dist / uDepth;
     float far = 1.0 - smoothstep(0.55, 1.0, t);
@@ -210,33 +205,11 @@ function start(canvas: HTMLCanvasElement): void {
       uMaxPx: { value: 9 },
       uColor: { value: new Color(0xc2c2c2) },
       uOpacity: { value: 0.95 },
-      uAb: { value: 0 },
     },
   });
   const points = new Points(geo, material);
   points.frustumCulled = false;
   scene.add(points);
-
-  // 테두리 색수차: 같은 별을 붉은 겹(바깥으로 밀림)·푸른 겹(안쪽으로 밀림)으로 한 번 더 그린다(테두리에서만 보인다)
-  const tintPoints = [
-    { ab: 1, color: new Color(1.0, 0.3, 0.25) },
-    { ab: -1, color: new Color(0.3, 0.5, 1.0) },
-  ].map((m, i) => {
-    const mat = new ShaderMaterial({
-      vertexShader: VERT,
-      fragmentShader: FRAG,
-      transparent: true,
-      depthTest: false,
-      depthWrite: false,
-      blending: AdditiveBlending,
-      uniforms: { ...material.uniforms, uAb: { value: m.ab }, uColor: { value: m.color }, uOpacity: { value: 0.7 } },
-    });
-    const pts = new Points(geo, mat);
-    pts.frustumCulled = false;
-    pts.renderOrder = -1 - i;
-    scene.add(pts);
-    return pts;
-  });
 
   // 테두리 쪽 줄무늬: 같은 별을 (머리, 꼬리) 두 점의 선분으로 그린다. 가운데 흰 줄 + 붉은·푸른 색수차 줄 두 겹
   const sPos = new Float32Array(COUNT * 6);
@@ -258,8 +231,8 @@ function start(canvas: HTMLCanvasElement): void {
   sGeo.setAttribute('aZ', new BufferAttribute(sZ, 1));
   const streakMats = [
     { ab: 0, color: new Color(0xc2c2c2), opacity: 0.3 },
-    { ab: 1, color: new Color(1.0, 0.25, 0.2), opacity: 0.3 },
-    { ab: -1, color: new Color(0.25, 0.45, 1.0), opacity: 0.3 },
+    { ab: 1, color: new Color(1.0, 0.25, 0.2), opacity: 0.16 },
+    { ab: -1, color: new Color(0.25, 0.45, 1.0), opacity: 0.16 },
   ].map((m, i) => {
     const mat = new ShaderMaterial({
       vertexShader: STREAK_VERT,
@@ -277,7 +250,7 @@ function start(canvas: HTMLCanvasElement): void {
         uRoll: material.uniforms.uRoll,
         uTime: material.uniforms.uTime,
         uMotion: { value: 1 },
-        uStreak: { value: 0.06 },
+        uStreak: { value: 0.045 },
         uAb: { value: m.ab },
         uColor: { value: m.color },
         uOpacity: { value: m.opacity },
@@ -299,7 +272,6 @@ function start(canvas: HTMLCanvasElement): void {
     material.uniforms.uOpacity.value = light ? 0.7 : 0.95;
     material.needsUpdate = true;
     // 줄무늬·색수차는 어두운 배경에서만(밝은 배경에서는 빛으로 더하는 효과가 보이지 않는다)
-    tintPoints.forEach((pt) => (pt.visible = !light));
     streakMats.forEach((m, i) => {
       m.lines.visible = !light;
       if (i === 0) m.mat.uniforms.uColor.value = material.uniforms.uColor.value;

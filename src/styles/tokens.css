@@ -38,7 +38,7 @@
   --accent: #86561f;
   --code-bg: #ebebe7;
   --particle: 28, 27, 25;
-  --nav-pill-bg: rgba(234, 234, 227, 0.4); /* lifestories.org 밝은 화면 값 */
+  --nav-pill-bg: rgba(110, 110, 110, 0.16);
   --nav-dot: rgba(234, 234, 227, 0.7);
 }
 
@@ -123,7 +123,7 @@
   --nav-label-spring: cubic-bezier(0.34, 1.4, 0.6, 1);
   --ease-custom: cubic-bezier(0.5, 0, 0.2, 1);
   /* lifestories.org 값 그대로: 알약 면, 허브 점, 알약 안쪽에서 떠도는 색 빛 4색 */
-  --nav-pill-bg: rgba(25, 25, 25, 0.4);
+  --nav-pill-bg: rgba(140, 140, 140, 0.22); /* 약간 그레이, 반투명 */
   --nav-dot: rgba(254, 254, 254, 0.9);
   --glow-tan: rgba(99, 96, 113, 0.5);
   --glow-orange: rgba(179, 45, 0, 0.5);

@@ -88,7 +88,7 @@
     radial-gradient(ellipse 1.625rem 2.1875rem at calc(100% + var(--drift-ax) - var(--drift-fx) * var(--hover-boost)) calc(27% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)), var(--glow-blue), transparent),
     radial-gradient(ellipse 3.25rem 2.5rem at calc(100% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(27% + var(--drift-ay) - var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent);
   box-shadow: inset 0 0 0.3125rem 0.0625rem rgba(0, 0, 0, 0.14);
-  opacity: 0.9;
+  opacity: 0.6;
   pointer-events: none;
   transition:
     opacity 0.3s var(--ease-custom),
@@ -146,24 +146,24 @@
 
 @keyframes nav-drift-a {
   0% { --drift-ax: 0px; --drift-ay: 0px; }
-  25% { --drift-ax: 8px; --drift-ay: -4px; }
-  50% { --drift-ax: -5px; --drift-ay: 6px; }
-  75% { --drift-ax: 4px; --drift-ay: 7px; }
+  25% { --drift-ax: 20px; --drift-ay: -10px; }
+  50% { --drift-ax: -12px; --drift-ay: 15px; }
+  75% { --drift-ax: 10px; --drift-ay: 18px; }
   100% { --drift-ax: 0px; --drift-ay: 0px; }
 }
 
 @keyframes nav-drift-b {
   0% { --drift-bx: 0px; --drift-by: 0px; }
-  33% { --drift-bx: -6px; --drift-by: 5px; }
-  66% { --drift-bx: 7px; --drift-by: -6px; }
+  33% { --drift-bx: -15px; --drift-by: 12px; }
+  66% { --drift-bx: 18px; --drift-by: -15px; }
   100% { --drift-bx: 0px; --drift-by: 0px; }
 }
 
 @keyframes nav-drift-fast {
   0% { --drift-fx: 0px; --drift-fy: 0px; }
-  25% { --drift-fx: 12px; --drift-fy: -8px; }
-  50% { --drift-fx: -10px; --drift-fy: 10px; }
-  75% { --drift-fx: 9px; --drift-fy: -7px; }
+  25% { --drift-fx: 30px; --drift-fy: -20px; }
+  50% { --drift-fx: -25px; --drift-fy: 25px; }
+  75% { --drift-fx: 22px; --drift-fy: -18px; }
   100% { --drift-fx: 0px; --drift-fy: 0px; }
 }
 

@@ -6,7 +6,7 @@
 ## 0. 현재 상태
 
 - **Phase 0 완료** (배포 가능한 최소 기반 검증), **Phase 1 완료·승인됨** (2026-10-10, 디자인 토큰과 사이트 틀).
-- **디자인 방향 v2 적용됨** (2026-10-10, `docs/07`): 어두운 기본 테마, 탭 바, 메인 별가루 히어로. Phase 2 전에 하위 페이지별 디자인을 구체화한다.
+- **디자인 방향 v2 적용됨** (2026-10-10, `docs/07`): 어두운 기본 테마, 탭 바, 메인 별 입자 장면 히어로. Phase 2 전에 하위 페이지별 디자인을 구체화한다.
 - **정보 구조 논의 반영 완료** (2026-10-10): 메뉴 순서 `projects about knowledge writing`(외부 방문자가 projects를 먼저 보도록, home은 메뉴에서 제외), HOME은 NOW + 최근 활동만 유지하되 Selected projects를 Recent보다 위에, ABOUT은 `docs/01` §4.2. 탭 바 디자인은 사용자가 직접 수정할 수 있다(순서·이름은 유지).
 - **한국어만 지원**한다. UI 라벨은 영어를 유지한다. 영어 글·UI 작업은 하지 않는다.
 - **탭 바 v4 구현됨** (2026-10-10, `tabbar-v4` 브랜치): 사용자 지시로 lifestories.org의 상단 알약을 그대로 따랐다. 평소에는 화면 위 가운데에 떠 있는 작은 알약(가운데 허브)이고, 마우스가 올라가면 스프링으로 늘어나며 글자가 모인다. 글자에 마우스를 올리면 알약 아래쪽에서 은은한 빛이 따라온다. **home은 메뉴에서 뺐고** 이름과 허브가 홈 링크다. 모양은 `src/styles/nav.css`, 값은 `tokens.css`의 탭 바 토큰, 동작은 `src/scripts/nav.ts`. 이 효과는 `docs/07` §3 c·`DESIGN.md`의 승인된 예외다.
@@ -95,7 +95,7 @@ src/
   pages/                       라우팅. 얇게 유지
 ```
 
-디자인 v2에서 추가됨: `docs/07`, `src/components/home/HomeHero.astro`, `src/scripts/starfield.ts`.
+디자인 v2에서 추가됨: `docs/07`, `src/components/home/HomeHero.astro`, `src/scripts/scene.ts`.
 About에서 추가됨: `src/components/about/Timeline.astro`, `src/lib/content.ts`의 `getAbout`·`getTimeline`, about 스키마의 선택 필드 `lead`.
 Phase 1에서 추가됨: `src/components/layout/`(Header, Nav, Footer, ThemeToggle), `src/styles/{tokens,fonts,base}.css`, `src/scripts/{theme-init.js,theme-toggle.ts}`, `public/fonts/pretendard/`.
 이후에 추가될 것: `src/components/{content,home,about,mdx}/`, `src/styles/prose.css`, `src/lib/{topics,links,format}.ts`, `public/labs/`. 구조 명세는 `docs/05`.
@@ -125,7 +125,7 @@ Phase 1에서 추가됨: `src/components/layout/`(Header, Nav, Footer, ThemeTogg
 
 ## 8. 디자인 원칙 (기준: `docs/07` 우선, 그다음 `docs/04`)
 
-**2026-10-10 방향 변경 (사용자 승인·적용됨):** 어두운 테마 기본(dark ↔ light, system 없음), 상단 탭 바 + View Transitions, 메인 한정 별가루·문구 등장. 아래 목록은 이에 맞게 완화됐다: 모션은 `docs/07` §3의 허용 범위만 쓴다. 카드 그리드·장식 그림자/그라디언트·CTA 히어로·eyebrow 라벨 금지는 유지.
+**2026-10-10 방향 변경 (사용자 승인·적용됨):** 어두운 테마 기본(dark ↔ light, system 없음), 상단 탭 바 + View Transitions, 메인 한정 별 입자 장면·문구 등장. 아래 목록은 이에 맞게 완화됐다: 모션은 `docs/07` §3의 허용 범위만 쓴다. 카드 그리드·장식 그림자/그라디언트·CTA 히어로·eyebrow 라벨 금지는 유지.
 
 Minimal · Technical · Editorial · Calm · Personal · Typography-driven · 여백 많음.
 

@@ -62,9 +62,7 @@
   justify-content: center;
   padding-inline: 1.375rem;
   border-radius: 1.875rem;
-  background: color-mix(in srgb, var(--text) 7%, transparent);
-  -webkit-backdrop-filter: blur(var(--nav-blur));
-  backdrop-filter: blur(var(--nav-blur));
+  /* 배경색·블러 없음: 뒤의 화면(홈의 별가루 등)이 그대로 비친다. 안쪽 효과는 알약 모양으로 잘린다 */
   overflow: hidden;
   animation: nav-drift-a 12s ease-in-out infinite, nav-drift-b 9s ease-in-out infinite,
     nav-drift-f 5s ease-in-out infinite;
@@ -254,10 +252,11 @@
   .nav-hub span:nth-child(3) { top: calc(50% + 0.09375rem); left: calc(50% - 0.28125rem); }
   .nav-hub span:nth-child(4) { top: calc(50% + 0.09375rem); left: calc(50% + 0.09375rem); }
 
-  /* 글자 밑에서 은은하게 올라오는 빛. 알약 아래쪽 가장자리에 걸쳐 있고 글자를 따라 움직인다 */
+  /* 글자 밑에서 은은하게 올라오는 하얀 빛. 알약 안쪽 아래 가장자리에서 윗부분 1/5만 보이고, 알약 밖으로는 나가지 않는다.
+   * 5rem 높이 중 1rem만 알약 안으로 들어온다(top: 100% - 1rem). 색은 테마의 입자색(--particle: 어두운 테마 흰색) */
   .nav-blob {
     position: absolute;
-    top: 100%;
+    top: calc(100% - 1rem);
     left: 0;
     z-index: 0;
     display: block;
@@ -265,12 +264,12 @@
     height: 5rem;
     border-radius: 50%;
     background:
-      radial-gradient(circle 1.75rem at 35% 35%, color-mix(in srgb, var(--accent) 85%, #fff), transparent),
-      radial-gradient(circle 1.625rem at 70% 40%, color-mix(in srgb, var(--accent) 70%, #fff), transparent),
-      radial-gradient(circle 1.875rem at 45% 70%, color-mix(in srgb, var(--accent) 80%, #fff), transparent);
+      radial-gradient(circle 1.75rem at 35% 35%, rgba(var(--particle), 0.85), transparent),
+      radial-gradient(circle 1.625rem at 70% 40%, rgba(var(--particle), 0.7), transparent),
+      radial-gradient(circle 1.875rem at 45% 70%, rgba(var(--particle), 0.8), transparent);
     filter: blur(0.625rem);
     opacity: 0;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     pointer-events: none;
     transition:
       opacity 0.45s var(--ease-custom),

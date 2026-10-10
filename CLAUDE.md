@@ -5,7 +5,8 @@
 
 ## 0. 현재 상태
 
-- **Phase 0 완료** (배포 가능한 최소 기반 검증). 사용자 승인 전에는 Phase 1로 넘어가지 않는다.
+- **Phase 0 완료** (배포 가능한 최소 기반 검증), **Phase 1 완료·승인됨** (2026-10-10, 디자인 토큰과 사이트 틀).
+- 다음은 **Phase 2** (글 읽기 파이프라인). 사용자 승인 전에는 Phase 2로 넘어가지 않는다.
 - 진행 순서와 각 Phase의 완료 기준: `docs/06_implementation_plan.md`
 - 한 번에 **한 Phase만** 구현하고, 끝나면 완료 기준별 결과를 보고한 뒤 승인을 기다린다.
 - 계획에 없는 기능이 필요해 보이면 구현하지 말고 먼저 제안한다.
@@ -50,7 +51,7 @@ Learn → Build → Explain → Reflect 과정을 쌓는 개인 아카이브다.
 4. **`src/content/`와 `src/data/`에는 코드가 없고, 나머지에는 글이 없다.** 콘텐츠 파일은 컴포넌트 이름을 몰라야 한다 (MDX의 `<Embed>` 등 mdx 컴포넌트 제외).
 5. **페이지/컴포넌트에서 `getCollection`을 직접 호출하지 않는다.** `src/lib/content.ts`를 거친다 (draft 제외 같은 규칙을 한 곳에서 관리).
 6. **컴포넌트는 데이터를 받아 그리기만 한다.** 조회·가공 로직은 `src/lib/`에 둔다.
-7. **색·서체·간격은 디자인 토큰으로만** 쓴다 (Phase 1에서 `src/styles/tokens.css` 생성). 컴포넌트에 상수를 직접 쓰지 않는다. 서체는 sans 한 가족(Pretendard 후보)으로 시작하되 토큰으로 관리해 나중에 교체 가능하게 한다.
+7. **색·서체·간격은 디자인 토큰으로만** 쓴다 (`src/styles/tokens.css`). 컴포넌트에 상수를 직접 쓰지 않는다. 서체는 sans 한 가족(Pretendard 후보)으로 시작하되 토큰으로 관리해 나중에 교체 가능하게 한다.
 8. **관계(`links`)는 한쪽에만 선언**하고 반대쪽은 빌드 시 계산한다 (backlink, Phase 3).
 9. **`draft`는 "사이트에 배포하지 않을 콘텐츠"일 뿐 비공개가 아니다.** 저장소는 public이다.
 10. **다국어 라우팅/번역 시스템을 만들지 않는다.** 글마다 `lang`(`ko`|`en`, 기본 `ko`)만 둔다.
@@ -85,7 +86,8 @@ src/
   pages/                       라우팅. 얇게 유지
 ```
 
-Phase 1 이후에 추가될 것: `src/components/{layout,content,home,about,mdx}/`, `src/styles/`, `src/scripts/`, `src/lib/{topics,links,format}.ts`, `public/fonts`, `public/labs/`. 구조 명세는 `docs/05`.
+Phase 1에서 추가됨: `src/components/layout/`(Header, Nav, Footer, ThemeToggle), `src/styles/{tokens,fonts,base}.css`, `src/scripts/{theme-init.js,theme-toggle.ts}`, `public/fonts/pretendard/`.
+이후에 추가될 것: `src/components/{content,home,about,mdx}/`, `src/styles/prose.css`, `src/lib/{topics,links,format}.ts`, `public/labs/`. 구조 명세는 `docs/05`.
 
 ## 6. Content model (요약. 기준은 `docs/02` + `src/content.config.ts`)
 
@@ -185,11 +187,21 @@ npm run preview      # 빌드 결과 미리보기
 - Astro 7.3.5, Node ≥ 22.12. `z`는 `astro/zod`에서 import한다 (`astro:content`가 아니다).
 - 컬렉션은 `src/content.config.ts`에서 `glob` 로더(`astro/loaders`)로 정의한다. `.yaml` 파일도 glob 로더가 data entry로 읽으며, **최상위는 배열이 아니라 객체**여야 한다.
 - 엔트리 식별자는 `entry.id`(파일명 기반 slug)다. 본문 렌더링은 `import { render } from 'astro:content'`.
-- 개발 서버를 백그라운드로 쓸 때는 `astro dev --background` / `astro dev stop`.
+- 개발 서버를 백그라운드로 쓸 때는 `astro dev --background` / `astro dev stop`. `astro preview`도 스스로 백그라운드로 뜨며 `astro preview stop`으로 끈다.
+
+## 13-1. Phase 1에서 확정한 구현 사실
+
+- **테마**: `<html data-theme="system|light|dark">`. 첫 페인트 전에 `src/scripts/theme-init.js`를 BaseLayout이 `?raw`로 읽어 `<script is:inline>`으로 박는다(번들되지 않으므로 짧게 유지). 저장 키는 `theme`(system은 저장하지 않음). dark 토큰 값은 `tokens.css`의 두 곳(명시적 dark / system일 때의 OS dark)에 있으니 **항상 같이 고친다.**
+- **테마 전환 순간**: `theme-toggle.ts`가 `<html data-theme-switching>`을 잠깐 붙여 transition을 끈다(배경은 즉시, 링크 색만 140ms 늦게 바뀌는 프레임 방지). 새 transition을 넣어도 이 규칙(`base.css`)이 덮는다.
+- **토글 2개**: 헤더가 ThemeToggle을 두 번 렌더링(`placement=mobile|desktop`)하고 640px 경계에서 하나만 보인다. Tab 순서를 화면 순서와 맞추기 위한 것이므로 하나로 합치지 않는다. 토글 라벨은 JS가 아니라 CSS가 `data-theme`를 보고 표시한다.
+- **레이아웃**: header/main/footer 안쪽 컨테이너는 모두 `.page`(`--page-max` 880px)를 쓴다. 본문 폭 680px(`--measure`)은 `main`의 제목·p·목록에만 적용되며, 코드·표·Embed 같은 넓은 요소는 거기에 넣지 않는다.
+- **폰트**: `pretendard@1.3.9`(OFL)의 dynamic subset woff2를 `public/fonts/pretendard/`에 복사했고(dependency 아님), `src/styles/fonts.css`는 그 패키지 CSS에서 url 경로만 바꾼 것이다. 폰트를 바꾸면 `tokens.css`의 `--font-sans`와 이 두 곳을 같이 본다.
+- **푸터 링크**: `site.ts`의 `links`가 비어 있으면 푸터는 저작권 줄만 그린다. 외부 링크를 넣기 전에는 사용자에게 확인한다(§4).
+- **현재 메뉴 표시**: 정확히 그 페이지면 `aria-current="page"`, 그 섹션의 하위 글이면 `"true"`. 둘 다 굵기 600.
 
 ## 14. Phase 0에서 의도적으로 하지 않은 것
 
-디자인 토큰·완성된 디자인, 다크 모드, 복잡한 navigation, backlink UI, 검색, 애니메이션, 인터랙티브 시각화, Project/Article UI, `topics.yaml`, `/tags/`, Home의 NOW 표시. 모두 `docs/06`의 해당 Phase에서 구현한다.
+디자인 토큰·다크 모드·기본 틀은 Phase 1에서 구현했다. Phase 0에서는 하지 않은 것: 페이지별 완성 디자인, 복잡한 navigation, backlink UI, 검색, 애니메이션, 인터랙티브 시각화, Project/Article UI, `topics.yaml`, `/tags/`, Home의 NOW 표시. 모두 `docs/06`의 해당 Phase에서 구현한다.
 
 ## 15. 알려진 사항
 

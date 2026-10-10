@@ -54,13 +54,13 @@ const words = title.flatMap((seg) =>
     pointer-events: none;
   }
 
-  /* 가장자리를 배경색으로 살짝 어둡게(lifestories의 vignette 기본값: 65%에서 시작, 0.4) */
+  /* 가장자리를 배경색으로 살짝 어둡게(lifestories의 vignette 기본값: 가운데에 시선이 모이도록 45%에서 시작, 0.7) */
   .vignette {
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 65%, color-mix(in srgb, var(--bg) 40%, transparent) 100%);
+    background: radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--bg) 70%, transparent) 100%);
   }
 
   .hero {
@@ -91,12 +91,6 @@ const words = title.flatMap((seg) =>
 
   /* 움직임을 줄이는 설정이 아닐 때만, 처음엔 숨겨 두었다가 순서대로 떠오른다 */
   @media (prefers-reduced-motion: no-preference) {
-    /* lifestories의 intro 문구처럼 문구 전체가 아주 천천히 물러난다(scale 1 → 0.94, 왼쪽 정렬 기준) */
-    .hero {
-      transform-origin: left center;
-      animation: recede 24s var(--ease-out) forwards;
-    }
-
     .word,
     .hero-sub {
       opacity: 0;
@@ -107,12 +101,6 @@ const words = title.flatMap((seg) =>
     .word,
     .hero-sub {
       animation-delay: calc(300ms + var(--i) * 90ms);
-    }
-  }
-
-  @keyframes recede {
-    to {
-      transform: scale(0.94);
     }
   }
 

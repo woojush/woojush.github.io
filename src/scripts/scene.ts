@@ -49,7 +49,7 @@ const VERT = /* glsl */ `
     xy *= mix(1.0 - uIntroSpread, 1.0, onset);
     gl_Position = vec4(xy / (dist * uTan), 0.0, 1.0);
     float t = dist / uDepth;
-    float size = (0.7 + aSize * 2.6) * mix(1.7, 0.55, t) * uDpr;
+    float size = (0.9 + aSize * 3.2) * mix(2.4, 0.6, t) * uDpr;
     gl_PointSize = min(size, uMaxPx * uDpr) * onset;
     // 먼 쪽과 바로 눈앞에서는 흐려진다
     float far = 1.0 - smoothstep(0.55, 1.0, t);
@@ -86,7 +86,7 @@ function start(canvas: HTMLCanvasElement): void {
   const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1); // 정점 셰이더가 직접 화면 좌표를 만든다
 
   const DEPTH = 36;
-  const COUNT = small.matches ? 6000 : 14000;
+  const COUNT = small.matches ? 1500 : 3200;
   const FOV_TAN = Math.tan((60 * Math.PI) / 360); // fov 60°
 
   // 입자 생성: 화면 전체에 고르게 + 일부는 성단처럼 뭉친다. x,y는 깊이 1일 때 화면 비율(-1~1)
@@ -94,12 +94,12 @@ function start(canvas: HTMLCanvasElement): void {
   const size = new Float32Array(COUNT);
   const seed = new Float32Array(COUNT);
   const zs = new Float32Array(COUNT);
-  const CLUSTERS = 90;
+  const CLUSTERS = 40;
   const centers = Array.from({ length: CLUSTERS }, () => [Math.random() * 2.4 - 1.2, Math.random() * 2.4 - 1.2, Math.random() * DEPTH]);
   const gauss = () => Math.sqrt(-2 * Math.log(Math.max(1e-6, Math.random()))) * Math.cos(2 * Math.PI * Math.random());
   for (let i = 0; i < COUNT; i++) {
     let x: number, y: number, z: number, big = 0.11 + Math.random() * 0.28;
-    if (Math.random() < 0.55) {
+    if (Math.random() < 0.35) {
       const c = centers[(Math.random() * CLUSTERS) | 0];
       x = c[0] + gauss() * 0.08;
       y = c[1] + gauss() * 0.08;
@@ -142,7 +142,7 @@ function start(canvas: HTMLCanvasElement): void {
       uDpr: { value: 1 },
       uMaxPx: { value: 3.5 },
       uColor: { value: new Color(0xc2c2c2) },
-      uOpacity: { value: 0.75 },
+      uOpacity: { value: 0.95 },
     },
   });
   const points = new Points(geo, material);
@@ -155,7 +155,7 @@ function start(canvas: HTMLCanvasElement): void {
     // 어두운 배경에서는 빛으로 더하고, 밝은 배경에서는 어두운 점으로 얹는다
     const light = root.getAttribute('data-theme') === 'light';
     material.blending = light ? NormalBlending : AdditiveBlending;
-    material.uniforms.uOpacity.value = light ? 0.55 : 0.75;
+    material.uniforms.uOpacity.value = light ? 0.7 : 0.95;
     material.needsUpdate = true;
     if (reduce.matches) render();
   }
@@ -179,7 +179,7 @@ function start(canvas: HTMLCanvasElement): void {
   let last = 0;
   let intro = 0;
   const INTRO_SECONDS = 3.4;
-  const FLY_SPEED = 0.9; // 초당 깊이 이동량 (36 중)
+  const FLY_SPEED = 2.4; // 초당 깊이 이동량(36 중): 별이 중앙에서 바깥으로 확대되며 흐른다
   const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 
   function render(): void {

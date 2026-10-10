@@ -3,8 +3,19 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import HomeHero from '@/components/home/HomeHero.astro';
 import { site } from '@/data/site';
+import { getEntries } from '@/lib/content';
+
+// 장면의 카드: 공개된 글(프로젝트·지식·글)의 최신순 제목. 없으면 빈 액자만 뜬다.
+const sections = ['projects', 'knowledge', 'writing'] as const;
+const cards = (
+  await Promise.all(sections.map(async (name) => (await getEntries(name)).map((e) => ({ label: name, title: e.data.title, date: e.data.date.valueOf() }))))
+)
+  .flat()
+  .sort((a, b) => b.date - a.date)
+  .slice(0, 12)
+  .map(({ label, title }) => ({ label, title }));
 ---
 
 <BaseLayout title={site.name}>
-  <HomeHero title={site.hero.title} sub={site.hero.sub} />
+  <HomeHero title={site.hero.title} sub={site.hero.sub} cards={cards} />
 </BaseLayout>

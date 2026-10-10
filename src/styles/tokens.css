@@ -118,7 +118,8 @@
   --nav-w-open: 26rem; /* 호버 416px (원본은 360px. 한글 라벨 4개가 들어가도록 넓혔다) */
   --nav-spring: cubic-bezier(0.44, 1.85, 0.6, 1); /* 늘어나고 줄어들 때의 스프링(오버슈트 1회) */
   --nav-spring-duration: 600ms;
-  --nav-bg-opacity: 82%; /* 알약 배경 = 페이지 배경색의 불투명도 */
+  --nav-bg-tint: 7%; /* 알약 배경의 옅은 회색빛 = 페이지 배경에 글자색을 이만큼 섞은 색 */
+  --nav-bg-opacity: 82%; /* 그 색의 불투명도 */
   --glitter-red: 255, 74, 92; /* 테두리를 도는 붉은 빛(rgb) */
   --glitter-blue: 82, 140, 255; /* 테두리를 도는 푸른 빛(rgb) */
   --nav-label-spring: cubic-bezier(0.34, 1.4, 0.6, 1);

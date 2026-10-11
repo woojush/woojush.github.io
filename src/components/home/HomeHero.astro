@@ -1,8 +1,8 @@
 ---
-// 메인(/)의 인트로: 배경 별가루 + 점점 커지는 큰 문구 (한 번만, docs/07). 끝에서 하얀 빛이 구름처럼 번져 화면을 덮고 요약정리 화면이 나타난다.
+// 메인(/)의 인트로: 배경 별가루 + 점점 커지는 큰 문구 (한 번만, docs/07). 끝에서 블랙홀의 어둠이 번져 화면을 덮고, 어두운 화면에서 하얀 요약정리 화면이 천천히 나타난다.
 // 홈에서 Knowledge로 나갈 때의 효과는 src/scripts/home-exit.ts(홈 쪽 0.55초)와 Knowledge 도착 쪽(topic-stage.ts)이 나눠 맡는다. 이 층은 쓰지 않는다.
 // 문구는 data/site.ts의 hero를 받아 그리기만 한다. 확대 곡선과 상태 전환은 src/scripts/home-intro.ts,
-// 배경(별 입자 장면)은 src/scripts/scene.ts. 여기서는 모양만 정하고 확대(--zoom)·사라짐(--hero-fade)·흰 빛(캔버스 .world-veil)은 veil.ts가 그린다.
+// 배경(별 입자 장면)은 src/scripts/scene.ts. 여기서는 모양만 정하고 확대(--zoom)·사라짐(--hero-fade)·어둠(--hole)·흰 바탕(--home-p)을 CSS가 읽는다.
 // 인트로를 할지는 index.astro의 <head> 인라인 스크립트가 첫 페인트 전에 정한다.
 interface Segment {
   text: string;
@@ -24,7 +24,7 @@ const words = title.flatMap((seg) =>
 );
 ---
 
-{/* 쌓는 순서(아래에서 위): 별 → 비네팅 → 문구 → 흰 빛. 흰 빛이 번지면서 문구를 덮어 삼킨다(흰 바탕 위에 밝은 문구의 잔상이 비치지 않게) */}
+{/* 쌓는 순서(아래에서 위): 별 → 비네팅 → 문구 → 어둠 → 흰 바탕 → (요약정리 화면). 어둠이 번지며 문구와 별을 삼킨 뒤 흰 바탕이 어둠 위로 나타난다 */}
 <canvas class="scene" data-scene aria-hidden="true"></canvas>
 <div class="vignette" aria-hidden="true"></div>
 
@@ -43,7 +43,8 @@ const words = title.flatMap((seg) =>
   </div>
 </section>
 
-<canvas class="world-veil" aria-hidden="true" data-veil></canvas>
+<div class="hole" aria-hidden="true" data-hole></div>
+<div class="paper" aria-hidden="true" data-paper></div>
 
 <script>
   import '@/scripts/home-intro.ts';
@@ -54,14 +55,16 @@ const words = title.flatMap((seg) =>
   /* 별·흰 빛 층은 인트로(data-intro="play")가 도는 동안에만 있다. 끝나거나 하지 않으면 통째로 숨긴다 */
   .scene,
   .vignette,
-  .world-veil,
+  .hole,
+  .paper,
   .hero {
     display: none;
   }
 
   :global(:root[data-intro='play']) .scene,
   :global(:root[data-intro='play']) .vignette,
-  :global(:root[data-intro='play']) .world-veil {
+  :global(:root[data-intro='play']) .hole,
+  :global(:root[data-intro='play']) .paper {
     display: block;
   }
 
@@ -98,23 +101,35 @@ const words = title.flatMap((seg) =>
     background-repeat: no-repeat, repeat;
   }
 
-  /* 흰 빛: 마지막 확대의 후반에 하얀 빛이 구름처럼 번져 화면 전체를 덮는다(veil.ts가 6px 칸의 알파를 그려 부드럽게 늘린다).
-   * 별(캔버스)과 문구 위, 요약정리 화면 아래에 둔다(DOM 순서로 쌓는다: 모두 같은 z-index 0). */
-  .world-veil {
+  /* 블랙홀의 어둠: 마지막 확대의 후반에 화면 가운데에서 어둠이 번져 별과 문구를 삼킨다.
+   * --hole(0~1)은 home-intro.ts가 준다. 0이면 투명, 1이면 모서리까지 어둡다. 색은 세계가 바뀌어도 변하지 않는 --void. */
+  .hole,
+  .paper {
     position: fixed;
     inset: 0;
     z-index: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
     pointer-events: none;
+  }
+
+  .hole {
+    background: radial-gradient(
+      circle at 50% 50%,
+      var(--void) calc(var(--hole, 0) * 135% - 35%),
+      transparent calc(var(--hole, 0) * 135%)
+    );
+  }
+
+  /* 흰 바탕: 어두운 화면 위로 천천히 나타난다(요약정리 화면과 같은 --home-p). 요약정리 화면은 이 위에 쌓인다 */
+  .paper {
+    background: var(--paper);
+    opacity: var(--home-p, 0);
   }
 
   /* 화면 정중앙, 가운데 정렬 */
   .hero {
     position: fixed;
     inset: 0;
-    z-index: 0; /* 흰 빛(.world-veil)보다 DOM에서 앞에 있어 그 아래에 깔린다 */
+    z-index: 0; /* 어둠(.hole)보다 DOM에서 앞에 있어 그 아래에 깔린다 */
     align-items: center;
     justify-content: center;
     padding-inline: var(--space-5);

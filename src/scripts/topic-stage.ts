@@ -5,7 +5,10 @@
 // 좌측 하단 칩은 전환 중 내려갔다가 새 경로로 다시 올라온다.
 // 하위가 하나뿐이어도 건너뛰지 않고, 끝(글 목록)은 평범한 페이지 이동이다. 뒤로 가기·앞으로 가기도 같은 화면 안에서 처리한다.
 // 별은 scene.ts(메인과 같은 three.js 장면), 태그의 움직임·끌기는 topic-float.ts.
-// 홈의 흰 세계에서 탈출 효과(home-exit.ts)로 들어오면(sessionStorage 'world-exit') 별이 페이드인 없이 이미 보이는 채로 시작하고 태그가 피어난다.
+// 홈의 흰 세계에서 효과(home-exit.ts)로 들어오면(<html data-arrive>, knowledge/index.astro의 head 스크립트가 표시) 흰 화면으로 시작해
+// 흰 빛(veil.ts)이 가운데부터 구름처럼 걷히며 별이 드러나고(별은 빠른 비행에서 잦아든다) 걷히는 도중에 태그가 피어난다(intro-timeline.ts의 arriveFrame).
+import { EXIT_CRUISE, arriveFrame } from '@/scripts/intro-timeline';
+import { createVeil } from '@/scripts/veil';
 import { startScene, type SceneHandle } from '@/scripts/scene';
 import { createField } from '@/scripts/topic-float';
 import { findStage, levelTags, topicHref, type StageNode, type Tag } from '@/lib/topics';
@@ -46,6 +49,11 @@ if (space && dataEl?.textContent && list && chipsEl) {
   }
   const field = createField(space);
   let clock = 0;
+  // 홈의 흰 세계에서 도착했는가(움직임 줄이기면 효과 없이 평범하게 시작한다)
+  const rootEl = document.documentElement;
+  const veilCanvas = space.querySelector<HTMLCanvasElement>('[data-veil]');
+  let veil = !reduce && veilCanvas && 'arrive' in rootEl.dataset ? createVeil(veilCanvas, 'last') : null;
+  let arrivalBloomed = false;
   let motionAt = -1; // 전환이 시작된 시각(clock 기준). 음수면 전환 중이 아니다
   const smooth = (x: number) => {
     const u = Math.min(1, Math.max(0, x));
@@ -79,8 +87,29 @@ if (space && dataEl?.textContent && list && chipsEl) {
       lastZoom = zs;
       space!.style.setProperty('--wob-s', zs);
     }
+    let speedPlus = 0;
+    let boostPlus = 0;
+    if (veil) {
+      const f = arriveFrame(clock);
+      veil.set(f.veil, clock);
+      speedPlus = f.speed - EXIT_CRUISE;
+      boostPlus = f.boost;
+      if (f.veil < 0.5 && rootEl.dataset.arrive === 'world') rootEl.dataset.arrive = 'clearing'; // 이름(J)·탭 바 색이 바뀌는 때
+      if (f.bloom && !arrivalBloomed) {
+        arrivalBloomed = true;
+        bloom();
+        space!.classList.remove('is-hidden');
+        space!.classList.add('is-entering');
+        void wait(ENTER_MS).then(() => space!.classList.remove('is-entering'));
+      }
+      if (f.done) {
+        veil.set(0, clock);
+        delete rootEl.dataset.arrive;
+        veil = null;
+      }
+    }
     scene?.setFx(burst);
-    scene?.update(0.35 + 8 * burst * burst, 0.14 * burst, dt, clock, 1);
+    scene?.update(0.35 + 8 * burst * burst + speedPlus, Math.max(0.14 * burst, boostPlus), dt, clock, 1);
     field.tick(dt);
     requestAnimationFrame(frame);
   }
@@ -261,28 +290,12 @@ if (space && dataEl?.textContent && list && chipsEl) {
     chipsEl.classList.add('is-in');
   });
 
-  // 홈의 흰 세계에서 블랙홀을 벗어나 들어온 경우(home-exit.ts가 이동 직전에 시각을 남긴다): 별이 이미 보이는 채로 시작하고(페이드 없음)
-  // 태그가 피어난다. 오래된 표시(다른 경로로 들어온 경우)는 무시한다. 표시는 읽는 즉시 지운다
-  const arrivedFromWorld =
-    !reduce &&
-    (() => {
-      try {
-        const at = Number(sessionStorage.getItem('world-exit'));
-        sessionStorage.removeItem('world-exit');
-        return at > 0 && Date.now() - at < 12000;
-      } catch {
-        return false;
-      }
-    })();
-
   // 처음 화면
   space.classList.add('is-floating');
   field.load(lis(), hrefOf(current));
-  if (arrivedFromWorld) {
-    scene?.skipFade();
-    bloom();
-    space.classList.add('is-entering');
-    void wait(ENTER_MS).then(() => space.classList.remove('is-entering'));
+  if (veil) {
+    scene?.skipFade(); // 흰 빛 아래에서 이미 보이는 채로 시작한다
+    space.classList.add('is-hidden'); // 태그는 흰 빛이 걷히는 도중(arriveFrame의 bloom)에 피어난다
   }
   if (!reduce) requestAnimationFrame(frame); // 움직임 줄이기: 별은 scene.ts가 한 장면만 그리고 태그는 제자리에 있다
 }

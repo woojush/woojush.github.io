@@ -1,7 +1,8 @@
-// 홈의 별 세계 층(별 캔버스·흰 세계)과 요약정리 화면을 인트로(home-intro.ts)와 탈출(home-exit.ts)이 같이 쓰는 도구.
+// 홈의 별 세계 층(별 캔버스·흰 빛)과 요약정리 화면을 인트로(home-intro.ts)와 퇴장(home-exit.ts)이 같이 쓰는 도구.
 // DOM 요소와 별 장면을 한 곳에서 잡아 두고, 흰 세계의 크기·요약정리 화면의 나타남·바탕색(흰/어두움)을 바꾸는 함수만 둔다.
 // 시간표(곡선)는 intro-timeline.ts, 별 그리기는 scene.ts.
 import { startScene, type SceneHandle } from '@/scripts/scene';
+import { createVeil } from '@/scripts/veil';
 
 export const root = document.documentElement;
 const pick = <T extends HTMLElement>(selector: string) => document.querySelector<T>(selector);
@@ -9,7 +10,8 @@ const pick = <T extends HTMLElement>(selector: string) => document.querySelector
 export const hero = pick('[data-hero]');
 export const inner = hero?.querySelector<HTMLElement>('[data-hero-inner]') ?? null;
 export const canvas = pick<HTMLCanvasElement>('[data-scene]');
-const disc = pick('[data-world-disc]'); // 가운데에서 커지는 흰 세계 (HomeHero.astro)
+const veilCanvas = pick<HTMLCanvasElement>('[data-veil]'); // 번져 덮는 흰 빛 (HomeHero.astro)
+const veil = veilCanvas ? createVeil(veilCanvas, 'first') : null;
 const home = pick('[data-home]'); // 요약정리 화면 (index.astro)
 const footer = pick('.site-footer');
 const main = pick('#main');
@@ -36,9 +38,14 @@ export function getScene(): SceneHandle | null {
   return scene;
 }
 
-/** 흰 세계의 크기(0~1). 반지름은 CSS가 world × 170%(화면 모서리까지 거리 기준)로 그린다 */
-export function setWorld(world: number): void {
-  disc?.style.setProperty('--world', world.toFixed(4));
+/** 흰 빛의 정도(0~1). 1이면 화면 전체가 흰색이다. 노이즈가 흐르는 시계는 장면 시계(clock)를 쓴다 */
+export function setWorld(level: number): void {
+  veil?.set(level, clock.t);
+}
+
+/** 흰 빛 캔버스가 막 보이게 되었거나 화면 크기가 바뀌었을 때 */
+export function resizeVeil(): void {
+  veil?.resize();
 }
 
 /** 요약정리 화면(과 푸터)이 나타난 정도(0~1). 흰 세계가 덮는 만큼 나타나고 살짝 커진다 (index.astro의 CSS가 읽는다) */
@@ -62,10 +69,4 @@ export function aimHome(): void {
 export function setLight(on: boolean): void {
   if (on) root.dataset.world = 'light';
   else delete root.dataset.world;
-}
-
-/** 푸터가 페이지 바탕과 따로 흰 세계 색을 유지하게 한다(탈출 중 요약정리와 함께 사라져야 하므로) */
-export function keepFooterLight(on: boolean): void {
-  if (on) footer?.setAttribute('data-world', 'light');
-  else footer?.removeAttribute('data-world');
 }

@@ -14,6 +14,19 @@ const tree = buildTopicTree(entries, config.topics);
 ---
 
 <BaseLayout title="Knowledge" description="배운 것을 개념 단위로 쌓은 노트의 분야별 목록">
+  {/* 홈의 흰 세계에서 효과(home-exit.ts)로 들어왔는지 첫 페인트 전에 정한다: 맞으면 흰 화면으로 시작한다(topic-space.css의 data-arrive 규칙, topic-stage.ts가 걷어낸다).
+      표시는 읽는 즉시 지우고, 12초가 지난 것은 무시한다. 반드시 <head>의 인라인. */}
+  <script is:inline slot="head">
+    (() => {
+      try {
+        const at = Number(sessionStorage.getItem('world-exit'));
+        sessionStorage.removeItem('world-exit');
+        if (at > 0 && Date.now() - at < 12000 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.dataset.arrive = 'world';
+        }
+      } catch (e) {}
+    })();
+  </script>
   {
     tree.length > 0 ? (
       <TopicSpace tree={stageData(tree)} path="" title="Knowledge" note={config.lead} chips={[]} total={0} />

@@ -307,3 +307,30 @@ body:has([data-space]) .site-footer {
     transition: none;
   }
 }
+
+/* 홈의 흰 세계에서 도착했을 때(<html data-arrive>): 흰 화면으로 시작하고 흰 빛(.veil)이 가운데부터 걷힌다 (veil.ts, topic-stage.ts).
+ * 이름(J)과 탭 바는 흰 빛 위에 있으므로 흰 바탕 위의 색으로 시작한다. data-arrive가 'clearing'이 되면(흰 빛이 절반 걷히면) 원래 색으로 돌아온다. */
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: none;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+html[data-arrive] .veil {
+  display: block;
+  opacity: 1;
+  background-color: var(--paper);
+}
+
+html[data-arrive] {
+  --nav-pill-bg: rgba(25, 25, 25, 0.82);
+}
+
+html[data-arrive='world'] .site-name {
+  color: var(--paper-ink);
+}

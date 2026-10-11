@@ -11,7 +11,7 @@
 // "확대 속도 → 별의 속도": 문구가 로그 척도로 커지는 비율(rate, 1/s)이 곧 별이 날아오는 속도를 정한다.
 // 카메라가 앞으로 날아갈 때 가까운 물체는 비례해서 빠르게 커지므로, 문구와 별이 한 장면 안에서 맞물려 보인다.
 //
-// 반대로 흰 세계에서 Knowledge로 나갈 때(블랙홀 벗어나기)는 같은 곡선을 거꾸로 돈다: exitFrame(t).
+// 흰 세계에서 Knowledge로 나갈 때의 시간표는 아래쪽 exitFrame·arriveFrame.
 
 export const T_TITLE = 2;
 export const T_SUB = T_TITLE + 1.8; // 메인 문장이 나타나고 1.8초 뒤 (HomeHero.astro의 animation-delay와 같은 값)
@@ -29,13 +29,10 @@ const CLIMAX_POWER = 4; // 마지막 확대의 가속: 확대 비율이 (진행)
 const RATE_START = 0.02; // 문장이 나타날 때의 확대 비율(로그, 1/s)
 const RATE_CLIMAX = 0.066; // 마지막 확대 직전의 확대 비율. 여기서 끊김 없이 이어서 빨라진다
 
-// 흰 세계: 가운데의 작은 빛에서 시작해 가속하며 커져 화면을 덮는다.
-// world는 0~1이고, CSS(HomeHero.astro의 .world-disc)가 반지름을 world × 170%(화면 모서리까지 거리 기준)로 그린다.
-// WORLD_COVERED 이상이면 가장자리의 번짐까지 포함해 화면 전체가 흰색이다.
-const WORLD_START = 0.5; // 마지막 확대의 진행이 여기에 닿으면 흰 세계가 나타난다
-const WORLD_POWER = 2.4; // 클수록 처음엔 작게 머물다 끝에서 폭발적으로 커진다 (별이 쏟아지는 가속과 같은 결)
-export const WORLD_COVERED = 0.64;
-const HOME_FROM = 0.84; // 마지막 확대의 진행이 여기에 닿으면 요약정리 화면이 흰 세계 안에서 나타나기 시작한다 (이때 흰 세계가 내용 영역을 덮고 있다)
+// 흰 빛(veil.ts): 마지막 확대의 후반에 하얀 빛이 구름처럼 번져 화면을 덮는다. world는 그 정도(0~1)이고 1이면 화면 전체가 흰색이다.
+const WORLD_START = 0.5; // 마지막 확대의 진행이 여기에 닿으면 흰 빛이 번지기 시작한다
+const WORLD_END = 0.92; // 여기서 화면 전체를 덮는다
+const HOME_FROM = 0.88; // 마지막 확대의 진행이 여기에 닿으면 요약정리 화면이 흰 빛 안에서 나타나기 시작한다
 
 const GROW_SECONDS = T_CLIMAX - T_TITLE;
 const LOG_AT_CLIMAX = RATE_START * GROW_SECONDS + ((RATE_CLIMAX - RATE_START) * GROW_SECONDS) / 2;
@@ -59,7 +56,7 @@ export interface IntroFrame {
   climax: number;
   /** 별을 더 크고 밝게 하는 정도(0~1). 마지막 확대가 가팔라질수록 커진다 */
   boost: number;
-  /** 가운데에서 커지는 흰 세계의 크기(0~1). WORLD_COVERED 이상이면 화면 전체가 흰색이다 */
+  /** 번져 덮는 흰 빛의 정도(0~1). 1이면 화면 전체가 흰색이다 */
   world: number;
   /** 흰 세계가 화면을 덮었는가. 이때부터 페이지 바탕·헤더가 흰 세계의 색으로 바뀌어도 눈에 띄지 않는다 */
   covered: boolean;
@@ -101,17 +98,17 @@ export function introFrame(t: number, hold = false): IntroFrame {
     ((RATE_PEAK - RATE_CLIMAX) * CLIMAX_SECONDS * tau ** (CLIMAX_POWER + 1)) / (CLIMAX_POWER + 1);
   const rate = RATE_CLIMAX + (RATE_PEAK - RATE_CLIMAX) * tau ** CLIMAX_POWER;
   const scale = SCALE_START * Math.exp(log);
-  const world = Math.max(0, (tau - WORLD_START) / (1 - WORLD_START)) ** WORLD_POWER;
+  const world = smoothstep(WORLD_START, WORLD_END, tau);
   return {
     scale,
     rate,
     // 문구는 크기를 기준으로 사라진다(가속이 끝에 몰려 있어서 시간 기준이면 작은 채로 사라진다)
     fade: 1 - smoothstep(Math.log(2.2), Math.log(30), Math.log(scale)),
     world,
-    covered: world >= WORLD_COVERED,
+    covered: world >= 1,
     // 마지막 확대가 끝난 뒤(SETTLE_SECONDS)까지 이어서 자리 잡는다. 시간 기준이라 tau가 1에서 멈춰도 계속 진행한다
     home: smoothstep(T_CLIMAX + HOME_FROM * CLIMAX_SECONDS, T_DONE, time),
-    // 흰 세계가 화면을 완전히 덮은 뒤(world 0.64 → tau 약 0.91)에야 별을 끈다
+    // 흰 빛이 화면을 완전히 덮은 뒤(tau 0.92)에야 별을 끈다
     stars: 1 - smoothstep(0.93, 1, tau),
     climax: tau,
     boost: tau * tau,
@@ -124,38 +121,57 @@ export function flySpeed(rate: number): number {
   return FLY_BASE + FLY_PER_RATE * rate;
 }
 
-// ───────── 블랙홀 벗어나기 (흰 세계 → 별 세계, 홈에서 Knowledge로 나갈 때) ─────────
+// ───────── 홈에서 Knowledge로 (흰 세계 → 별 세계) ─────────
 //
-// 입장의 거꾸로다. 흰 세계가 가운데 한 점으로 줄어들며 요약정리 화면이 그 안으로 말려 들어가고, 별은 반대 방향으로 날며(가운데로 모여들며)
-// 줄이 길게 늘어났다가 점점 잦아들어 평소의 느린 비행(Knowledge의 별과 같은 속도)으로 이어진다. 끝나면 Knowledge로 이동한다.
-export const EXIT_SECONDS = 1.6;
+// 두 막이다. ① 홈에서(exitFrame, 0.55초): 요약정리가 흰 바탕 위에서 가운데로 가라앉으며 사라지고 곧바로 Knowledge로 이동한다(흰 바탕은 그대로).
+// ② Knowledge에서(arriveFrame, 약 3.4초): 흰 화면으로 시작해, 흰 빛이 가운데부터 구름처럼 걷히며 그 속에서 별이 드러난다.
+// 별은 줄(꼬리)로 길게 늘어난 빠른 비행에서 시작해 평소 속도로 잦아들고, 걷힐 때쯤 태그가 피어난다. 효과가 도착한 쪽에서 돌기 때문에 이동을 기다리는 시간이 없고
+// 마지막 장면이 Knowledge의 별 장면 자체라서 이어붙인 자국이 없다.
+export const EXIT_SECONDS = 0.55;
+export const ARRIVE_HOLD = 0.35; // 도착해서 별 장면이 준비될 때까지 흰색으로 머무는 시간
+export const ARRIVE_SECONDS = 3.4; // 흰 빛이 걷히는 데 걸리는 시간
+export const ARRIVE_BLOOM_AT = 0.45; // 걷힘의 이 비율에서 태그가 피어나기 시작한다
 export const EXIT_CRUISE = 0.35; // Knowledge 장면(topic-stage.ts)의 평소 비행 속도. 여기서 끊김 없이 이어진다
-const EXIT_REVERSE_SPEED = 14; // 시작할 때 뒤로 나는 속도(깊이 단위/초). 입장의 마지막 속도보다 느리다
-const EXIT_BOOST = 0.8;
-const EXIT_HOME_FADE = 0.22; // 요약정리 화면이 사라지는 데 걸리는 진행(0~1)
+const ARRIVE_SPEED = 9; // 걷히기 시작할 때 별의 추가 속도(깊이 단위/초)
+const ARRIVE_BOOST = 0.7;
 
 export interface ExitFrame {
-  /** 흰 세계의 크기(0~1). 입장에서 화면을 막 덮은 크기(WORLD_COVERED)에서 시작해 0으로 줄어든다 */
-  world: number;
-  /** 요약정리 화면이 보이는 정도(1 → 0). 흰 세계가 줄기 시작하면 곧바로 말려 들어간다 */
+  /** 요약정리 화면이 보이는 정도(1 → 0) */
   home: number;
-  /** 별의 비행 속도(깊이 단위/초). 음수는 뒤로 나는 것(가운데로 모여든다) */
-  speed: number;
-  /** 별을 더 크고 밝게, 줄로 늘이는 정도(0~1) */
-  boost: number;
-  /** 탈출이 끝나 다음 페이지로 이동할 때가 되었는가 */
+  /** 홈에서의 효과가 끝나 이동할 때가 되었는가 */
   done: boolean;
 }
 
-/** 시각 t(초)의 탈출 상태 */
+/** 시각 t(초)의 홈 쪽 상태 */
 export function exitFrame(t: number): ExitFrame {
   const u = Math.min(1, Math.max(0, t / EXIT_SECONDS));
+  return { home: 1 - smoothstep(0, 1, u), done: u >= 1 };
+}
+
+export interface ArriveFrame {
+  /** 흰 빛의 정도(1 → 0) */
+  veil: number;
+  /** 별의 비행 속도(깊이 단위/초) */
+  speed: number;
+  /** 별을 더 크고 밝게, 줄로 늘이는 정도(0~1) */
+  boost: number;
+  /** 태그가 피어날 때가 되었는가 */
+  bloom: boolean;
+  /** 걷힘이 끝났는가 */
+  done: boolean;
+}
+
+/** 도착 후 시각 t(초)의 상태 */
+export function arriveFrame(t: number): ArriveFrame {
+  const u = Math.min(1, Math.max(0, (t - ARRIVE_HOLD) / ARRIVE_SECONDS));
+  // 부드러운 시작과 끝(smoothstep): 처음엔 천천히 열리고 가운데가 가장 빠르며 끝에서 잔잔히 멎는다
+  const open = u * u * (3 - 2 * u);
   const r = 1 - u;
   return {
-    world: WORLD_COVERED * r ** WORLD_POWER,
-    home: 1 - smoothstep(0, EXIT_HOME_FADE, u),
-    speed: EXIT_CRUISE - EXIT_REVERSE_SPEED * r ** 3,
-    boost: EXIT_BOOST * r * r,
+    veil: 1 - open,
+    speed: EXIT_CRUISE + ARRIVE_SPEED * r * r * r,
+    boost: ARRIVE_BOOST * r * r,
+    bloom: u >= ARRIVE_BLOOM_AT,
     done: u >= 1,
   };
 }

@@ -50,6 +50,7 @@ const tags = levelTags(here, here ? here.children : tree);
   <h1 class="sr-only" data-title>{title}</h1>
   <p class="space-note" data-note>{note}</p>
   <TopicChips chips={chips} total={total} />
+  <canvas class="veil" aria-hidden="true" data-veil></canvas>
   <script type="application/json" data-tree set:html={JSON.stringify(tree).replace(/</g, '\\u003c')} />
 </section>
 

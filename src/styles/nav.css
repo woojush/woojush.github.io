@@ -197,7 +197,8 @@
   .nav {
     position: fixed;
     top: calc((var(--header-h) - var(--nav-h)) / 2);
-    left: 50%;
+    /* 50%가 아니라 50vw: 스크롤바가 생기는 페이지(about)에서도 창 가운데에 있어, 스크롤바 없는 페이지와 같은 자리다 */
+    left: 50vw;
     flex: none;
     width: var(--nav-w-rest);
     transform: translateX(-50%);

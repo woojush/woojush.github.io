@@ -1,5 +1,5 @@
 ---
-// HOME. 첫 방문에는 인트로(HomeHero)가 먼저 돌고, 끝나면 같은 화면에서 흰 세계가 번지며 프로필·NOW·프로젝트·최근 글(요약정리)이 나타난다.
+// HOME. 첫 방문에는 인트로(HomeHero)가 먼저 돌고, 끝나면 같은 화면에서 하얀 빛이 번지며 프로필·NOW·프로젝트·최근 글(요약정리)이 나타난다.
 // 요약정리는 흰 세계다(<html data-world="light">, tokens.css). 인트로(별 세계)는 어두운 세계에서 시작한다.
 // 비어 있는 섹션은 그리지 않는다 (CLAUDE.md 8절).
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -43,7 +43,7 @@ const recent = await getRecentPosts(5);
     })();
   </script>
   <HomeHero title={site.hero.title} sub={site.hero.sub} />
-  {/* data-world="light": 요약정리는 인트로·탈출 중에 페이지 바탕이 어두운 세계여도 흰 세계의 색을 쓴다 */}
+  {/* data-world="light": 요약정리는 인트로·퇴장 중에 페이지 바탕이 어두운 세계여도 흰 세계의 색을 쓴다 */}
   <div class="home" data-home data-world="light">
     <HomeProfile name={site.name} lead={about.data.lead} summary={site.profile.summary} photo={getProfilePhoto()} />
     <HomeNow items={now.items} />
@@ -67,7 +67,7 @@ const recent = await getRecentPosts(5);
     will-change: opacity, transform;
   }
 
-  /* 탈출(home-exit.ts): 거꾸로, 흰 세계가 줄어드는 만큼 요약정리 화면이 가운데로 말려 들어가며 사라진다 */
+  /* 탈출(home-exit.ts): 흰 바탕 위에서 요약정리 화면이 가운데로 가라앉으며 사라진다 */
   :global(:root[data-intro='exit']) .home,
   :global(:root[data-intro='exit'] .site-footer) {
     opacity: var(--home-p, 1);
@@ -78,10 +78,5 @@ const recent = await getRecentPosts(5);
     transform: scale(calc(0.9 + 0.1 * var(--home-p, 1)));
     transform-origin: 50% var(--home-oy, 50vh);
     will-change: opacity, transform;
-  }
-
-  /* 탈출 첫 순간에는 탭 바 뒤가 아직 흰색이다. 알약 유리가 뿌옇게 연해지지 않도록 흰 세계의 진한 값을 그대로 둔다(0.5초 전환은 다음 페이지에서) */
-  :global(:root[data-intro='exit']) {
-    --nav-pill-bg: rgba(25, 25, 25, 0.82);
   }
 </style>

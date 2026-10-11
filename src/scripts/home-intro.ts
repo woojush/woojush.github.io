@@ -1,6 +1,6 @@
 // 메인(/)의 인트로를 한 시계로 움직인다: 문구가 점점 커지고, 그 확대 속도에 맞춰 별이 날아오고,
 // 작은 문장이 다 나타나고 1.3초 뒤에는 별들의 중심을 향한 블랙홀식 마지막 확대(4초)가 시작된다.
-// 그 끝에서 가운데의 작은 빛이 흰 세계로 커져 화면을 덮고, 요약정리 화면이 그 안에서 나타나 자리 잡는다(<html data-intro="done">).
+// 그 끝에서 하얀 빛이 구름처럼 번져 화면을 덮고, 요약정리 화면이 그 안에서 나타나 자리 잡는다(<html data-intro="done">).
 // 다른 페이지로 이동하지 않는다. 곡선은 intro-timeline.ts, 별 그리기는 scene.ts, 공용 도구는 home-world.ts.
 // 여기서는 시계·문구(CSS 변수)·상태 전환만 맡는다.
 //
@@ -8,12 +8,14 @@
 // (브라우저 세션에서 처음 들어왔을 때만 붙는다. 사이트 안에서 홈으로 돌아오거나 새로고침하거나 움직임 줄이기면 붙지 않고 요약정리 화면이 바로 보인다).
 // 인트로는 어두운 세계에서 시작하므로 그 스크립트가 data-world(흰 세계)를 떼고, 흰 세계가 화면을 덮는 순간 여기서 다시 켠다.
 import { T_END, flySpeed, introFrame } from '@/scripts/intro-timeline';
-import { aimHome, clock, getScene, hero, inner, root, setHome, setLight, setWorld } from '@/scripts/home-world';
+import { aimHome, clock, getScene, hero, inner, resizeVeil, root, setHome, setLight, setWorld } from '@/scripts/home-world';
 
 if (root.dataset.intro === 'play' && hero && inner) {
   root.dataset.introStarted = ''; // 인라인 스크립트의 안전장치(스크립트가 안 뜨면 요약정리 화면을 보여준다)에 알린다
 
   const scene = getScene();
+  resizeVeil(); // 캔버스가 보이는 상태(play)에서 크기를 잡는다
+  addEventListener('resize', resizeVeil);
   aimHome();
 
   const FAST_FORWARD = 6; // 건너뛰기를 누르면 남은 인트로를 이 배속으로 빨리 감는다
@@ -27,8 +29,9 @@ if (root.dataset.intro === 'play' && hero && inner) {
     document.removeEventListener('visibilitychange', play);
     removeEventListener('pointerdown', skip);
     removeEventListener('keydown', skipKey);
+    removeEventListener('resize', resizeVeil);
     setLight(true);
-    setWorld(1);
+    setWorld(0); // 인트로 층은 곧 숨겨진다(흰 바탕은 페이지 자체가 이어받는다)
     setHome(1);
     root.dataset.intro = 'done'; // 인트로 층은 CSS가 숨기고 요약정리 화면이 자리 잡는다
     scrollTo(0, 0);

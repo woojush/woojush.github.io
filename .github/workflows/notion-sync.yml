@@ -45,7 +45,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add -A src/content/knowledge src/data/topics.yaml public/images/knowledge public/labs
+          git add -A
           if git diff --cached --quiet; then
             echo "바뀐 내용이 없습니다."
             exit 0

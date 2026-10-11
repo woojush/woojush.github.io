@@ -1,14 +1,17 @@
 # 이 파일은 노션 Categories DB에서 scripts/notion-sync.mjs가 만든다. 직접 고치지 말고 노션에서 고친다.
-# lead만 손으로 쓴다(동기화가 유지한다).
+# lead(Knowledge 첫 화면 설명)는 비워 둔다. 쓰려면 이 줄을 직접 고친다(동기화가 유지한다).
 lead: ""
 topics:
   - { path: ai, name: "AI", color: walnut }
   - { path: ai/mathematics, name: "Mathematics" }
-  - { path: ai/mathematics/linear-algebra, name: "2. Linear Algebra" }
-  - { path: ai/mathematics/analytic-geometry, name: "3. Analytic Geometry" }
+  - { path: ai/mathematics/linear-algebra, name: "Linear Algebra" }
+  - { path: ai/mathematics/linear-algebra/linear-maps, name: "Linear Maps" }
+  - { path: ai/mathematics/linear-algebra/inner-product-spaces, name: "Inner Product Spaces" }
+  - { path: ai/mathematics/linear-algebra/orthogonality-projection, name: "Orthogonality & Projection" }
+  - { path: ai/mathematics/linear-algebra/determinant-trace, name: "Determinant & Trace" }
+  - { path: ai/mathematics/linear-algebra/eigen-theory, name: "Eigen Theory" }
+  - { path: ai/mathematics/linear-algebra/matrix-decompositions, name: "Matrix Decompositions" }
   - { path: art, name: "Art", color: clay }
   - { path: art/drawing, name: "Drawing" }
-  - { path: english, name: "English", color: slate }
-  - { path: english/vocabulary, name: "Vocabulary" }
   - { path: philosophy, name: "Philosophy", color: plum }
   - { path: philosophy/ethics, name: "Ethics" }

@@ -103,13 +103,16 @@
   animation-delay: calc(var(--nav-clock, 0) * -1s);
 }
 
-.nav-list {
+.nav-items {
   display: flex;
   flex: 1 1 auto;
   align-items: center;
   justify-content: space-between;
-  margin: 0;
-  padding: 0;
+}
+
+/* 모바일: 묶음은 껍데기일 뿐이고 글자는 한 줄에 고르게 놓인다 */
+.nav-list {
+  display: contents;
   list-style: none;
 }
 
@@ -119,6 +122,7 @@
 
 .nav-link {
   position: relative;
+  display: inline-block;
   color: var(--text);
   font-size: var(--fs-s);
   line-height: 1.15;
@@ -128,6 +132,17 @@
 
 .nav-link[aria-current] {
   font-weight: var(--fw-strong);
+}
+
+/* 굵은 글자 폭을 미리 잡아 두어, 현재 페이지 표시(굵기)가 이웃 글자를 밀지 않게 한다 */
+.nav-link::after {
+  content: attr(data-label);
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: var(--fw-strong);
+  pointer-events: none;
 }
 
 /* 터치 영역: 글자 둘레로 넓힌다 */
@@ -221,8 +236,28 @@
     mask: radial-gradient(circle, transparent 1.05469rem, #000 1.125rem);
   }
 
+  .nav-items {
+    gap: 0;
+  }
+
+  /* 허브 양옆: 두 묶음이 같은 폭(1fr)을 나눠 갖고 허브 쪽으로 붙는다 → 글자 사이 간격과 허브와의 간격이 어느 글자에서나 같다 */
   .nav-list {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
     gap: 1.40625rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-list-start {
+    justify-content: flex-end;
+    margin-right: 1.40625rem;
+  }
+
+  .nav-list-end {
+    justify-content: flex-start;
+    margin-left: 1.40625rem;
   }
 
   .nav-spacer {

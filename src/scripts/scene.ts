@@ -187,17 +187,17 @@ const POST_FRAG = /* glsl */ `
       sg = texture2D(uTex, uv);
       sb = texture2D(uTex, uv - off);
     } else {
-      for (int i = 0; i < 12; i++) {
+      for (int i = 0; i < 8; i++) {
         float ang = float(i) * 2.39996 + rot;
-        float d = sqrt((float(i) + 0.5) / 12.0);
+        float d = sqrt((float(i) + 0.5) / 8.0);
         vec2 o = vec2(cos(ang), sin(ang) * uAspect) * d * rad;
         sr += texture2D(uTex, uv + off + o);
         sg += texture2D(uTex, uv + o * 0.8);
         sb += texture2D(uTex, uv - off + o * 1.15);
       }
-      sr /= 12.0;
-      sg /= 12.0;
-      sb /= 12.0;
+      sr /= 8.0;
+      sg /= 8.0;
+      sb /= 8.0;
     }
     vec3 col = vec3(sr.r, sg.g * (1.0 + 0.3 * edge), sb.b);
     // 별은 빛(더하기)이라 밝기가 곧 불투명도
@@ -377,10 +377,26 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
     material.uniforms.uOpacity.value = 0.95;
   }
 
+  // 적응형 화질: 프레임이 계속 느리면 해상도 배율을 단계적으로 낮춘다(다시 올리지 않는다)
+  let quality = 1;
+  let avgMs = 16.7;
+  let slowFor = 0;
+  function adapt(dt: number): void {
+    if (dt <= 0 || dt >= 0.2) return; // 탭 전환 등으로 생긴 긴 간격은 무시
+    avgMs += (dt * 1000 - avgMs) * 0.08;
+    slowFor = avgMs > 24 ? slowFor + dt : 0;
+    if (slowFor > 1.2 && quality > 0.6) {
+      quality = Math.max(0.6, quality * 0.8);
+      slowFor = 0;
+      avgMs = 16.7;
+      resize();
+    }
+  }
+
   function resize(): void {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
-    const dpr = Math.min(devicePixelRatio || 1, post ? 1.5 : 2); // 후처리는 화면 전체를 여러 번 읽으므로 해상도 배율을 낮춘다
+    const dpr = Math.min(devicePixelRatio || 1, post ? 1.5 : 2) * quality; // 후처리는 화면 전체를 여러 번 읽으므로 해상도 배율을 낮춘다
     renderer.setPixelRatio(dpr);
     renderer.setSize(w, h, false);
     material.uniforms.uDpr.value = dpr;
@@ -397,6 +413,7 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
   const FADE_SECONDS = 1.6; // 캔버스가 나타나는 시간(별의 위치·크기는 그대로)
   let fly = 0;
   let swirl = 0;
+  let lastOpacity = '';
   const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 
   function render(): void {
@@ -432,6 +449,7 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
 
   function update(flySpeed: number, boost: number, dt: number, clock: number, alpha: number): void {
     if (reduce.matches) return;
+    adapt(dt);
     intro = Math.min(1, intro + dt / FADE_SECONDS);
     px += (tx - px) * Math.min(1, dt * 2.2);
     py += (ty - py) * Math.min(1, dt * 2.2);
@@ -448,7 +466,11 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
     const ramp = Math.min(1, boost / 0.35);
     u.uTrail.value = Math.min(flySpeed * 0.06, 5) * ramp * ramp * (3 - 2 * ramp);
     streaks.visible = boost > 0;
-    canvas.style.opacity = String(ease(intro) * alpha);
+    const op = String(ease(intro) * alpha);
+    if (op !== lastOpacity) {
+      lastOpacity = op;
+      canvas.style.opacity = op;
+    }
     render();
   }
 

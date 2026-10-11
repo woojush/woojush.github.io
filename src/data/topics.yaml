@@ -1,6 +1,6 @@
 # 이 파일은 노션 Categories DB에서 scripts/notion-sync.mjs가 만든다. 직접 고치지 말고 노션에서 고친다.
 # lead만 손으로 쓴다(동기화가 유지한다).
-lead: 배운 것을 개념 단위로 쌓는 곳. 덜 익은 노트도 그대로 올리고, 이해가 깊어지면 고쳐 씁니다.
+lead: ""
 topics:
   - { path: ai, name: "AI", color: walnut }
   - { path: ai/mathematics, name: "Mathematics" }

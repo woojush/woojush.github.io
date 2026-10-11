@@ -20,33 +20,38 @@ function currentState(href: string): 'page' | 'true' | undefined {
 }
 
 // 가운데 허브를 사이에 두고 항목을 반으로 나눈다. 글자는 바깥쪽에서 안쪽으로 모여든다.
+// 왼쪽 묶음은 허브 쪽으로, 오른쪽 묶음은 허브 쪽으로 붙여서 글자 사이·허브와의 간격이 항상 같다.
 const half = Math.ceil(items.length / 2);
 const shifts = ['-0.875rem', '-0.5rem', '0.5rem', '0.875rem'];
 const entries = items.map((item, i) => ({
   ...item,
   state: currentState(item.href),
   shift: shifts[Math.min(i < half ? i : shifts.length - (items.length - i), shifts.length - 1)],
-  spacerBefore: i === half,
 }));
+const groups = [entries.slice(0, half), entries.slice(half)];
 ---
 
 <nav class="nav" aria-label="Main">
   <div class="nav-pill">
     <span class="nav-blob" aria-hidden="true"></span>
-    <ul class="nav-list">
+    <div class="nav-items">
       {
-        entries.map((item) => (
+        groups.map((group, g) => (
           <>
-            {item.spacerBefore && <li class="nav-spacer" aria-hidden="true" />}
-            <li>
-              <a class="nav-link" href={item.href} aria-current={item.state} style={`--shift:${item.shift}`}>
-                {item.label}
-              </a>
-            </li>
+            {g === 1 && <span class="nav-spacer" aria-hidden="true" />}
+            <ul class={`nav-list nav-list-${g === 0 ? 'start' : 'end'}`} role="list">
+              {group.map((item) => (
+                <li>
+                  <a class="nav-link" href={item.href} data-label={item.label} aria-current={item.state} style={`--shift:${item.shift}`}>
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </>
         ))
       }
-    </ul>
+    </div>
   </div>
   <a class="nav-hub" href="/" aria-label="Home" aria-current={currentPath === '/' ? 'page' : undefined}>
     <span></span><span></span><span></span><span></span>

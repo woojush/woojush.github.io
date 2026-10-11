@@ -121,7 +121,7 @@ const topicLines = walk('').map((c) => {
 });
 const topicsYaml = [
   '# 이 파일은 노션 Categories DB에서 scripts/notion-sync.mjs가 만든다. 직접 고치지 말고 노션에서 고친다.',
-  '# lead만 손으로 쓴다(동기화가 유지한다).',
+  '# lead(Knowledge 첫 화면 설명)는 비워 둔다. 쓰려면 이 줄을 직접 고친다(동기화가 유지한다).',
   lead,
   'topics:',
   ...topicLines,

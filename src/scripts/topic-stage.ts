@@ -60,6 +60,7 @@ if (space && dataEl?.textContent && list && chipsEl) {
   };
 
   let last = performance.now();
+  let lastZoom = '';
   function frame(now: number) {
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
@@ -72,7 +73,11 @@ if (space && dataEl?.textContent && list && chipsEl) {
       zoom = 1 + 0.04 * punch(t);
       if (t > 4) motionAt = -1;
     }
-    space!.style.setProperty('--wob-s', zoom.toFixed(4));
+    const zs = zoom.toFixed(4);
+    if (zs !== lastZoom) {
+      lastZoom = zs;
+      space!.style.setProperty('--wob-s', zs);
+    }
     scene?.setFx(burst);
     scene?.update(0.35 + 8 * burst * burst, 0.14 * burst, dt, clock, 1);
     field.tick(dt);

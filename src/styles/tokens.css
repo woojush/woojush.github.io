@@ -154,5 +154,11 @@
   --book-umber: #5a4130;
   --book-teal: #2a5656;
   --book-cream: #cbbf9f;
-  --book-cream-ink: #3a2f1c; /* 크림색 책등 위의 제목 */
+  --book-sage: #a9b49b;
+  --book-dust: #c0a094;
+  --book-mist: #a8b7c1;
+  --book-ink: #2a2318; /* 밝은 종이 책등 위의 제목 */
+  --book-print: #e6dec9; /* 천 책등에 인쇄한 제목 */
+  --book-foil: #bf9f5c; /* 가죽 책등의 금박 제목 */
+  --font-spine: 'Noto Serif KR', 'Noto Serif CJK KR', 'Nanum Myeongjo', AppleMyungjo, 'Batang', var(--font-sans); /* 책등 제목 (명조 계열) */
 }

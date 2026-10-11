@@ -5,7 +5,9 @@ import { formatDate } from '@/lib/format';
 
 export type Piece = CollectionEntry<'writing'>;
 export type Kind = Piece['data']['kind'];
-export type SpineHue = 'oxblood' | 'navy' | 'forest' | 'ochre' | 'slate' | 'plum' | 'umber' | 'cream' | 'teal';
+export type SpineHue = 'oxblood' | 'navy' | 'forest' | 'ochre' | 'slate' | 'plum' | 'umber' | 'cream' | 'teal' | 'sage' | 'dust' | 'mist';
+/** 책의 종류: cloth 천 양장(인쇄 제목), paper 종이 표지(밝음), leather 가죽 양장(금박 제목) */
+export type SpineKind = 'cloth' | 'paper' | 'leather';
 
 /** 위에서 아래로 놓이는 층. label은 노션 Form과 같은 한글 이름, en은 작은 부제 */
 export const SHELVES: readonly { kind: Kind; label: string; en: string }[] = [
@@ -25,11 +27,14 @@ export interface Book {
   /** 'YYYY.MM.DD' */
   when: string;
   description?: string;
-  /** 책등 크기(rem) */
+  /** 책등 크기(rem). 두께(width)는 제목 길이와 무관하다 */
   width: number;
   height: number;
-  /** 제목이 들어가는 줄(세로쓰기 칸) 수 */
+  /** 제목 줄(세로쓰기 칸) 수: 1 또는 2 */
   cols: number;
+  /** 제목 글자 크기(rem) */
+  fs: number;
+  kind: SpineKind;
   hue: SpineHue;
   /** 옆 책에 기대어 기울어진 정도(deg). 대부분 0 */
   tilt: number;
@@ -52,23 +57,37 @@ function hash(s: string): number {
   return h >>> 0;
 }
 
-// 책 천·가죽 색(tokens.css --book-*). 크림은 드물게 섞는다
-const HUES: readonly SpineHue[] = ['oxblood', 'navy', 'forest', 'umber', 'slate', 'ochre', 'plum', 'teal', 'oxblood', 'navy', 'forest', 'cream', 'umber', 'slate'];
+// 책 종류별로 쓰는 색 (tokens.css --book-*)
+const HUES: Record<SpineKind, readonly SpineHue[]> = {
+  cloth: ['navy', 'forest', 'slate', 'plum', 'teal', 'umber', 'navy', 'oxblood'],
+  paper: ['cream', 'sage', 'dust', 'mist', 'cream'],
+  leather: ['oxblood', 'forest', 'navy', 'umber'],
+};
 
-const LINE_REM = 0.95; // 세로쓰기에서 글자 한 자가 차지하는 길이
-const COL_REM = 1.35; // 제목 한 줄(칸)의 너비
-const TRIM_REM = 3; // 위아래 제본 띠와 여백
-const MIN_H = 7.5;
-const PER_COL = 9; // 한 칸에 들어가는 최대 글자 수. 넘으면 칸이 늘어난다(최대 4칸, 그 이상은 잘린다)
+const PRINT_REM = 0.78; // 제목 글자 하나가 차지하는 길이(작은 글자 기준)
+const TRIM_REM = 3.2; // 위아래 여백과 장식
+const MAX_H = 14;
 
 export function bookOf(entry: Piece): Book {
   const h = hash(entry.id);
   const len = [...entry.data.title].length;
-  // 긴 제목은 칸 수를 늘려 칸마다 글자 수를 비슷하게 맞춘다 (한 글자만 덩그러니 남는 칸이 없게)
-  const cols = Math.min(4, Math.max(1, Math.ceil(len / PER_COL)));
-  const perCol = Math.ceil(len / cols);
-  const height = Math.max(MIN_H, TRIM_REM + perCol * LINE_REM) + ((h >> 3) % 5) * 0.2;
-  const width = 1.3 + cols * COL_REM + ((h >> 7) % 3) * 0.2;
+  // 두께는 제목과 무관하게 책마다 다르다 (실제 책은 쪽수로 두께가 정해진다)
+  const width = 2.5 + ((h >> 7) % 4) * 0.2;
+  let height = 10 + ((h >> 3) % 8) * 0.5;
+  const fit = (fs: number) => Math.floor((height - TRIM_REM) / (fs * 1.14));
+  let cols = 1;
+  let fs = 0.92;
+  if (len > fit(0.92)) {
+    if (len <= fit(0.72)) fs = Math.round(((height - TRIM_REM) / (len * 1.14)) * 100) / 100;
+    else {
+      cols = 2; // 두께는 그대로, 작은 글자를 두 줄로. 그래도 모자라면 책이 조금 커진다
+      fs = 0.72;
+      height = Math.min(MAX_H, Math.max(height, TRIM_REM + Math.ceil(len / 2) * PRINT_REM));
+    }
+  }
+  const v = (h >> 19) % 10;
+  const kind: SpineKind = v < 5 ? 'cloth' : v < 8 ? 'paper' : 'leather';
+  const hues = HUES[kind];
   return {
     href: pieceHref(entry),
     title: entry.data.title,
@@ -77,7 +96,9 @@ export function bookOf(entry: Piece): Book {
     width: Math.round(width * 100) / 100,
     height: Math.round(height * 100) / 100,
     cols,
-    hue: HUES[h % HUES.length],
+    fs,
+    kind,
+    hue: hues[h % hues.length],
     // 일곱 권에 한 권쯤 기대어 있다
     tilt: (h >> 11) % 7 === 0 ? ((h >> 14) % 2 ? 1 : -1) * (3 + ((h >> 16) % 3)) : 0,
   };

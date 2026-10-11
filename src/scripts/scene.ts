@@ -130,33 +130,54 @@ const POST_VERT = /* glsl */ `
 const POST_FRAG = /* glsl */ `
   uniform sampler2D uTex;
   uniform float uCA;      // 색수차 세기(모서리에서의 UV 이동량)
+  uniform float uBlur;    // 가장자리 번짐 반경(모서리에서의 UV 길이)
   uniform float uVig;     // 가장자리 어둡기(0~1)
   uniform float uGrain;   // 그레인 세기
+  uniform float uAspect;  // 가로/세로
   uniform float uTime;
   uniform float uLight;   // 1이면 밝은 테마(별이 어두운 점): 비네팅·그레인을 쓰지 않는다
   varying vec2 vUv;
-  float hash(vec2 p) {
-    p = fract(p * vec2(123.34, 456.21));
-    p += dot(p, p + 45.32);
-    return fract(p.x * p.y);
+  // 격자 무늬가 생기지 않는 디더용 노이즈 (interleaved gradient noise)
+  float ign(vec2 p) {
+    return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715))));
   }
   void main() {
     vec2 c = vUv - 0.5;
     float r2 = dot(c, c) * 4.0;          // 가운데 0 → 모서리 약 2
+    float rr = sqrt(r2);
+    float edge = smoothstep(0.3, 1.1, rr);
     vec2 off = c * uCA * r2;
-    vec4 sr = texture2D(uTex, vUv + off);
-    vec4 sg = texture2D(uTex, vUv);
-    vec4 sb = texture2D(uTex, vUv - off);
-    vec3 col = vec3(sr.r, sg.g, sb.b);
+    // 가장자리일수록 퍼지는 원형 번짐: R·B는 반대로 어긋난 중심에서, G는 제자리에서 모은다
+    float rad = uBlur * edge * edge;
+    vec4 sr = vec4(0.0);
+    vec4 sg = vec4(0.0);
+    vec4 sb = vec4(0.0);
+    // 점마다 나선을 무작위로 돌려 한 별이 여러 개의 점(눈송이 무늬)으로 갈라지지 않고 곱게 번지게 한다
+    float rot = ign(gl_FragCoord.xy * 0.91 + 17.0) * 6.2831853;
+    for (int i = 0; i < 12; i++) {
+      float ang = float(i) * 2.39996 + rot;
+      float d = sqrt((float(i) + 0.5) / 12.0);
+      vec2 o = vec2(cos(ang), sin(ang) * uAspect) * d * rad;
+      sr += texture2D(uTex, vUv + off + o);
+      sg += texture2D(uTex, vUv + o * 0.8);
+      sb += texture2D(uTex, vUv - off + o * 1.15);
+    }
+    sr /= 12.0;
+    sg /= 12.0;
+    sb /= 12.0;
+    vec3 col = vec3(sr.r, sg.g * (1.0 + 0.3 * edge * (1.0 - uLight)), sb.b);
     // 어두운 테마: 별은 빛(더하기)이라 밝기가 곧 불투명도. 밝은 테마: 저장된 알파를 쓴다
     float a = mix(max(col.r, max(col.g, col.b)), max(sr.a, max(sg.a, sb.a)), uLight);
-    float edge = smoothstep(0.25, 1.0, sqrt(r2));
-    float v = uVig * edge * (1.0 - uLight);
-    float g = (hash(gl_FragCoord.xy + fract(uTime) * 91.7) - 0.5) * uGrain * (0.35 + 0.65 * edge) * (1.0 - uLight);
-    vec3 n = vec3(g, g * 0.6 + (hash(gl_FragCoord.yx + fract(uTime) * 37.1) - 0.5) * uGrain * edge * 0.8, g);
+    float v = uVig * smoothstep(0.25, 1.0, rr) * (1.0 - uLight);
+    float n1 = ign(gl_FragCoord.xy + fract(uTime * 0.37) * 211.0) - 0.5;
+    float n2 = ign(gl_FragCoord.yx * 1.31 + fract(uTime * 0.53) * 173.0) - 0.5;
+    float g = n1 * uGrain * (0.35 + 0.65 * edge) * (1.0 - uLight);
+    vec3 n = vec3(g, g * 0.6 + n2 * uGrain * edge * 0.8, g);
     col = col * (1.0 - v) + max(n, 0.0) * 0.9;
     float outA = 1.0 - (1.0 - a) * (1.0 - v);
     outA = max(outA, max(col.r, max(col.g, col.b)) * (1.0 - uLight));
+    // 비네팅이 만드는 단계(밴딩)가 등고선처럼 보이지 않게 어둠 쪽 알파에 미세한 디더를 섞는다
+    outA = clamp(outA + n1 * 0.06 * min(1.0, v * 10.0), 0.0, 1.0);
     gl_FragColor = vec4(col, outA);
   }
 `;
@@ -295,6 +316,8 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
           uniforms: {
             uTex: { value: target.texture },
             uCA: { value: 0.006 },
+            uBlur: { value: 0.006 },
+            uAspect: { value: 1.6 },
             uVig: { value: 0.3 },
             uGrain: { value: 0.03 },
             uTime: { value: 0 },
@@ -353,7 +376,9 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
     }
     const pu = post.mat.uniforms;
     pu.uCA.value = 0.006 + 0.016 * fx;
-    pu.uVig.value = 0.3 + 0.4 * fx;
+    pu.uBlur.value = 0.007 + 0.014 * fx;
+    pu.uAspect.value = canvas.clientWidth / Math.max(1, canvas.clientHeight);
+    pu.uVig.value = 0.16 + 0.34 * fx;
     pu.uGrain.value = 0.03 + 0.07 * fx;
     pu.uTime.value = material.uniforms.uTime.value;
     renderer.setRenderTarget(post.target);

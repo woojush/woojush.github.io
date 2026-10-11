@@ -74,7 +74,7 @@ if (space && dataEl?.textContent && list && chipsEl) {
 
   // ── 태그 ──
   const tagLi = (t: Tag, i: number) =>
-    `<li class="tag-item" style="--hue:var(--tag-${t.color});--i:${i}"><a class="tag" href="${html(t.href)}" data-path="${html(t.path ?? '')}"><span class="tag-name">${html(t.name)}</span><span class="tag-count" aria-label="${t.count}개의 노트">${t.count}</span></a><span class="tag-hint" aria-hidden="true">Click to reveal notes about this topic</span></li>`;
+    `<li class="tag-item" style="--hue:var(--tag-${t.color});--i:${i}"><a class="tag" href="${html(t.href)}" data-path="${html(t.path ?? '')}"><span class="tag-name">${html(t.name)}</span><span class="tag-count" aria-label="${t.count}개의 노트">${t.count}</span></a><span class="tag-ghost" aria-hidden="true"><span class="tag-name">${html(t.name)}</span><span class="tag-count">${t.count}</span></span><span class="tag-hint" aria-hidden="true">Click to reveal notes about this topic</span></li>`;
   const lis = () => [...list!.querySelectorAll<HTMLElement>('li')];
 
   function place(path: string) {
@@ -148,6 +148,7 @@ if (space && dataEl?.textContent && list && chipsEl) {
     chipsEl!.classList.remove('is-in');
     if (reduce) {
       place(path);
+      setHeading(path);
       renderChips(path);
       chipsIn();
     } else {
@@ -158,6 +159,7 @@ if (space && dataEl?.textContent && list && chipsEl) {
       space!.classList.remove('is-exiting');
       space!.classList.add('is-hidden');
       place(path); // 새 태그는 숨긴 채 놓아 둔다
+      setHeading(path); // 안내 문구도 이때(숨겨진 동안) 새 단계 것으로 바꾼다. 늦게 바뀌면 이전 단계 설명이 남아 보인다
       await wait(STARS_ONLY_MS);
       bloom();
       space!.classList.remove('is-hidden');
@@ -168,7 +170,6 @@ if (space && dataEl?.textContent && list && chipsEl) {
       space!.classList.remove('is-entering');
     }
     if (push) history.pushState(null, '', hrefOf(path));
-    setHeading(path);
     current = path;
     busy = false;
   }

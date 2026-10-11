@@ -1,6 +1,6 @@
 /*
  * nav.css — 탭 바(Nav.astro)의 스타일. 컴포넌트에서 분리한 것이다(스타일이 길어서).
- * 값은 tokens.css의 탭 바 토큰을 쓴다. 기준: docs/07 §3 c (lifestories.org의 상단 알약).
+ * 값은 tokens.css의 탭 바 토큰을 쓴다. 기준: docs/07 §3 c (lifestories.org의 상단 알약). rem 값은 lifestories의 루트 글자 크기(18px)에 맞춰 16px 기준 값에 1.125를 곱한 것이다(2026-10-11, 크기·배경을 원본과 동일하게).
  */
 @property --beam-angle { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
 @property --hub-spin { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
@@ -17,7 +17,7 @@
   position: relative;
   flex: 1 0 100%;
   height: var(--nav-h);
-  border-radius: 1.875rem;
+  border-radius: 2.10938rem;
   animation: nav-beam 8s linear infinite;
 }
 
@@ -27,7 +27,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  padding: 0.0625rem;
+  padding: 0.07031rem;
   border-radius: inherit;
   background: conic-gradient(
     from var(--beam-angle, 0deg),
@@ -49,7 +49,7 @@
     linear-gradient(#fff, #fff) content-box,
     linear-gradient(#fff, #fff);
   mask-composite: exclude;
-  filter: blur(0.5rem) brightness(1.3) saturate(1.4);
+  filter: blur(0.5625rem) brightness(1.3) saturate(1.4);
   pointer-events: none;
   will-change: transform;
 }
@@ -62,11 +62,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-inline: 1.375rem;
-  border-radius: 1.875rem;
+  padding-inline: 1.54688rem;
+  border-radius: 2.10938rem;
   background: var(--nav-pill-bg);
-  -webkit-backdrop-filter: blur(0.9375rem);
-  backdrop-filter: blur(0.9375rem);
+  -webkit-backdrop-filter: blur(1.05469rem);
+  backdrop-filter: blur(1.05469rem);
   overflow: hidden;
 }
 
@@ -78,16 +78,16 @@
   z-index: -1;
   border-radius: inherit;
   background:
-    radial-gradient(ellipse 4.375rem 2.1875rem at calc(33% + var(--drift-ax) + var(--drift-fx) * var(--hover-boost)) calc(-7% + var(--drift-ay) + var(--drift-fy) * var(--hover-boost)), var(--glow-tan), transparent),
-    radial-gradient(ellipse 3.75rem 1.875rem at calc(12% + var(--drift-bx) - var(--drift-fx) * var(--hover-boost)) calc(-5% + var(--drift-by) + var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
-    radial-gradient(ellipse 2.5rem 2.5rem at calc(2% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(68% + var(--drift-ay) + var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent),
-    radial-gradient(ellipse 1.25rem 1.75rem at calc(2% + var(--drift-ax) + var(--drift-fx) * var(--hover-boost)) calc(68% + var(--drift-by) - var(--drift-fy) * var(--hover-boost)), var(--glow-green), transparent),
-    radial-gradient(ellipse 11.25rem 1.875rem at calc(74% + var(--drift-ax) - var(--drift-fx) * var(--hover-boost)) calc(100% + var(--drift-ay) + var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
-    radial-gradient(ellipse 5.3125rem 1.5625rem at calc(55% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(100% + var(--drift-by) - var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent),
-    radial-gradient(ellipse 4.625rem 1.875rem at calc(94% + var(--drift-bx) + var(--drift-fx) * var(--hover-boost)) calc(0% + var(--drift-ay) - var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
-    radial-gradient(ellipse 1.625rem 2.1875rem at calc(100% + var(--drift-ax) - var(--drift-fx) * var(--hover-boost)) calc(27% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)), var(--glow-blue), transparent),
-    radial-gradient(ellipse 3.25rem 2.5rem at calc(100% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(27% + var(--drift-ay) - var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent);
-  box-shadow: inset 0 0 0.3125rem 0.0625rem rgba(0, 0, 0, 0.14);
+    radial-gradient(ellipse 4.92188rem 2.46094rem at calc(33% + var(--drift-ax) + var(--drift-fx) * var(--hover-boost)) calc(-7% + var(--drift-ay) + var(--drift-fy) * var(--hover-boost)), var(--glow-tan), transparent),
+    radial-gradient(ellipse 4.21875rem 2.10938rem at calc(12% + var(--drift-bx) - var(--drift-fx) * var(--hover-boost)) calc(-5% + var(--drift-by) + var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
+    radial-gradient(ellipse 2.8125rem 2.8125rem at calc(2% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(68% + var(--drift-ay) + var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent),
+    radial-gradient(ellipse 1.40625rem 1.96875rem at calc(2% + var(--drift-ax) + var(--drift-fx) * var(--hover-boost)) calc(68% + var(--drift-by) - var(--drift-fy) * var(--hover-boost)), var(--glow-green), transparent),
+    radial-gradient(ellipse 12.65625rem 2.10938rem at calc(74% + var(--drift-ax) - var(--drift-fx) * var(--hover-boost)) calc(100% + var(--drift-ay) + var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
+    radial-gradient(ellipse 5.97656rem 1.75781rem at calc(55% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(100% + var(--drift-by) - var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent),
+    radial-gradient(ellipse 5.20312rem 2.10938rem at calc(94% + var(--drift-bx) + var(--drift-fx) * var(--hover-boost)) calc(0% + var(--drift-ay) - var(--drift-fy) * var(--hover-boost)), var(--glow-orange), transparent),
+    radial-gradient(ellipse 1.82812rem 2.46094rem at calc(100% + var(--drift-ax) - var(--drift-fx) * var(--hover-boost)) calc(27% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)), var(--glow-blue), transparent),
+    radial-gradient(ellipse 3.65625rem 2.8125rem at calc(100% + var(--drift-bx) + var(--drift-fy) * var(--hover-boost)) calc(27% + var(--drift-ay) - var(--drift-fx) * var(--hover-boost)), var(--glow-tan), transparent);
+  box-shadow: inset 0 0 0.35156rem 0.07031rem rgba(0, 0, 0, 0.14);
   opacity: 0.6;
   pointer-events: none;
   transition:
@@ -198,26 +198,26 @@
   }
 
   .nav-pill {
-    gap: 1.25rem;
-    padding-inline: 1.25rem;
+    gap: 1.40625rem;
+    padding-inline: 1.40625rem;
     /* 가운데 허브 자리를 비운다 */
-    mask: radial-gradient(circle, transparent 0.9375rem, #000 1rem);
+    mask: radial-gradient(circle, transparent 1.05469rem, #000 1.125rem);
   }
 
   .nav-list {
-    gap: 1.25rem;
+    gap: 1.40625rem;
   }
 
   .nav-spacer {
     display: block;
     flex-shrink: 0;
-    width: 1.875rem;
-    height: 1.875rem;
+    width: 2.10938rem;
+    height: 2.10938rem;
   }
 
   /* 평소에는 글자가 없다. 올라가면 안쪽으로 모이며 나타난다 */
   .nav-link {
-    font-size: var(--fs-base);
+    font-size: 1.125rem; /* lifestories: 18px */
     opacity: 0;
     transform: translate(var(--shift)) scale(0.96);
     pointer-events: none;
@@ -239,8 +239,8 @@
     left: 50%;
     z-index: 2;
     display: block;
-    width: 1.875rem;
-    height: 1.875rem;
+    width: 2.10938rem;
+    height: 2.10938rem;
     transform: translate(-50%, -50%) rotate(var(--hub-spin, 0deg));
     border-radius: 50%;
     will-change: transform;
@@ -252,33 +252,33 @@
 
   .nav-hub span {
     position: absolute;
-    width: 0.1875rem;
-    height: 0.1875rem;
+    width: 0.21094rem;
+    height: 0.21094rem;
     background: var(--nav-dot);
   }
 
-  .nav-hub span:nth-child(1) { top: calc(50% - 0.28125rem); left: calc(50% - 0.28125rem); }
-  .nav-hub span:nth-child(2) { top: calc(50% - 0.28125rem); left: calc(50% + 0.09375rem); }
-  .nav-hub span:nth-child(3) { top: calc(50% + 0.09375rem); left: calc(50% - 0.28125rem); }
-  .nav-hub span:nth-child(4) { top: calc(50% + 0.09375rem); left: calc(50% + 0.09375rem); }
+  .nav-hub span:nth-child(1) { top: calc(50% - 0.31641rem); left: calc(50% - 0.31641rem); }
+  .nav-hub span:nth-child(2) { top: calc(50% - 0.31641rem); left: calc(50% + 0.10547rem); }
+  .nav-hub span:nth-child(3) { top: calc(50% + 0.10547rem); left: calc(50% - 0.31641rem); }
+  .nav-hub span:nth-child(4) { top: calc(50% + 0.10547rem); left: calc(50% + 0.10547rem); }
 
   /* 글자 밑에서 올라오는 하얀 빛 (lifestories.org의 hover-blob 그대로). 알약 안쪽으로 25px만 들어오고, 알약 밖으로는 나가지 않는다 */
   .nav-blob {
     position: absolute;
-    top: calc(100% - 1.5625rem);
+    top: calc(100% - 1.75781rem);
     left: 0;
     z-index: 0;
     display: block;
-    width: 5rem;
-    height: 5rem;
+    width: 5.625rem;
+    height: 5.625rem;
     border-radius: 50%;
     background:
-      radial-gradient(circle 1.75rem at calc(30% + var(--drift-ax) * 0.6) calc(30% + var(--drift-ay) * 0.6), rgba(255, 248, 240, 0.85), transparent),
-      radial-gradient(circle 1.625rem at calc(72% - var(--drift-bx) * 0.6) calc(32% + var(--drift-by) * 0.6), rgba(244, 248, 255, 0.8), transparent),
-      radial-gradient(circle 1.875rem at calc(32% + var(--drift-fy) * 0.5) calc(72% - var(--drift-fx) * 0.5), rgba(248, 252, 246, 0.8), transparent),
-      radial-gradient(circle 1.75rem at calc(70% - var(--drift-ay) * 0.6) calc(70% + var(--drift-ax) * 0.6), rgba(252, 246, 240, 0.8), transparent),
-      radial-gradient(circle 1.5rem at calc(50% + var(--drift-fx) * 0.4) calc(50% + var(--drift-fy) * 0.4), rgba(255, 252, 246, 0.7), transparent);
-    filter: blur(0.625rem);
+      radial-gradient(circle 1.96875rem at calc(30% + var(--drift-ax) * 0.6) calc(30% + var(--drift-ay) * 0.6), rgba(255, 248, 240, 0.85), transparent),
+      radial-gradient(circle 1.82812rem at calc(72% - var(--drift-bx) * 0.6) calc(32% + var(--drift-by) * 0.6), rgba(244, 248, 255, 0.8), transparent),
+      radial-gradient(circle 2.10938rem at calc(32% + var(--drift-fy) * 0.5) calc(72% - var(--drift-fx) * 0.5), rgba(248, 252, 246, 0.8), transparent),
+      radial-gradient(circle 1.96875rem at calc(70% - var(--drift-ay) * 0.6) calc(70% + var(--drift-ax) * 0.6), rgba(252, 246, 240, 0.8), transparent),
+      radial-gradient(circle 1.6875rem at calc(50% + var(--drift-fx) * 0.4) calc(50% + var(--drift-fy) * 0.4), rgba(255, 252, 246, 0.7), transparent);
+    filter: blur(0.70312rem);
     opacity: 0;
     transform: translateX(-50%);
     pointer-events: none;

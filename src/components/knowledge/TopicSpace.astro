@@ -36,6 +36,10 @@ const tags = levelTags(here, here ? here.children : tree);
                 <span class="tag-name">{t.name}</span>
                 <span class="tag-count" aria-label={`${t.count}개의 노트`}>{t.count}</span>
               </a>
+              <span class="tag-ghost" aria-hidden="true">
+                <span class="tag-name">{t.name}</span>
+                <span class="tag-count">{t.count}</span>
+              </span>
               <span class="tag-hint" aria-hidden="true">Click to reveal notes about this topic</span>
             </li>
           ))

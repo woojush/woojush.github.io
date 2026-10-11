@@ -1,7 +1,7 @@
 // Knowledge 주제 장면의 지휘자 (lifestories.org/discover의 전환을 참고했다).
 // 태그를 누르면: ① 태그들이 바깥으로 흩어지며 사라지는 동안(약 0.6초) 별이 울렁이고 → ② 0.4초 동안 별만 남아 울렁이다가
 // ③ 새 태그들이 0.4배에서 점점 커지며 나타나 제 크기에서 멈춘다. 좌측 하단 칩은 전환 중 내려갔다가 새 경로로 다시 올라온다.
-// 하위가 하나뿐인 단계는 건너뛰고, 끝(글 목록)은 평범한 페이지 이동이다. 뒤로 가기·앞으로 가기도 같은 화면 안에서 처리한다.
+// 하위가 하나뿐이어도 건너뛰지 않고, 끝(글 목록)은 평범한 페이지 이동이다. 뒤로 가기·앞으로 가기도 같은 화면 안에서 처리한다.
 // 별은 scene.ts(메인과 같은 three.js 장면), 태그의 움직임·끌기는 topic-float.ts.
 import { startScene, type SceneHandle } from '@/scripts/scene';
 import { createField } from '@/scripts/topic-float';
@@ -35,7 +35,7 @@ if (space && dataEl?.textContent && list && chipsEl) {
   let scene: SceneHandle | null = null;
   if (sky) {
     try {
-      scene = startScene(sky);
+      scene = startScene(sky, { post: true });
     } catch {
       sky.hidden = true; // WebGL을 못 쓰면 별 없이 태그만 보인다
     }
@@ -62,6 +62,7 @@ if (space && dataEl?.textContent && list && chipsEl) {
     }
     space!.style.setProperty('--wob-s', ws.toFixed(4));
     space!.style.setProperty('--wob-r', `${wr.toFixed(3)}deg`);
+    scene?.setFx(burst);
     scene?.update(0.35 + 8 * burst * burst, 0.14 * burst, dt, clock, 1);
     field.tick(dt);
     requestAnimationFrame(frame);
@@ -186,22 +187,13 @@ if (space && dataEl?.textContent && list && chipsEl) {
     location.href = href;
   }
 
-  /** 아래로 내려갈 때: 하위가 하나뿐이고 직접 글이 없는 단계는 건너뛴다 */
-  function descend(path: string): { path: string; page: string | null } {
-    let node = findStage(tree, path);
-    while (node && node.children.length === 1 && node.ownNotes === 0) node = node.children[0];
-    if (!node) return { path, page: null };
-    return node.leaf ? { path: node.path, page: topicHref(node.path) } : { path: node.path, page: null };
-  }
-
   space.addEventListener('click', (e) => {
     const a = (e.target as Element).closest<HTMLAnchorElement>('a.tag');
     if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
-    if (a.dataset.path) {
-      const to = descend(a.dataset.path);
-      return to.page ? void goPage(to.page) : void goLevel(to.path, true);
-    }
+    // 하위가 있으면(하나뿐이어도) 반드시 별 세계를 거쳐 들어가고, 하위가 없는 끝이나 직접 글 목록만 페이지로 간다
+    const node = a.dataset.path ? findStage(tree, a.dataset.path) : null;
+    if (node && !node.leaf) return void goLevel(node.path, true);
     void goPage(a.href);
   });
 

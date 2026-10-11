@@ -40,6 +40,7 @@ const { chips, total } = Astro.props;
   /* 글 목록 페이지: 고정된 칩이 푸터 링크를 가리지 않게 푸터를 칩 높이만큼 띄운다 */
   body:has([data-chips]) .site-footer {
     padding-bottom: 3.5rem;
+    z-index: 0; /* main(z-index 1) 안의 고정 칩이 푸터에 가려 클릭이 막히지 않게 */
   }
 
   .chips {

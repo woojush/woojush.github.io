@@ -5,6 +5,8 @@
 //  - 별은 처음부터 이미 자리에 있고, 화면 전체가 부드럽게 나타난 뒤 별들이 점차 앞으로 다가온다(터져 나오는 연출 없음).
 //  - 비행 속도와 마지막 확대의 강도는 밖(home-intro.ts)이 정한다. 문구가 커지는 속도와 같은 곡선이다(intro-timeline.ts).
 //  - 마지막 확대(블랙홀로 빨려 들어가는 구간)에서는 별이 짧은 줄(streak)로 늘어나 가운데에서 쏟아지고 장면이 점점 빠르게 회전한다.
+//  - 별은 화면 전체에 고르게 흩어진다(멀리 있을 때의 화면 위치를 고르게 뽑고, 다가오며 바깥으로 흘러간다). 가장자리 별도 보인다.
+//  - 선택(post): 가장자리로 갈수록 색이 어긋나는 색수차 + 가장자리 비네팅 + 잔 그레인(lifestories.org와 같은 후처리). 전환 때 setFx로 세게 한다.
 //  - 색은 CSS 토큰 --particle(rgb 채널). 테마가 바뀌면 다시 읽는다.
 //  - prefers-reduced-motion이면 한 장면만 그린다. WebGL이 없으면 startScene이 던지고, 부르는 쪽이 캔버스를 숨긴다.
 import {
@@ -15,9 +17,13 @@ import {
   LineSegments,
   NormalBlending,
   OrthographicCamera,
+  Mesh,
+  NoBlending,
+  PlaneGeometry,
   Points,
   Scene,
   ShaderMaterial,
+  WebGLRenderTarget,
   WebGLRenderer,
 } from 'three';
 
@@ -65,20 +71,20 @@ const VERT = /* glsl */ `
     float t = dist / uDepth;
     // 원근법: 처음(먼 곳)의 크기에서 시작해, 다가올수록 거리에 반비례하는 쪽으로 점점 커진다
     float size = (0.9 + aSize * 3.2) * 0.6 * pow(uDepth / dist, 0.55) * (1.0 + 0.6 * uBoost) * uDpr;
-    gl_PointSize = clamp(size, 3.0 * uDpr, uMaxPx * (1.0 + uBoost) * uDpr) * onset; // 최소 3px(discover의 1px보다 2px 크게)
+    gl_PointSize = clamp(size, 2.4 * uDpr, uMaxPx * (1.0 + uBoost) * uDpr) * onset; // 최소 2px: discover처럼 작고 또렷한 점
     // 먼 쪽과 바로 눈앞에서는 흐려진다
-    float far = 1.0 - smoothstep(0.55, 1.0, t);
+    float far = 1.0 - smoothstep(0.78, 1.0, t);
     float near = smoothstep(0.0, 0.08, t);
     // 입자마다 제 박자의 반짝임(두 사인이 겹쳐 불규칙하게)
     float ph = aSeed * 40.0;
     float sp = 1.0 + fract(aSeed * 7.31) * 3.0;
-    float tw = 0.35 + 0.65 * (0.5 + 0.5 * sin(uTime * 1.6 * sp + ph) * sin(uTime * 1.1 * sp + ph * 1.7));
+    float tw = 0.3 + 0.7 * (0.5 + 0.5 * sin(uTime * 1.6 * sp + ph) * sin(uTime * 1.1 * sp + ph * 1.7));
     float rr = length(xy);
     float edge = smoothstep(0.35, 1.1, rr);
     // 가운데에도 별이 있되, 한 점으로 뭉쳐 보이지 않도록 가장 안쪽만 아주 옅게 한다
     float hole = smoothstep(0.02, 0.16, rr);
     // 마지막 확대에서는 가장자리로 쏟아지는 별도 흐려지지 않고 오히려 밝아진다
-    vAlpha = far * near * tw * onset * (1.0 - 0.7 * edge * (1.0 - uBoost)) * hole * (1.0 + 0.35 * uBoost) * tailKeep;
+    vAlpha = far * near * tw * onset * (1.0 - 0.3 * edge * (1.0 - uBoost)) * hole * (1.0 + 0.35 * uBoost) * tailKeep * 1.7;
   }
 `;
 
@@ -89,7 +95,7 @@ const FRAG = /* glsl */ `
   void main() {
     float r = length(gl_PointCoord - 0.5) * 2.0;
     if (r > 1.0) discard;
-    float a = pow(1.0 - r, 0.9);
+    float a = pow(1.0 - r, 0.85); // 가장자리가 빨리 꺼져 또렷한 점
     gl_FragColor = vec4(uColor, a * vAlpha * uOpacity);
   }
 `;
@@ -107,9 +113,55 @@ const FRAG_LINE = /* glsl */ `
 export interface SceneHandle {
   /** 한 프레임 그린다. flySpeed: 앞으로 날아오는 속도(깊이 단위/초), boost: 마지막 확대의 진행(0~1), clock: 장면이 시작한 뒤의 초, alpha: 장면 전체의 투명도 배수(0~1) */
   update(flySpeed: number, boost: number, dt: number, clock: number, alpha: number): void;
+  /** 후처리(색수차·비네팅·그레인)를 세게 하는 정도(0~1). startScene에서 post를 켠 경우에만 의미가 있다 */
+  setFx(amount: number): void;
 }
 
-export function startScene(canvas: HTMLCanvasElement): SceneHandle {
+// 후처리: 별 장면을 한 번 텍스처에 그린 뒤, 화면 가장자리로 갈수록 R·B 채널을 반대 방향으로 밀어 색이 어긋나게 하고(색수차),
+// 가장자리를 어둡게 하고(비네팅), 잔 노이즈(그레인)를 얹는다. 결과는 곱해진(premultiplied) 색으로 내보낸다.
+const POST_VERT = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = vec4(position.xy, 0.0, 1.0);
+  }
+`;
+
+const POST_FRAG = /* glsl */ `
+  uniform sampler2D uTex;
+  uniform float uCA;      // 색수차 세기(모서리에서의 UV 이동량)
+  uniform float uVig;     // 가장자리 어둡기(0~1)
+  uniform float uGrain;   // 그레인 세기
+  uniform float uTime;
+  uniform float uLight;   // 1이면 밝은 테마(별이 어두운 점): 비네팅·그레인을 쓰지 않는다
+  varying vec2 vUv;
+  float hash(vec2 p) {
+    p = fract(p * vec2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
+  }
+  void main() {
+    vec2 c = vUv - 0.5;
+    float r2 = dot(c, c) * 4.0;          // 가운데 0 → 모서리 약 2
+    vec2 off = c * uCA * r2;
+    vec4 sr = texture2D(uTex, vUv + off);
+    vec4 sg = texture2D(uTex, vUv);
+    vec4 sb = texture2D(uTex, vUv - off);
+    vec3 col = vec3(sr.r, sg.g, sb.b);
+    // 어두운 테마: 별은 빛(더하기)이라 밝기가 곧 불투명도. 밝은 테마: 저장된 알파를 쓴다
+    float a = mix(max(col.r, max(col.g, col.b)), max(sr.a, max(sg.a, sb.a)), uLight);
+    float edge = smoothstep(0.25, 1.0, sqrt(r2));
+    float v = uVig * edge * (1.0 - uLight);
+    float g = (hash(gl_FragCoord.xy + fract(uTime) * 91.7) - 0.5) * uGrain * (0.35 + 0.65 * edge) * (1.0 - uLight);
+    vec3 n = vec3(g, g * 0.6 + (hash(gl_FragCoord.yx + fract(uTime) * 37.1) - 0.5) * uGrain * edge * 0.8, g);
+    col = col * (1.0 - v) + max(n, 0.0) * 0.9;
+    float outA = 1.0 - (1.0 - a) * (1.0 - v);
+    outA = max(outA, max(col.r, max(col.g, col.b)) * (1.0 - uLight));
+    gl_FragColor = vec4(col, outA);
+  }
+`;
+
+export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean } = {}): SceneHandle {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const small = matchMedia('(max-width: 640px)');
   const root = document.documentElement;
@@ -121,7 +173,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
   const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1); // 정점 셰이더가 직접 화면 좌표를 만든다
 
   const DEPTH = 36;
-  const COUNT = small.matches ? 1500 : 3200;
+  const COUNT = small.matches ? 4500 : 11000;
   const FOV_TAN = Math.tan((60 * Math.PI) / 360); // fov 60°
 
   // 입자 생성: 화면 전체에 고르게 + 일부는 성단처럼 뭉친다. x,y는 깊이 1일 때 화면 비율(-1~1)
@@ -130,6 +182,11 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
   const seed = new Float32Array(COUNT);
   const zs = new Float32Array(COUNT);
   const CLUSTERS = 24;
+  // 별의 화면 위치는 p * D0 / dist. 가장 먼 깊이(dist≈DEPTH)에서 화면 전체에 고르게 놓이도록 p = s * (DFAR / D0)로 뽑는다.
+  // (p를 상자 안에서 고르게 뽑으면 화면 가운데에 몰리고 바깥은 비는 고리 모양이 된다)
+  const D0 = 7;
+  const DFAR = DEPTH + 0.3;
+  const K = DFAR / D0;
   const centers = Array.from({ length: CLUSTERS }, () => [Math.random() * 2.4 - 1.2, Math.random() * 2.4 - 1.2, Math.random() * DEPTH]);
   const gauss = () => Math.sqrt(-2 * Math.log(Math.max(1e-6, Math.random()))) * Math.cos(2 * Math.PI * Math.random());
   for (let i = 0; i < COUNT; i++) {
@@ -141,19 +198,19 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
       z = c[2] + gauss() * 1.4;
       big = 0.13 + Math.random() * 0.5;
     } else {
-      x = Math.random() * 2.4 - 1.2;
-      y = Math.random() * 2.4 - 1.2;
+      x = Math.random() * 2.6 - 1.3;
+      y = Math.random() * 2.6 - 1.3;
       z = Math.random() * DEPTH;
     }
     if (Math.random() < 0.02) big = 0.9 + Math.random() * 0.8; // 가끔 큰 별
-    // 소실점(가운데)을 정확히 지나가는 별은 만들지 않는다: 한 점으로 뭉쳐 보이는 것을 막고, 가운데에도 별은 흩어져 있게 한다
+    // 소실점(가운데)을 정확히 지나가는 별은 만들지 않는다: 한 점으로 뭉쳐 보이는 것을 막는다
     const rr = Math.hypot(x, y);
-    if (rr < 0.32) {
-      const k = (0.32 + Math.random() * 0.2) / Math.max(rr, 1e-3);
+    if (rr < 0.05) {
+      const k = (0.05 + Math.random() * 0.08) / Math.max(rr, 1e-3);
       x *= k;
       y *= k;
     }
-    pos.set([x, y, 0], i * 3);
+    pos.set([x * K, y * K, 0], i * 3);
     size[i] = big;
     seed[i] = Math.random();
     zs[i] = ((z % DEPTH) + DEPTH) % DEPTH;
@@ -174,7 +231,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
     uniforms: {
       uFly: { value: 0 },
       uDepth: { value: DEPTH },
-      uD0: { value: 7 },
+      uD0: { value: D0 },
       uNear: { value: 0.3 },
       uPan: { value: [0, 0] },
       uRoll: { value: 0 },
@@ -224,6 +281,35 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
   streaks.visible = false;
   scene.add(streaks);
 
+  // 후처리 준비 (options.post일 때만)
+  const post = options.post
+    ? (() => {
+        const target = new WebGLRenderTarget(2, 2, { depthBuffer: false });
+        const mat = new ShaderMaterial({
+          vertexShader: POST_VERT,
+          fragmentShader: POST_FRAG,
+          blending: NoBlending,
+          transparent: false,
+          depthTest: false,
+          depthWrite: false,
+          uniforms: {
+            uTex: { value: target.texture },
+            uCA: { value: 0.006 },
+            uVig: { value: 0.3 },
+            uGrain: { value: 0.03 },
+            uTime: { value: 0 },
+            uLight: { value: 0 },
+          },
+        });
+        const quad = new Mesh(new PlaneGeometry(2, 2), mat);
+        quad.frustumCulled = false;
+        const postScene = new Scene();
+        postScene.add(quad);
+        return { target, mat, postScene };
+      })()
+    : null;
+  let fx = 0;
+
   function readTheme(): void {
     const rgb = css('--particle').split(',').map((n) => Number(n.trim()));
     if (rgb.length === 3 && rgb.every((n) => !Number.isNaN(n))) material.uniforms.uColor.value = new Color(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
@@ -234,6 +320,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
     lineMaterial.blending = material.blending;
     material.needsUpdate = true;
     lineMaterial.needsUpdate = true;
+    if (post) post.mat.uniforms.uLight.value = light ? 1 : 0;
     if (reduce.matches) render();
   }
 
@@ -244,6 +331,7 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
     renderer.setPixelRatio(dpr);
     renderer.setSize(w, h, false);
     material.uniforms.uDpr.value = dpr;
+    post?.target.setSize(Math.max(2, Math.round(w * dpr)), Math.max(2, Math.round(h * dpr)));
     material.uniforms.uTan.value = [FOV_TAN * (w / h), FOV_TAN];
     if (reduce.matches) render();
   }
@@ -259,7 +347,19 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
   const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 
   function render(): void {
+    if (!post) {
+      renderer.render(scene, camera);
+      return;
+    }
+    const pu = post.mat.uniforms;
+    pu.uCA.value = 0.006 + 0.016 * fx;
+    pu.uVig.value = 0.3 + 0.4 * fx;
+    pu.uGrain.value = 0.03 + 0.07 * fx;
+    pu.uTime.value = material.uniforms.uTime.value;
+    renderer.setRenderTarget(post.target);
     renderer.render(scene, camera);
+    renderer.setRenderTarget(null);
+    renderer.render(post.postScene, camera);
   }
 
   // 움직임을 줄이는 설정이면 한 장면만 그린다
@@ -307,5 +407,8 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
   resize();
   readTheme();
   if (reduce.matches) still();
-  return { update };
+  function setFx(amount: number): void {
+    fx = Math.min(1, Math.max(0, amount));
+  }
+  return { update, setFx };
 }

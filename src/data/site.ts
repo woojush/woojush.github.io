@@ -1,11 +1,12 @@
-// 사이트 단위 설정. 이름 표기는 'J'다(2026-10-11 사용자 지시로 'Shin WooJu'에서 바꿨다; 실명 공개 자체는 2026-10-10에 확정). 사진·연락처 등 나머지 개인정보는 CLAUDE.md "공개 정보 원칙"을 따른다.
+// 사이트 단위 설정. 이름은 실명 'Shin WooJu'로 공개하기로 확정했다(2026-10-10). 화면 맨 위 왼쪽 고정 표기(`mark`)만 'J'다(2026-10-11 사용자 지시). 사진·연락처 등 나머지 개인정보는 CLAUDE.md "공개 정보 원칙"을 따른다.
 export interface SiteLink {
   label: string;
   href: string;
 }
 
 export const site = {
-  name: 'J', // 2026-10-11 사용자 지시
+  name: 'Shin WooJu', // 실명 공개 확정 (2026-10-10)
+  mark: 'J', // 헤더 맨 왼쪽 위 고정 표기만 (2026-10-11 사용자 지시). 홈·About·제목은 name을 쓴다
   tagline: 'AI Engineering student', // 학교/정체성 표현은 허용
   defaultLang: 'ko',
   // 메뉴는 4개 고정(home은 메뉴에서 뺐다: 이름과 탭 바 가운데 허브가 홈 링크, 2026-10-10). 추가 조건은 docs/01_information_architecture.md 7절.

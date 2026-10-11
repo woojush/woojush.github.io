@@ -41,7 +41,7 @@ const pageTitle = title === site.name ? title : `${title} — ${site.name}`;
   </head>
   <body>
     <a class="skip-link" href="#main">본문으로 건너뛰기</a>
-    <Header name={site.name} items={site.nav} currentPath={Astro.url.pathname} />
+    <Header name={site.mark} items={site.nav} currentPath={Astro.url.pathname} />
     {/* .page: header / footer와 같은 컨테이너라서 왼쪽 선이 맞는다. tabindex=-1: skip link 이동 후 포커스를 받는다 */}
     <main id="main" class="page" tabindex="-1">
       <slot />

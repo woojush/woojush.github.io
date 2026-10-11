@@ -223,7 +223,8 @@
   }
 
   .nav:hover .nav-pill::before,
-  .nav:focus-within .nav-pill::before {
+  .nav:focus-within .nav-pill::before,
+  :root[data-nav-open] .nav .nav-pill::before {
     opacity: 1;
     filter: brightness(1.15) saturate(1.3);
   }
@@ -301,6 +302,11 @@
     animation: nav-spin 0.6s var(--ease-custom);
   }
 
+  /* 새 페이지가 벌어진 채 시작했을 때 허브가 다시 돌지 않게(같은 애니메이션 이름 + 길이 0) */
+  :root[data-nav-open] .nav .nav-hub {
+    animation: nav-spin 0s;
+  }
+
   .nav-hub span {
     position: absolute;
     width: 0.21094rem;
@@ -343,7 +349,8 @@
     animation-delay: calc(var(--nav-clock, 0) * -1s);
   }
 
-  .nav:hover .nav-blob {
+  .nav:hover .nav-blob,
+  :root[data-nav-open] .nav .nav-blob {
     animation-play-state: running;
   }
 }

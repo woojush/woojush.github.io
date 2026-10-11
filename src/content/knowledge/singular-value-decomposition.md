@@ -8,7 +8,7 @@ order: 4
 
 <div class="callout" role="note" data-kind="note">
 
-<strong>이어받는 질문</strong> : 위의 두 한계(정사각 한정, 대각화 불가능한 경우)를 모두 없애 수는 없는가?
+<strong>이어받는 질문</strong> : 위의 두 한계(정사각 한정, 대각화 불가능한 경우)를 모두 없앨 수는 없는가?
 
 <strong>핵심 아이디어</strong> : 고유분해는 입력 기저와 출력 기저를 같게($S=T$) 고정해서 한계가 생겼다. 도메인 기저 $V$와 코도메인 기저 $U$를 <strong>따로</strong> 고르고 둘 다 정규직교로 잡으면 $A=U\Sigma V^\top$이 항상 존재한다. 재료는 Spectral Theorem이다. $A^\top A$는 항상 대칭 PSD라 정규직교 고유기저가 보장되고, 그것이 $V$가 된다.
 
@@ -51,7 +51,7 @@ $\sigma_i$ : singular value (관례상 $\sigma_1\ge\sigma_2\ge\cdots\ge0$), $u_i
 
 <summary>④ rank와 kernel (2장)</summary>
 
-> $\text{rank}(A)=r$이면 $\dim\ker(A)=n-r$이다. (Rank-Nullity) 0이 아닌 singular value의 개수가 곧 $r$이다. ※ 교재 밖 보충 : $A^\top Ax=0\Rightarrow x^\top A^\top Ax=\Vert Ax\Vert^2=0\Rightarrow Ax=0$이므로 $\ker(A^\top A)=\ker(A)$이고, rank\$(A^top A)=$rank$(A)=r\$이다. 즉 $A^\top A$의 0이 아닌 고유값이 정확히 $r$개이다.
+> $\text{rank}(A)=r$이면 $\dim\ker(A)=n-r$이다. (Rank-Nullity) 0이 아닌 singular value의 개수가 곧 $r$이다. ※ 교재 밖 보충 : $A^\top Ax=0\Rightarrow x^\top A^\top Ax=\Vert Ax\Vert^2=0\Rightarrow Ax=0$이므로 $\ker(A^\top A)=\ker(A)$이고, $\text{rank}(A^\top A)=\text{rank}(A)=r$이다. 즉 $A^\top A$의 0이 아닌 고유값이 정확히 $r$개이다.
 
 </details>
 

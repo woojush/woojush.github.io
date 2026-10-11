@@ -66,7 +66,7 @@ $Ax=\lambda x$는 “$Ax$와 $x$가 collinear”라는 뜻이다. ($\lambda<0$�
 
 1. 고유벡터들로 기저를 잡는다.
 1. 그 기저의 좌표에서 A는 각 축을 $\lambda_i$배 하는 변환일 뿐이다. 즉 <strong>대각행렬</strong>이 된다.
-1. 대각행렬이면 거듭제곡 $A^k$, 역행렬, det를 한 줄로 계산할 수 있다.
+1. 대각행렬이면 거듭제곱 $A^k$, 역행렬, det를 한 줄로 계산할 수 있다.
 
 <details>
 
@@ -304,7 +304,7 @@ $\sum_i\lambda_i=\text{tr}(A),\;\;\prod_i\lambda_i=\det(A)$
 
 <div class="callout" role="note" data-kind="intuition">
 
-이 근 $3,1$은 2장 Example 2.23에서 기저 $B=\big((1,1)^\top,(1,-1)^\top\big)$로 바꿈을 때 나온 대각 성분 $3,1$과 같다. 왜 같은지는 4.2·4.4에서 풀린다.
+이 근 $3,1$은 2장 Example 2.23에서 기저 $B=\big((1,1)^\top,(1,-1)^\top\big)$로 바꿨을 때 나온 대각 성분 $3,1$과 같다. 왜 같은지는 4.2·4.4에서 풀린다.
 
 </div>
 
@@ -393,7 +393,7 @@ $Ix=1\cdot x$이므로 영벡터가 아닌 <strong>모든 벡터</strong>가 고
 - 대각화 (4.4)
 - SVD (4.5)
 - PCA (10장)
-- 거듭제곡이 수렴하는지 판단 ($A^kx$의 장기 거동)
+- 거듭제곱이 수렴하는지 판단 ($A^kx$의 장기 거동)
 - 이해 어려움
 
 </details>

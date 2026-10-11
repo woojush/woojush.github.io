@@ -76,7 +76,7 @@ order: 4
 
 
 $$
-b_k = \underbrace{\pi_{U_{k-1}}(b_k)}_{U_{k-1}\text{이 이미 설명하는 성분}} + \underbrace{\left(b_k-\pi_{U_{k-1}}(b_k)\right)}_{U_{k-1}\text{에 수직한 새로운 성분}}
+b_k = \underbrace{\pi_{U_{k-1}}(b_k)}_{U_{k-1}\text{이 이미 설명하는 성분}} + \underbrace{\left(b_k-\pi_{U_{k-1}}(b_k)\right)}_{U_{k-1}\text{에 수직인 새로운 성분}}
 $$
 
 </div>

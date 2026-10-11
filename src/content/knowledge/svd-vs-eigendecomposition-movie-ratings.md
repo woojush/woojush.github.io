@@ -67,7 +67,7 @@ $A=\begin{bmatrix}5&4&1\\5&5&0\\0&0&5\\1&0&4\end{bmatrix}$, $\Sigma$의 특이�
 
 > • <strong>full SVD</strong> : 교재의 정의 (4.64). $U$는 $m\times m$, $V$는 $n\times n$, $\Sigma$는 $m\times n$이다.
 • <strong>reduced SVD</strong> : $m\ge n$일 때 $U$를 $m\times n$, $\Sigma$를 $n\times n$ 대각행렬로 줄인 꼴이다. 수학 구조는 같고 행렬을 만드는 방식만 다르다.
-• 계수 $r$에 맞춰 $U$를 $m\times r$, $\Sigma$를 $r\times r$, $V^\top$를 $r\times n$으로 줄이는 정의도 있다. 0이 아니는 값만 남는다.
+• 계수 $r$에 맞춰 $U$를 $m\times r$, $\Sigma$를 $r\times r$, $V^\top$를 $r\times n$으로 줄이는 정의도 있다. 0이 아닌 값만 남는다.
 • <strong>truncated SVD</strong> : 큰 특이값 몇 개만 남기는 것이다. 다음 노트(4.6)의 행렬 근사이다.
 
 </details>

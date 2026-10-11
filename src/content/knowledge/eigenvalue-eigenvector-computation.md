@@ -26,8 +26,8 @@ order: 2
 
 <summary><strong>왜 필요한가</strong></summary>
 
-> 정의 $Ax=\lambda x$만으로는 $\lambda$와 $x$를 동시에 찾아야 해서 막막하다. 앞 노트에서 만든 특성다항식이 이 문제를 <strong>두 단계로 쪼개다.</strong>
-① $\lambda$만의 방정식을 푸다. ② 구한 $\lambda$마다 $x$를 푸다.
+> 정의 $Ax=\lambda x$만으로는 $\lambda$와 $x$를 동시에 찾아야 해서 막막하다. 앞 노트에서 만든 특성다항식이 이 문제를 <strong>두 단계로 쪼갠다.</strong>
+① $\lambda$만의 방정식을 푼다. ② 구한 $\lambda$마다 $x$를 푼다.
 
 </details>
 
@@ -107,20 +107,20 @@ n by n행렬 A를 대각화하려면 <strong>선형독립인 고유벡터가 n�
 
 그것을 알아내기 위해서 AM(Algebraic multiplicity)과 GM(Geometric multiplicity)을 비교한다.
 
-> <strong>판정 기준</strong> : $A$가 대각화 가능 ⇔ <strong>모든 고유값에서 GM = AM</strong> (이유는 아래 "3단계 연결" toggle) \[보완\] "3단계 연결" toggle은 현재 페이지에 없다. 이유는 바로 위 문단(독립 고유벡터 n개 ⇔ 기저)과 아래 Theorem 4.12 toggle을 보면 된다. 또 이 "⇔"은 실수 고유값이 충분히 나오는 경우를 전제로 한다. 특성다항식이 실수에서 완전히 인수분해되지 않으면(예: 회전행렬) GM=AM을 따지기 전에 실수 고유값이 모자라 실수 대각화가 안 된다.. 하나라도 $\text{GM}<\text{AM}$이면 대각화가 불가능하고, 그런 행렬을 defective라 부른다.
+> <strong>판정 기준</strong> : $A$가 대각화 가능 ⇔ <strong>모든 고윳값에서 GM = AM</strong> (이유는 아래 "3단계 연결" toggle) \[보완\] "3단계 연결" toggle은 현재 페이지에 없다. 이유는 바로 위 문단(독립 고유벡터 n개 ⇔ 기저)과 아래 Theorem 4.12 toggle을 보면 된다. 또 이 "⇔"은 실수 고유값이 충분히 나오는 경우를 전제한다. 특성다항식이 실수에서 완전히 인수분해되지 않으면(예: 회전행렬) GM=AM을 따지기 전에 실수 고유값이 모자라 실수 대각화가 안 된다.. 하나라도 $\text{GM}<\text{AM}$이면 대각화가 불가능하고, 그런 행렬을 defective라 부른다.
 
 <details>
 
 <summary>대수적 중복도 (Algebraic Multiplicity, AM)</summary>
 
-> AM은 특성다항식에서 특정 고윗값이 근으로 등장하는 중복 횟수이다.
+> AM은 특성다항식에서 특정 고윳값이 근으로 등장하는 중복 횟수이다.
 
 ex. <strong>예시:</strong> $p(\lambda) = (\lambda - 2)^2 (\lambda - 5)$
 • $\lambda = 2$의 $\text{AM} = 2$
 • $\lambda = 5$의 $\text{AM} = 1$
 (중복까지 세면 AM의 합은 항상 $n$이다. 여기서는 $2+1=3$) \[보완\] 복소수 근까지 세었을 때 성립한다. 교재 Theorem 4.16도 $\lambda_i\in\mathbb C$로 쓴다. 실수 안에서는 합이 $n$보다 작을 수 있다.
 
-$\text{AM}$은 고윗값의 중복 횟수를 알려주지만, 이것만으로 독립적인 고유벡터의 개수를 확정할 수는 없다.
+$\text{AM}$은 고윳값의 중복 횟수를 알려주지만, 이것만으로 독립적인 고유벡터의 개수를 확정할 수는 없다.
 
 </details>
 
@@ -128,7 +128,7 @@ $\text{AM}$은 고윗값의 중복 횟수를 알려주지만, 이것만으로 �
 
 <summary>기하적 중복도 (Geometric Multiplicity, GM)</summary>
 
-> $(A-\lambda I)\mathbf{v}=\mathbf{0}$의 해 전체(영벡터 포함)인 고유공간 $E_\lambda=\ker(A-\lambda I)$의 <strong>차원</strong>이다. 즉 해당 고윗값에 대응하는 <strong>선형독립인 고유벡터를 최대 몇 개 확보할 수 있는지</strong>이며, rank-nullity에 의해 $\text{GM}=n-\text{rank}(A-\lambda I)$이다.
+> $(A-\lambda I)\mathbf{v}=\mathbf{0}$의 해 전체(영벡터 포함)인 고유공간 $E_\lambda=\ker(A-\lambda I)$의 <strong>차원</strong>이다. 즉 해당 고윳값에 대응하는 <strong>선형독립인 고유벡터를 최대 몇 개 확보할 수 있는지</strong>이며, rank-nullity에 의해 $\text{GM}=n-\text{rank}(A-\lambda I)$이다.
 
 </details>
 
@@ -138,11 +138,11 @@ $\text{AM}$은 고윗값의 중복 횟수를 알려주지만, 이것만으로 �
 
 <strong>1. 대상 행렬</strong> : $A=\begin{pmatrix}2&1&0\\0&2&0\\0&0&5\end{pmatrix}$
 
-<strong>2. 고윗값과 AM</strong> : $\det(A-\lambda I)=(2-\lambda)^2(5-\lambda)=0$
+<strong>2. 고윳값과 AM</strong> : $\det(A-\lambda I)=(2-\lambda)^2(5-\lambda)=0$
 • $\lambda=2$ : $\text{AM}=2$
 • $\lambda=5$ : $\text{AM}=1$
 
-<strong>3. 고유공간과 GM</strong> (각각 $(A-\lambda I)\mathbf{v}=\mathbf{0}$을 푸다)
+<strong>3. 고유공간과 GM</strong> (각각 $(A-\lambda I)\mathbf{v}=\mathbf{0}$을 푼다)
 • $\lambda=5$ : $A-5I=\begin{pmatrix}-3&1&0\\0&-3&0\\0&0&0\end{pmatrix}$은 rank 2이므로 자유변수 1개. $y=0,\;x=0$이고 $z$는 자유 ⇒ $E_5=\text{span}\{\mathbf{e}_3\}$, $\text{GM}=3-2=1$
 • $\lambda=2$ : $A-2I=\begin{pmatrix}0&1&0\\0&0&0\\0&0&3\end{pmatrix}$도 rank 2이므로 자유변수 1개. $y=0,\;z=0$이고 $x$는 자유 ⇒ $E_2=\text{span}\{\mathbf{e}_1\}$, $\text{GM}=3-2=1$
 
@@ -186,7 +186,7 @@ $\text{AM}$은 고윗값의 중복 횟수를 알려주지만, 이것만으로 �
 
 <strong>defective </strong>$\iff$<strong> 어떤 고유값에서 GM </strong>$<$<strong> AM.</strong>
 따라서 defective 행렬은 서로 다른 고유값 $n$개를 가질 수 없다. (교재 Remark)
-중복 고유값이 있다고 해서 곳바로 defective인 것은 아니다.
+중복 고유값이 있다고 해서 곧바로 defective인 것은 아니다.
 
 </div>
 

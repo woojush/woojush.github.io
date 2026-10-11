@@ -14,7 +14,7 @@ order: 5
 
 </div>
 
-> <strong>구성 전략 (교재 4.5.2)</strong> : SVD를 찾는다는 것은 도메인 $\mathbb R^n$의 정규직교기저 $V=(v_1,\dots,v_n)$과 코도메인 $\mathbb R^m$의 정규직교기저 $U=(u_1,\dots,u_m)$을 찾는 것이다.
+> <strong>구성 전략 (교재 4.5.2)</strong> : SVD를 찾는다는 것은 도메인 $\mathbb R^n$의 정규직교기저 $V=(v_1,\dots,v_n)$과 코도메인 $\mathbb R^m$의 정규직교기저 $U=(u_1,\dots,u_m)$를 찾는 것이다.
 $v_i$<strong>를 먼저 만들고, </strong>$u_i$<strong>는 </strong>$v_i$<strong>의 정규화된 상(image)으로 만든다.</strong>
 
 <details>
@@ -79,7 +79,7 @@ $v_i$<strong> = </strong>$A^\top A$<strong>의 정규직교 고유벡터, </stro
 
 <div class="callout" role="note" data-kind="stuck">
 
-교재는 컴퓨터에서 이 방식($A^\top A$의 고유분해)은 수치적 성질이 나쁘서, 실제 SVD는 다른 방법으로 계산한다고 밝힌다. 이 순서는 <strong>손으로 원리를 익히기 위한 계산법</strong>이다.
+교재는 컴퓨터에서 이 방식($A^\top A$의 고유분해)은 수치적 성질이 나빠서, 실제 SVD는 다른 방법으로 계산한다고 밝힌다. 이 순서는 <strong>손으로 원리를 익히기 위한 계산법</strong>이다.
 
 </div>
 

@@ -28,7 +28,7 @@ $D$<strong>의 대각 성분 = 고유값, </strong>$P$<strong>의 열 = 대응�
 
 > $D=\text{diag}(c_1,\dots,c_n)$이면
 • $\det(D)=\prod c_i$
-• $D^k=\text{diag}(c_1^k,\dots,c_n^k)$ : 각 성분을 따로 거듭제곡하면 끝
+• $D^k=\text{diag}(c_1^k,\dots,c_n^k)$ : 각 성분을 따로 거듭제곱하면 끝
 • $D^{-1}=\text{diag}(1/c_1,\dots,1/c_n)$ : 모든 $c_i\neq0$일 때
 
 </details>
@@ -66,7 +66,7 @@ $PD=[p_1\cdots p_n]\,\text{diag}(\lambda_1,\dots,\lambda_n)=[\lambda_1p_1\;\cdot
 <summary><strong>왜 필요한가</strong></summary>
 
 > <strong>원인 → 결과 사슬</strong>
-1. 대각행렬 $D$는 거듭제곡·역·det가 한 줄이다.
+1. 대각행렬 $D$는 거듭제곱·역·det가 한 줄이다.
 2. $A$와 $D$가 <strong>같은 선형사상의 다른 좌표 표현</strong>이라면, $A$ 대신 $D$로 계산하고 좌표만 바꿔 오면 된다.
 3. 그런 좌표(기저)가 존재하는가? → <strong>고유벡터로 기저를 잡을 수 있으면 존재한다.</strong>
 4. 그러면 “어떤 $A$가 그런 기저를 가지는가?”가 질문이 되고, 답이 Theorem 4.20이다.
@@ -97,7 +97,7 @@ $PD=[p_1\cdots p_n]\,\text{diag}(\lambda_1,\dots,\lambda_n)=[\lambda_1p_1\;\cdot
 
 | 상황 | 대각화 | 이유 |
 | --- | --- | --- |
-| 독립 고유벡터가 $n$개 나온다 (4.2 “경우 나눠기” : 고유값이 모두 다르거나 GM = AM) | 가능 | Theorem 4.20 : 그 $n$개를 열로 모은 $P$가 가역 |
+| 독립 고유벡터가 $n$개 나온다 (4.2 “경우 나누기” : 고유값이 모두 다르거나 GM = AM) | 가능 | Theorem 4.20 : 그 $n$개를 열로 모은 $P$가 가역 |
 | $n$개에 못 미친다 (defective) | <strong>불가능</strong> | $P$를 가역으로 만들 열이 모자람 |
 | 대칭행렬 | <strong>항상 가능</strong> | Spectral Theorem. 게다가 $P$를 직교행렬로 잡을 수 있어 $D=P^\top AP$ (Theorem 4.21) |
 
@@ -159,7 +159,7 @@ $P$의 열로 쓸 독립 고유벡터가 2개 모자라서 invertible인 $P$를 
 
 <strong>막힐 가능성이 높은 지점</strong>
 
-1. $P$<strong>의 열 순서와 </strong>$D$<strong>의 대각 순서는 대응해야 한다.</strong> $p_i$를 $i$번째 열에 둔었으면 $\lambda_i$도 $D$의 $i$번째 대각에 둔다. 순서를 바꿔도 되지만 둘이 같이 바뀌어야 한다.
+1. $P$<strong>의 열 순서와 </strong>$D$<strong>의 대각 순서는 대응해야 한다.</strong> $p_i$를 $i$번째 열에 두었으면 $\lambda_i$도 $D$의 $i$번째 대각에 둔다. 순서를 바꿔도 되지만 둘이 같이 바뀌어야 한다.
 1. $A=PDP^{-1}$<strong>에서 </strong>$P^{-1}$<strong>의 위치.</strong> 오른쪽부터 읽는다. 먼저 $P^{-1}$이 표준 좌표를 고유기저 좌표로 바꾸고, $D$가 늘이고, $P$가 돌려놓는다. (다음 노트)
 1. <strong>고유벡터를 정규화할 필요는 없다.</strong> $P$가 invertible이기만 하면 된다. 정규직교로 만드는 이유는 대칭일 때 $P^{-1}=P^\top$을 쓰려는 것이다.
 1. <strong>“서로 다른 고유값 </strong>$n$<strong>개 </strong>$\Rightarrow$<strong> 대각화 가능”은 충분조건이지 필요조건이 아니다.</strong> 항등행렬은 고유값이 중복이지만 대각화 가능하다.

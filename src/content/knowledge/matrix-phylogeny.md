@@ -10,11 +10,11 @@ order: 8
 
 <strong>이어받는 질문</strong> : 어떤 행렬에 어떤 분해가 되는가?
 
-<strong>핵심 아이디어</strong> : 행렬의 종류는 포함 관계로 이어져 있고, 조건이 좋아질수록 쓸 수 있는 도구가 늘어난다. 조건이 없는 SVD에서 시작해 정사각 $\to$ non-defective(고유분해) $\to$ 대칭(직교 고유기저) $\to$ PD(Cholesky) 순으로 좌아진다.
+<strong>핵심 아이디어</strong> : 행렬의 종류는 포함 관계로 이어져 있고, 조건이 좁아질수록 쓸 수 있는 도구가 늘어난다. 조건이 없는 SVD에서 시작해 정사각 $\to$ non-defective(고유분해) $\to$ 대칭(직교 고유기저) $\to$ PD(Cholesky) 순으로 좁아진다.
 
 </div>
 
-> <strong>교재 4.7</strong> : 지금까지 본 행렬의 종류는 서로 <strong>포함 관계</strong>로 이어져 있다. 종류가 좋아질수록 쓸 수 있는 연산이 늘어난다. (Figure 4.13) 이 노트는 4장을 한 장의 지도로 정리한다.
+> <strong>교재 4.7</strong> : 지금까지 본 행렬의 종류는 서로 <strong>포함 관계</strong>로 이어져 있다. 종류가 좁아질수록 쓸 수 있는 연산이 늘어난다. (Figure 4.13) 이 노트는 4장을 한 장의 지도로 정리한다.
 
 <details>
 
@@ -70,7 +70,7 @@ order: 8
 
 <summary><strong>추가정보 (교재 4.8 Further Reading 요약)</strong></summary>
 
-- 고유분해는 <strong>spectral methods</strong>의 바탕이다. PCA(10장), Fisher discriminant analysis, MDS가 대표적이고, Isomap, Laplacian eigenmaps, Hessian eigenmaps, spectral clustering도 양의 정부호 커널의 고유분해에 기대른다.
+- 고유분해는 <strong>spectral methods</strong>의 바탕이다. PCA(10장), Fisher discriminant analysis, MDS가 대표적이고, Isomap, Laplacian eigenmaps, Hessian eigenmaps, spectral clustering도 양의 정부호 커널의 고유분해에 기댄다.
 - 이 방법들의 효율은 대칭 PSD 행렬의 <strong>최선의 rank-</strong>$k$<strong> 근사</strong>를 찾는 데서 나온다.
 - Cholesky의 쓰임은 해당 노트의 “왜 필요한가”와 같다.
 - SVD의 저차원 근사는 설계 행렬의 예측변수 상관을 없애는 전처리에도 쓰인다. (저장량은 행렬 근사 노트)

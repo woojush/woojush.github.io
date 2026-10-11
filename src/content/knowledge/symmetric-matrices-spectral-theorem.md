@@ -61,7 +61,7 @@ $x\to P^\top x$는 $x$를 고유벡터 좌표로 바꾸고(내적만 하면 된�
 - 고유벡터로 <strong>서로 직교하는</strong> 기저를 잡을 수 있다.
 - 따라서 $P$가 orthogonal이 되어 $A=PDP^{-1}$이 $A=PDP^\top$로 단순해진다.
 
-> 그리고 ML에서 자주 다루는 행렬(공분산, Gram, $A^\top A$)이 거의 대칭이다. 그래서 Theorem 4.14가 “어떤 행렬이든 대칭행렬로 만드는 방법”으로 쓰인다. \[보완\] 교재 Theorem 4.14의 정확한 내용 : 임의의 $A\in\mathbb R^{m\times n}$에 대해 $A^\top A$는 항상 대칭 <strong>양의 준정부호(PSD)</strong> 이고, rank\$(A)=n\$이면 <strong>양의 정부호(PD)</strong> 이다. 즉 “$A^\top A$는 언제나 Spectral Theorem의 대상이 된다”는 뜻이며, SVD(4.5)가 이 사실 위에 선다.
+> 그리고 ML에서 자주 다루는 행렬(공분산, Gram, $A^\top A$)이 거의 대칭이다. 그래서 Theorem 4.14가 “어떤 행렬이든 대칭행렬로 만드는 방법”으로 쓰인다. \[보완\] 교재 Theorem 4.14의 정확한 내용 : 임의의 $A\in\mathbb R^{m\times n}$에 대해 $A^\top A$는 항상 대칭 <strong>양의 준정부호(PSD)</strong> 이고, $\text{rank}(A)=n$이면 <strong>양의 정부호(PD)</strong> 이다. 즉 “$A^\top A$는 언제나 Spectral Theorem의 대상이 된다”는 뜻이며, SVD(4.5)가 이 사실 위에 선다.
 
 </details>
 

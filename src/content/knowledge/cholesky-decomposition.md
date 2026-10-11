@@ -57,13 +57,27 @@ $LL^\top$은 “$L$ 곱하기 $L$의 전치”이므로 $\sqrt a\cdot\sqrt a$의
 
 <details>
 
-<summary>$(LL^\top)_{ij}=\sum_k l_{ik}l_{jk}$</summary>
+<summary>$a_{ij}=(LL^\top)_{ij}=\sum_k l_{ik}l_{jk}$</summary>
 
 > $i$: 첫 번째로 선택한 행의 번호
 $j$: 두 번째로 선택한 행의 번호
-$k$: 두 행에서 몇 번째 원소끼리 곱할지 나타내는 번호
+$k$: 열의 번호
 
-> $L$이 하삼각이므로 $k\le\min(i,j)$인 항만 남는다.
+>
+>
+> A가 3×3 행렬이라고 하자. a32는 L의 3행과 2행의 내적이다.
+>
+> 즉,
+>
+> a32=l31l21+l32l22+l33l23
+>
+> 이때 L이 하삼각행렬이므로 l23=0이다. 따라서 k&gt;min⁡(3,2)=2인 k=3의 항 l33l23은 0이 되어 사라진다.
+>
+> 결국
+>
+> a32=l31l21+l32l22
+>
+> 이처럼 k≤min⁡(i,j)인 항만 남는다.
 
 </details>
 
@@ -82,6 +96,178 @@ $k$: 두 행에서 몇 번째 원소끼리 곱할지 나타내는 번호
 1. <strong>가우시안에서 표본 뽑기</strong> : 공분산 $\Sigma=LL^\top$이면, 표준정규 $z\sim\mathcal N(0,I)$로 $x=\mu+Lz$를 만들면 $\text{Cov}(x)=L\,I\,L^\top=\Sigma$이다.
 2. <strong>Reparametrization trick</strong> : 표본이 $\mu+Lz$ 꼴이면 $\mu,L$로 미분할 수 있다. 교재 Further Reading에 따르면 VAE에서 이 미분을 가능하게 하는 것이 Cholesky이다.
 3. <strong>det를 싸게 계산</strong> : $\det(A)=\det(L)\det(L^\top)=\det(L)^2=\prod_i l_{ii}^2$. $L$이 삼각이라 대각곱만 하면 된다. (교재 본문)
+
+<details>
+
+<summary><strong>위 세 줄이 막막하다면 : 숫자 예시로 풀어 쓰기 (0에서 시작)</strong></summary>
+
+> 위 세 줄은 가우시안, 공분산, 표준정규분포, VAE를 이미 안다고 가정하고 쓴 요약이다. 여기서는 이 개념들이 <strong>어떤 문제를 풀려고 등장했는지</strong>부터 숫자 예시로 풀어 본다. 확률과 통계를 몰라도 따라올 수 있게 썼다.
+
+<details>
+
+<summary><strong>용어 먼저 : 가우시안, 공분산, 표준정규분포</strong></summary>
+
+> <strong>가우시안(Gaussian) = 정규분포(Normal distribution)
+</strong>값이 평균 근처에 많이 모이고, 평균에서 멀어질수록 드물게 나오는 분포이다.
+예) 시험 점수가 평균 70점, 표준편차 10점인 분포에서 학생 한 명을 뽑으면 70점 근처가 나올 가능성이 높고, 30점이나 100점은 드물다.
+<strong>"표본을 뽑는다" = 이 분포를 따르는 임의의 값 하나를 생성한다</strong>는 뜻이다.
+
+> <strong>변수가 여러 개인 분포 = 다변량 가우시안 (multiviate Gaussian)</strong>
+>
+> 다변량 가우시안이 만들어지기 위해서는 각 변수의 평균과 분산이 필요하며, 해당 변수들이 서로 어떤 관계를 갖는지가 필요하다. 이 관계를 수치로 표현한 것이 <strong>공분산</strong>이다.
+>
+> 여기서 <strong>분산은 하나의 변수가 그 자체의 평균으로부터 얼마나 넓게 퍼져 있는지(산포도)를 나타내는 지표</strong>다. 즉, 공분산이 두 변수 사이의 관계를 보여준다면, 분산은 개별 변수가 가진 고유의 변동성의 크기를 의미한다.
+>
+> 분산과 공분산을 행렬에 담아내고, 그것을 공분산 행렬이라 한다.
+>
+> 그리고 평균과 공분산 행렬을 통해 다변량 가우시안 분포를 만들고, 컴퓨터는 해당 분포도에 무작위로 점을 찍어 새로운 사람의 데이터를 추출한다.
+>
+> - <strong>최종 결과</strong>: 분포 자체가 이미 두 변수의 관계(공분산)를 반영하고 있으므로, 새로 생성된 가상 인물들도 <strong>"키가 크면 몸무게도 많이 나가는" 자연스러운 관계를 유지</strong>하며 태어나게 됩니다.
+>
+> ---
+
+> <strong>표준정규분포 = 평균 0, 분산 1인 정규분포</strong>, 기호로 $\mathcal N(0,1)$이다. 서로 독립인 표준정규 난수 $z_1,z_2$를 모은 $z=(z_1,z_2)^\top$는 변수끼리 아무 관련이 없고 각각 분산이 1이므로 공분산행렬이 단위행렬이다 : $\text{Cov}(z)=I$. 컴퓨터가 바로 만들어 낼 수 있는 가장 기본적인 정규 난수이다.
+
+</details>
+
+<details>
+
+<summary><strong>① 가우시안에서 표본 뽑기 : 무관한 난수로 "상관 있는 데이터"를 만든다</strong></summary>
+
+> <strong>풀려는 문제</strong> : 공분산이 $\Sigma=\begin{bmatrix}4&2\\2&3\end{bmatrix}$인 두 변수 $(x_1,x_2)$를 무작위로 만들고 싶다. 그런데 컴퓨터가 바로 줄 수 있는 것은 서로 무관한 $z_1,z_2$뿐이다. <strong>무관한 난수를 "원하는 공분산을 가진 값"으로 바꾸는 변환</strong>이 필요하고, 그 변환이 $L$이다.
+
+<strong>Step 1. 분해</strong> : $\Sigma=LL^\top$, $L=\begin{bmatrix}2&0\\1&\sqrt2\end{bmatrix}$ (아래 예시 ②)
+
+<strong>Step 2. 난수 뽑기</strong> : $z_1,z_2\sim\mathcal N(0,1)$이 우연히 $z=(1,-1)^\top$으로 나왔다고 하자.
+
+<strong>Step 3. 변환</strong> : 평균을 $\mu=0$으로 두면 $x=Lz$이다.
+
+$$
+Lz=\begin{bmatrix}2&0\\1&\sqrt2\end{bmatrix}\begin{bmatrix}1\\-1\end{bmatrix}=\begin{bmatrix}2\\1-\sqrt2\end{bmatrix}
+$$
+
+이렇게 단순한 난수 두 개가 두 변수의 값으로 바뀐다. 이 과정을 계속 반복하면 공분산이 $\Sigma$인 데이터가 쌓인다.
+
+<details>
+
+<summary>왜 상관이 생기는가 : $L$의 열로 읽기</summary>
+
+> 3장에서 본 대로 행렬의 열은 "표준기저가 이동한 곳"이다. $L$의 열은 $(2,1)^\top$과 $(0,\sqrt2)^\top$이므로
+$Lz=z_1\begin{bmatrix}2\\1\end{bmatrix}+z_2\begin{bmatrix}0\\\sqrt2\end{bmatrix}=\begin{bmatrix}2z_1\\z_1+\sqrt2\,z_2\end{bmatrix}$
+
+> • $z_1$은 $x_1$과 $x_2$ <strong>양쪽에 동시에</strong> 들어간다 → $z_1$이 크면 둘이 같이 커진다 → <strong>양의 공분산</strong>이 생긴다.
+• $z_2$는 $x_2$에만 들어간다 → $x_2$에만 있는 나머지 흔들림을 만든다.
+
+</details>
+
+<details>
+
+<summary>왜 공분산이 정확히 $\Sigma$가 되는가</summary>
+
+> $\text{Cov}(Lz)=L\,\text{Cov}(z)\,L^\top=L\,I\,L^\top=LL^\top=\Sigma$
+둘째 등호가 성립하는 이유는 $\text{Cov}(z)=I$이기 때문이다. $z_1,z_2$가 서로 독립이고 각각 분산이 1이므로 대각은 1, 비대각은 0이다.
+
+> 숫자로 확인 : $\text{Var}(x_1)=2^2\cdot1=4$, $\text{Cov}(x_1,x_2)=2\cdot1\cdot1=2$, $\text{Var}(x_2)=1^2+(\sqrt2)^2=3$ → $\Sigma$의 성분과 모두 일치한다.
+
+</details>
+
+<div class="callout" role="note" data-kind="intuition">
+
+<strong>원인 → 결과 사슬</strong> : $\Sigma$를 쪼개 $L$을 얻는다 → 무관한 난수 $z$를 뽑는다 → $L$로 섞는다 → 원하는 공분산을 가진 표본이 나온다. Cholesky는 이 사슬의 첫 고리($\Sigma\to L$)를 맡는다.
+
+</div>
+
+</details>
+
+<details>
+
+<summary><strong>② Reparametrization trick : 난수가 낀 계산을 미분 가능하게 만든다</strong></summary>
+
+> <strong>미분이 왜 필요한가.</strong> 신경망은 (1) 현재 매개변수로 결과를 계산하고, (2) 정답과의 차이(손실)를 재고, (3) <strong>손실을 매개변수로 미분해서</strong> 매개변수를 어느 쪽으로 얼마나 바꿀지 정한다.
+
+> <strong>문제.</strong> 계산 도중에 "평균 $\mu$, 공분산 $\Sigma$인 가우시안에서 표본 $x$를 뽑아라"가 끼어 있으면, $\mu,\Sigma$를 바꿨을 때 $x$가 어떻게 변하는지 적힌 식이 없다. 손실에서 $\mu$로 거슬러 올라가는 길이 "무작위로 뽑기"에서 끊긴다.
+
+> <strong>해결.</strong> 무작위성을 $z$로 따로 빼고, 학습할 값 $\mu,L$은 평범한 식에 둔다.
+
+$$
+\boxed{x=\mu+Lz}
+$$
+
+$z$는 바깥에서 들어오는 입력값처럼 취급하고, $\mu,L$만 학습한다.
+
+<details>
+
+<summary>숫자 예시 (1차원)</summary>
+
+> $x=\mu+\sigma z$에서 지금 $\mu=1,\ \sigma=2$이고 뽑힌 난수가 $z=0.5$라 하자. (1차원에서는 $L=\sigma$)
+$x=1+2\cdot0.5=2$
+
+> $z$가 정해진 순간 $x$는 $\mu,\sigma$에 대한 평범한 식이다. 그래서 $\dfrac{\partial x}{\partial\mu}=1$, $\dfrac{\partial x}{\partial\sigma}=z=0.5$로 미분이 된다.
+
+> 손실이 $f=x^2$이면 $\dfrac{\partial f}{\partial\mu}=2x\cdot1=4$, $\dfrac{\partial f}{\partial\sigma}=2x\cdot z=2$이고, 이 값으로 $\mu,\sigma$를 갱신할 수 있다.
+
+> 실제 학습에서는 $z$가 벡터이고 $L$이 행렬이지만 원리는 같다.
+
+</details>
+
+<details>
+
+<summary>VAE와의 관계</summary>
+
+> VAE(Variational Autoencoder)는 데이터를 압축했다가 다시 생성하도록 학습하는 신경망이다. 압축하는 단계에서 확률분포로부터 표본을 뽑는 과정이 있어서, 그 과정을 위의 꼴로 바꿔 미분이 통과하게 한다.
+
+\[보완\] 공분산이 대각행렬이면 $L=\text{diag}(\sigma_1,\dots,\sigma_n)$이라서 분해를 따로 할 필요 없이 $x=\mu+\sigma\odot z$(성분별 곱)로 쓰면 된다. 일반(전체) 공분산 행렬, 즉 변수들 사이에 상관이 있는 경우에 Cholesky로 $L$을 구한다.
+
+</details>
+
+</details>
+
+<details>
+
+<summary><strong>③ det를 싸게 계산 : 삼각행렬의 대각곱</strong></summary>
+
+> 이 항목은 확률을 몰라도 이해할 수 있다. 위 예시의 $L$을 다시 보자.
+
+$$
+L=\begin{bmatrix}2&0\\1&\sqrt2\end{bmatrix}
+$$
+
+> 4.1에서 본 대로 삼각행렬의 det는 대각 성분의 곱이다 : $\det(L)=2\sqrt2$.
+$A=LL^\top$이므로 $\det(A)=\det(L)\det(L^\top)=\det(L)^2=(2\sqrt2)^2=8$.
+
+> 원래 행렬 $A=\begin{bmatrix}4&2\\2&3\end{bmatrix}$로 직접 계산해도 $\det(A)=4\cdot3-2\cdot2=8$로 같다. ✓
+
+<details>
+
+<summary>$n\times n$이 커지면 : 일반식과 로그</summary>
+
+> $100\times100$처럼 커져도 Cholesky 인수 $L$이 이미 있으면 대각 성분 100개를 곱하면 끝이다.
+
+$$
+\det(A)=\prod_i l_{ii}^2,\qquad \log\det(A)=2\sum_i\log l_{ii}
+$$
+
+> <strong>왜 </strong>$\log\det$<strong>이 자주 필요한가.</strong> 다변량 가우시안의 확률밀도 식에 $\det\Sigma$가 들어 있어서(6장), 로그 우도를 계산하면 $\log\det\Sigma$가 나온다. 또 $l_{ii}$ 수백 개를 그대로 곱하면 값이 너무 커지거나 너무 작아지기 쉽지만, 로그를 취하면 곱이 합으로 바뀌어 수치적으로 안정적이다.
+
+</details>
+
+</details>
+
+<div class="callout" role="note" data-kind="intuition">
+
+<strong>세 줄을 한 장으로</strong> : Cholesky는 단순히 행렬을 둘로 쪼개는 기술이 아니라, <strong>공분산을 가진 데이터를 만들거나 det 같은 계산을 싸게 하도록 도와주는 도구</strong>이다. 한 번 구한 $L$을 표본 뽑기, 미분, det 계산에 계속 재사용하는 것이 요점이다.
+
+</div>
+
+| 개념 | 쉽게 말하면 | $L$이 하는 일 |
+| --- | --- | --- |
+| 가우시안 표본 뽑기 | 원하는 공분산을 따르는 데이터 만들기 | 무관한 난수 $z$를 공분산 구조로 변환 ($x=\mu+Lz$) |
+| Reparametrization trick | 난수가 낀 계산을 미분 가능하게 쓰기 | 학습할 값 $\mu,L$과 난수 $z$를 분리 |
+| det 계산 | 큰 행렬의 det를 싸게 구하기 | 대각 성분만 곱해서 계산 ($\det(A)=\prod_i l_{ii}^2$) |
+
+※ VAE와 reparametrization trick은 지금 완전히 이해하지 못해도 된다. 가우시안, 분산, 공분산의 뜻을 먼저 익히고(6장) 다시 보면 자연스럽게 이어진다.
+
+</details>
 
 </details>
 

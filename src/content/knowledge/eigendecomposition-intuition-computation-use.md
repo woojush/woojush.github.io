@@ -10,7 +10,7 @@ order: 3
 
 <strong>이어받는 질문</strong> : $A=PDP^{-1}$이 존재함은 알았다. 이 식은 기하적으로 무엇을 하며, 어떤 계산을 쉽게 해 주는가?
 
-<strong>핵심 아이디어</strong> : $A=PDP^{-1}$을 오른쪽부터 읽으면 “좌표 바꾸기 → 축별 늘이기 → 되돌리기”이다. 가운데 $D$만 대각행렬이라 거듭제곡할 때 이웃한 $P^{-1}P$가 소거되어 $A^k=PD^kP^{-1}$이 된다.
+<strong>핵심 아이디어</strong> : $A=PDP^{-1}$을 오른쪽부터 읽으면 “좌표 바꾸기 → 축별 늘이기 → 되돌리기”이다. 가운데 $D$만 대각행렬이라 거듭제곱할 때 이웃한 $P^{-1}P$가 소거되어 $A^k=PD^kP^{-1}$이 된다.
 
 </div>
 
@@ -73,7 +73,7 @@ $A=PDP^\top=\dfrac{1}{\sqrt2}\begin{bmatrix}1&1\\-1&1\end{bmatrix}\begin{bmatrix
 
 <details>
 
-<summary><strong>활용 1 : 거듭제곡 </strong>$A^k=PD^kP^{-1}$</summary>
+<summary><strong>활용 1 : 거듭제곱 </strong>$A^k=PD^kP^{-1}$</summary>
 
 > $A^k=(PDP^{-1})(PDP^{-1})\cdots(PDP^{-1})$에서 이웃한 $P^{-1}P$가 모두 $I$로 지워지므로 $A^k=PD^kP^{-1}$.
 $D^k$는 대각 성분을 각각 $k$제곱하면 된다.

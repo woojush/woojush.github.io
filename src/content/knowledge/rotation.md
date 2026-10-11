@@ -19,7 +19,7 @@ order: 6
 
 <details>
 
-<summary><strong>왜 열벡터가 곳 기저벡터의 이동인가</strong></summary>
+<summary><strong>왜 열벡터가 곧 기저벡터의 이동인가</strong></summary>
 
 
 </details>
@@ -67,7 +67,7 @@ $$
 
 <summary><strong>1. 2차원 공간: 면적 변화율</strong></summary>
 
-> 행렬식(Determinant, $\det(A)$)의 기하학적 의미는 선형변환을 거쳐을 때 공간(면적이나 부피)이 몇 배로 확대 또는 축소되는지를 나타내는 변화율이다.
+> 행렬식(Determinant, $\det(A)$)의 기하학적 의미는 선형변환을 거쳤을 때 공간(면적이나 부피)이 몇 배로 확대 또는 축소되는지를 나타내는 변화율이다.
 >
 > 이 두 이동된 열벡터가 만드는 <strong>평행사변형의 넓이</strong>가 바로 행렬식의 절대값 $\vert{}\det(A)\vert{}$이다.
 
@@ -219,7 +219,7 @@ $$
 
 <strong>현실 세계의 물리 법칙 보존 (Isometry)</strong>
     ◦ 물체를 회전시켜도 실제 크기나 형태(거리·각도)가 왜곡되면 안 된다.
-    ◦ $R^\top R = I$  조건 덕분에 3D Graphics, Robotics(로봇 관절), Computer Vision(카메라 Pose / SLAM / NeRF)에서 물체를 찌그러뜨리지 않고 안정적으로 <strong>강체 변환</strong>(Rigid Body Motion)을 수행할 수 있다.
+    ◦ $R^\top R = I$  조건 덕분에 3D Graphics, Robotics(로봇 관절), Computer Vision(카메라 Pose / SLAM / NeRF)에서 물체를 찌그러뜨리지 않고 안정적인 <strong>강체 변환</strong>(Rigid Body Motion)을 수행할 수 있다.
 
 </div>
 

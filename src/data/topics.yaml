@@ -6,3 +6,9 @@ topics:
   - { path: ai/mathematics, name: "Mathematics", description: "Mathematics for Machine Learning을 따라 정리한 수학 기초" }
   - { path: ai/mathematics/linear-algebra, name: "2. Linear Algebra" }
   - { path: ai/mathematics/analytic-geometry, name: "3. Analytic Geometry" }
+  - { path: art, name: "Art", color: clay, description: "그림과 미술을 공부하며 쌓는 개념" }
+  - { path: art/drawing, name: "Drawing" }
+  - { path: english, name: "English", color: slate, description: "영어 공부 기록" }
+  - { path: english/vocabulary, name: "Vocabulary" }
+  - { path: philosophy, name: "Philosophy", color: plum, description: "철학 읽기와 개념 정리" }
+  - { path: philosophy/ethics, name: "Ethics" }

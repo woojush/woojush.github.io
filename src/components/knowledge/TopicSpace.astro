@@ -1,0 +1,54 @@
+---
+// KNOWLEDGE의 주제 장면: 화면 전체를 채운 별 위로 하위 주제 태그들이 떠다닌다 (lifestories.org/discover 참고, 사용자 지시).
+// 태그는 이름 칸 + 글 수 칸(글 수와 무관하게 크기 같음). 마우스를 올리면 글 수 칸이 하얗게 바뀌고 설명이 나온다.
+// 누르면 같은 화면 안에서 다음 단계로 넘어간다(울렁임 → 별만 → 태그가 커지며 등장). 이 모션은 Knowledge 한정 승인 예외다(CLAUDE.md §8, docs/07 §3).
+// 마크업은 평범한 링크 목록이고 스크립트가 없어도 쓸 수 있다. 동작은 src/scripts/topic-stage.ts, 칩은 TopicChips.astro.
+import TopicChips from '@/components/knowledge/TopicChips.astro';
+import '@/styles/topic-space.css';
+import { findStage, levelTags, type Chip, type StageNode } from '@/lib/topics';
+
+interface Props {
+  /** 전체 트리 (브라우저로 넘겨 같은 화면 안에서 단계를 오간다) */
+  tree: readonly StageNode[];
+  /** 지금 단계의 경로 ('' = 첫 화면) */
+  path: string;
+  title: string;
+  /** 첫 화면에서는 소개 문구, 그 밖에는 이 주제의 설명 */
+  note?: string;
+  chips: readonly Chip[];
+  total: number;
+}
+
+const { tree, path, title, note, chips, total } = Astro.props;
+const here = findStage(tree, path);
+const tags = levelTags(here, here ? here.children : tree);
+---
+
+<section class="space" data-space data-path={path} data-lead={note ?? ''} aria-label="Knowledge topics">
+  <canvas class="sky" data-sky aria-hidden="true"></canvas>
+  <div class="field" data-field>
+    <nav aria-label="Topics">
+      <ul>
+        {
+          tags.map((t, i) => (
+            <li class="tag-item" style={`--hue:var(--tag-${t.color});--i:${i}`}>
+              <a class="tag" href={t.href} data-path={t.path ?? ''}>
+                <span class="tag-name">{t.name}</span>
+                <span class="tag-count" aria-label={`${t.count}개의 노트`}>{t.count}</span>
+              </a>
+              <span class="tag-hint" aria-hidden="true">Click to reveal notes about this topic</span>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+  <h1 class="sr-only" data-title>{title}</h1>
+  <p class="space-note" data-note>{note}</p>
+  <TopicChips chips={chips} total={total} />
+  <script type="application/json" data-tree set:html={JSON.stringify(tree).replace(/</g, '\\u003c')} />
+</section>
+
+<script>
+  import '@/scripts/topic-stage';
+</script>

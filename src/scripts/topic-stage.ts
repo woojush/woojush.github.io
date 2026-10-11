@@ -1,149 +1,237 @@
-// 주제 장면: 하위 주제 링크들이 정해진 영역 안에서 아주 천천히 떠다닌다. 서로 겹치면 부드럽게 튕기고, 벽에 닿으면 되돌아온다.
-// 마우스를 올리거나 키보드 포커스가 있는 것은 멈춘다(누르기 쉽게). 움직임 줄이기 설정이면 처음 배치 그대로 멈춰 있다.
-// 누르면 나머지가 사라지는 짧은 전환(CSS) 뒤에 이동한다. 위치는 주소에서 만든 고정 난수로 정해서 같은 페이지는 늘 같은 모양으로 시작한다.
-const stage = document.querySelector<HTMLElement>('[data-stage]');
-const list = stage?.querySelector('ul');
+// Knowledge 주제 장면의 지휘자 (lifestories.org/discover의 전환을 참고했다).
+// 태그를 누르면: ① 태그들이 바깥으로 흩어지며 사라지는 동안(약 0.6초) 별이 울렁이고 → ② 0.4초 동안 별만 남아 울렁이다가
+// ③ 새 태그들이 0.4배에서 점점 커지며 나타나 제 크기에서 멈춘다. 좌측 하단 칩은 전환 중 내려갔다가 새 경로로 다시 올라온다.
+// 하위가 하나뿐인 단계는 건너뛰고, 끝(글 목록)은 평범한 페이지 이동이다. 뒤로 가기·앞으로 가기도 같은 화면 안에서 처리한다.
+// 별은 scene.ts(메인과 같은 three.js 장면), 태그의 움직임·끌기는 topic-float.ts.
+import { startScene, type SceneHandle } from '@/scripts/scene';
+import { createField } from '@/scripts/topic-float';
+import { findStage, levelTags, topicHref, type StageNode, type Tag } from '@/lib/topics';
 
-interface Item {
-  el: HTMLElement;
-  w: number;
-  h: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  held: boolean;
-}
+const space = document.querySelector<HTMLElement>('[data-space]');
+const dataEl = space?.querySelector<HTMLScriptElement>('script[data-tree]');
+const list = space?.querySelector<HTMLElement>('.field ul');
+const chipsEl = document.querySelector<HTMLElement>('[data-chips]');
 
-if (stage && list) {
+if (space && dataEl?.textContent && list && chipsEl) {
+  const tree: StageNode[] = JSON.parse(dataEl.textContent);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const GAP = 14; // 서로 떨어져 있어야 하는 최소 간격(px)
-  const items: Item[] = [];
-  let W = 0;
-  let H = 0;
+  const sky = space.querySelector<HTMLCanvasElement>('[data-sky]');
+  const noteEl = space.querySelector<HTMLElement>('[data-note]');
+  const titleEl = space.querySelector<HTMLElement>('[data-title]');
+  const lead = space.dataset.lead ?? '';
+  const siteName = document.title.split(' — ').at(-1) ?? '';
+  let current = space.dataset.path ?? '';
+  let busy = false;
 
-  // 주소 → 고정 난수 (mulberry32)
-  let seed = 0;
-  for (const ch of location.pathname) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
-  const rand = () => {
-    seed = (seed + 0x6d2b79f5) >>> 0;
-    let t = seed;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+  const EXIT_MS = 650; // 태그가 흩어져 사라지는 데 걸리는 시간(지연 포함)
+  const STARS_ONLY_MS = 400; // 별만 남아 울렁이는 시간
+  const ENTER_MS = 1700; // 태그가 나타나 제 크기가 되기까지(지연 포함)
+  const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+  const html = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  const hrefOf = (path: string) => (path ? topicHref(path) : '/knowledge/');
+  const pathOf = (href: string) => decodeURIComponent(new URL(href, location.href).pathname).replace(/^\/knowledge\/(topics\/)?/, '').replace(/\/$/, '');
 
-  const overlaps = (a: Item, b: Item, gap = GAP) => a.x < b.x + b.w + gap && b.x < a.x + a.w + gap && a.y < b.y + b.h + gap && b.y < a.y + a.h + gap;
-  const put = (it: Item) => (it.el.style.translate = `${it.x.toFixed(1)}px ${it.y.toFixed(1)}px`);
-
-  function measure() {
-    W = stage!.clientWidth;
-    H = stage!.clientHeight;
-    for (const it of items) {
-      it.w = it.el.offsetWidth;
-      it.h = it.el.offsetHeight;
-      it.x = Math.min(Math.max(it.x, 0), Math.max(0, W - it.w));
-      it.y = Math.min(Math.max(it.y, 0), Math.max(0, H - it.h));
-      put(it);
+  // ── 별 장면과 울렁임 ──
+  let scene: SceneHandle | null = null;
+  if (sky) {
+    try {
+      scene = startScene(sky);
+    } catch {
+      sky.hidden = true; // WebGL을 못 쓰면 별 없이 태그만 보인다
     }
   }
+  const field = createField(space);
+  let clock = 0;
+  let burst = 0; // 전환 때 1에서 0으로 잦아든다: 별이 빨리 흘러오고 장면이 출렁인다
+  let wobbleAt = -1;
 
-  function layout() {
-    stage!.classList.add('is-floating');
-    W = stage!.clientWidth;
-    H = stage!.clientHeight;
-    for (const el of list!.querySelectorAll<HTMLElement>('li')) {
-      const it: Item = { el, w: el.offsetWidth, h: el.offsetHeight, x: 0, y: 0, vx: 0, vy: 0, held: false };
-      // 겹치지 않는 자리를 찾을 때까지 시도한다 (못 찾으면 마지막 시도를 쓴다)
-      for (let n = 0; n < 300; n++) {
-        it.x = rand() * Math.max(0, W - it.w);
-        it.y = rand() * Math.max(0, H - it.h);
-        if (!items.some((o) => overlaps(it, o, GAP * 2))) break;
-      }
-      const angle = rand() * Math.PI * 2;
-      const speed = 7 + rand() * 7; // px/초. 아주 느리게
-      it.vx = Math.cos(angle) * speed;
-      it.vy = Math.sin(angle) * speed;
-      el.addEventListener('pointerenter', () => (it.held = true));
-      el.addEventListener('pointerleave', () => (it.held = false));
-      el.addEventListener('focusin', () => (it.held = true));
-      el.addEventListener('focusout', () => (it.held = false));
-      items.push(it);
-      put(it);
+  let last = performance.now();
+  function frame(now: number) {
+    const dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+    clock += dt;
+    burst = Math.max(0, burst - dt / 1.5);
+    let ws = 1;
+    let wr = 0;
+    if (wobbleAt >= 0) {
+      const t = clock - wobbleAt;
+      const w = Math.exp(-2.4 * t) * Math.sin(2 * Math.PI * 1.7 * t);
+      ws = 1 + 0.045 * w;
+      wr = 1.1 * w;
+      if (t > 2.5) wobbleAt = -1;
     }
-  }
-
-  function step(dt: number) {
-    for (const it of items) {
-      if (it.held) continue;
-      it.x += it.vx * dt;
-      it.y += it.vy * dt;
-      if (it.x < 0 || it.x > W - it.w) {
-        it.x = Math.min(Math.max(it.x, 0), Math.max(0, W - it.w));
-        it.vx = -it.vx;
-      }
-      if (it.y < 0 || it.y > H - it.h) {
-        it.y = Math.min(Math.max(it.y, 0), Math.max(0, H - it.h));
-        it.vy = -it.vy;
-      }
-    }
-    // 겹치면 겹침이 작은 쪽 축으로 밀어내고 그 축의 속도를 맞바꾼다
-    for (let i = 0; i < items.length; i++) {
-      for (let j = i + 1; j < items.length; j++) {
-        const a = items[i];
-        const b = items[j];
-        if (!overlaps(a, b, 0)) continue;
-        const ox = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
-        const oy = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
-        if (ox < oy) {
-          const dir = a.x + a.w / 2 < b.x + b.w / 2 ? -1 : 1;
-          if (!a.held) a.x += (dir * ox) / (b.held ? 1 : 2);
-          if (!b.held) b.x -= (dir * ox) / (a.held ? 1 : 2);
-          [a.vx, b.vx] = [b.vx, a.vx];
-        } else {
-          const dir = a.y + a.h / 2 < b.y + b.h / 2 ? -1 : 1;
-          if (!a.held) a.y += (dir * oy) / (b.held ? 1 : 2);
-          if (!b.held) b.y -= (dir * oy) / (a.held ? 1 : 2);
-          [a.vy, b.vy] = [b.vy, a.vy];
-        }
-      }
-    }
-    for (const it of items) put(it);
-  }
-
-  layout();
-
-  if (!reduce) {
-    let last = performance.now();
-    const frame = (now: number) => {
-      const dt = Math.min((now - last) / 1000, 0.05);
-      last = now;
-      step(dt);
-      requestAnimationFrame(frame);
-    };
+    space!.style.setProperty('--wob-s', ws.toFixed(4));
+    space!.style.setProperty('--wob-r', `${wr.toFixed(3)}deg`);
+    scene?.update(0.35 + 8 * burst * burst, 0.14 * burst, dt, clock, 1);
+    field.tick(dt);
     requestAnimationFrame(frame);
   }
+  const startMotion = () => {
+    burst = 1;
+    wobbleAt = clock;
+  };
 
-  let timer = 0;
-  addEventListener('resize', () => {
-    clearTimeout(timer);
-    timer = window.setTimeout(measure, 100);
-  });
+  // ── 태그 ──
+  const tagLi = (t: Tag, i: number) =>
+    `<li class="tag-item" style="--hue:var(--tag-${t.color});--i:${i}"><a class="tag" href="${html(t.href)}" data-path="${html(t.path ?? '')}"><span class="tag-name">${html(t.name)}</span><span class="tag-count" aria-label="${t.count}개의 노트">${t.count}</span></a><span class="tag-hint" aria-hidden="true">Click to reveal notes about this topic</span></li>`;
+  const lis = () => [...list!.querySelectorAll<HTMLElement>('li')];
 
-  // 링크를 누르면: 나머지가 사라지는 동안 잠깐 기다렸다가 이동한다 (새 탭·보조키·움직임 줄이기는 그대로 이동)
-  stage.addEventListener('click', (e) => {
-    const a = (e.target as HTMLElement).closest('a');
-    if (!a || reduce || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  function place(path: string) {
+    const node = findStage(tree, path);
+    const tags = levelTags(node, node ? node.children : tree);
+    list!.innerHTML = tags.map(tagLi).join('');
+    field.load(lis(), hrefOf(path));
+  }
+
+  // ── 좌측 하단 칩 ──
+  function renderChips(path: string) {
+    const segs = path ? path.split('/') : [];
+    const node = findStage(tree, path);
+    chipsEl!.classList.remove('is-in');
+    if (!node) {
+      chipsEl!.innerHTML = '';
+      return;
+    }
+    const chips = segs.map((_, i) => {
+      const p = segs.slice(0, i + 1).join('/');
+      return { name: findStage(tree, p)?.name ?? p, up: i === 0 ? '/knowledge/' : topicHref(segs.slice(0, i).join('/')) };
+    });
+    chipsEl!.innerHTML =
+      `<span class="chips-total" style="--i:0">Total: ${node.count}</span>` +
+      chips
+        .map(
+          (c, i) =>
+            `<a class="chip" href="${html(c.up)}" style="--i:${i + 1}" aria-label="${html(c.name)} 해제"><span class="chip-label">${html(c.name)}</span><svg class="chip-x" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg></a>`,
+        )
+        .join('');
+  }
+  const chipsIn = () => requestAnimationFrame(() => requestAnimationFrame(() => chipsEl!.classList.add('is-in')));
+
+  function setHeading(path: string) {
+    const node = findStage(tree, path);
+    const name = node?.name ?? 'Knowledge';
+    if (titleEl) titleEl.textContent = name;
+    if (noteEl) noteEl.textContent = node ? (node.description ?? '') : lead;
+    document.title = node ? `${name} — ${siteName}` : `Knowledge — ${siteName}`;
+  }
+
+  // ── 전환 ──
+  function scatter() {
+    const els = lis();
+    const cx = space!.clientWidth / 2;
+    const cy = space!.clientHeight / 2;
+    const rects = els.map((el) => el.getBoundingClientRect());
+    const far = Math.max(1, ...rects.map((r) => Math.hypot(r.x + r.width / 2 - cx, r.y + r.height / 2 - cy)));
+    els.forEach((el, i) => {
+      const r = rects[i];
+      const delay = (Math.hypot(r.x + r.width / 2 - cx, r.y + r.height / 2 - cy) / far) * 160 + Math.random() * 150;
+      const a = Math.random() * Math.PI * 2;
+      const d = (14 + Math.random() * 16) * 2.2;
+      el.style.setProperty('--delay', `${delay.toFixed(0)}ms`);
+      el.style.setProperty('--dur', `${(240 + Math.random() * 130).toFixed(0)}ms`);
+      el.style.setProperty('--ex', `${(Math.cos(a) * d).toFixed(1)}px`);
+      el.style.setProperty('--ey', `${(Math.sin(a) * d).toFixed(1)}px`);
+    });
+  }
+  function bloom() {
+    for (const el of lis()) {
+      el.style.setProperty('--delay', `${(Math.random() * 260).toFixed(0)}ms`);
+      el.style.setProperty('--dur', `${(1100 + Math.random() * 350).toFixed(0)}ms`);
+    }
+  }
+
+  /** 다음 단계로 (push: 주소를 새로 쌓을지. 뒤로 가기에서는 false) */
+  async function goLevel(path: string, push: boolean) {
+    if (busy) return;
+    busy = true;
+    chipsEl!.classList.remove('is-in');
+    if (reduce) {
+      place(path);
+      renderChips(path);
+      chipsIn();
+    } else {
+      startMotion();
+      scatter();
+      space!.classList.add('is-exiting');
+      await wait(EXIT_MS);
+      space!.classList.remove('is-exiting');
+      space!.classList.add('is-hidden');
+      place(path); // 새 태그는 숨긴 채 놓아 둔다
+      await wait(STARS_ONLY_MS);
+      bloom();
+      space!.classList.remove('is-hidden');
+      space!.classList.add('is-entering');
+      renderChips(path);
+      chipsIn();
+      await wait(ENTER_MS);
+      space!.classList.remove('is-entering');
+    }
+    if (push) history.pushState(null, '', hrefOf(path));
+    setHeading(path);
+    current = path;
+    busy = false;
+  }
+
+  /** 끝(글 목록)이나 이 주제의 직접 글 목록은 평범한 페이지 이동 */
+  async function goPage(href: string) {
+    if (busy) return;
+    busy = true;
+    chipsEl!.classList.remove('is-in');
+    if (!reduce) {
+      startMotion();
+      scatter();
+      space!.classList.add('is-exiting');
+      await wait(EXIT_MS);
+    }
+    location.href = href;
+  }
+
+  /** 아래로 내려갈 때: 하위가 하나뿐이고 직접 글이 없는 단계는 건너뛴다 */
+  function descend(path: string): { path: string; page: string | null } {
+    let node = findStage(tree, path);
+    while (node && node.children.length === 1 && node.ownNotes === 0) node = node.children[0];
+    if (!node) return { path, page: null };
+    return node.leaf ? { path: node.path, page: topicHref(node.path) } : { path: node.path, page: null };
+  }
+
+  space.addEventListener('click', (e) => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>('a.tag');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
-    stage.classList.add('is-leaving');
-    a.closest('li')?.classList.add('is-picked');
-    window.setTimeout(() => (location.href = a.href), 360);
+    if (a.dataset.path) {
+      const to = descend(a.dataset.path);
+      return to.page ? void goPage(to.page) : void goLevel(to.path, true);
+    }
+    void goPage(a.href);
   });
 
-  // 뒤로 가기로 돌아왔을 때(bfcache) 사라진 상태가 남지 않게
+  // 칩의 ✕: 바로 위 단계로 (건너뛰지 않고 그 단계 그대로)
+  chipsEl.addEventListener('click', (e) => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>('a.chip');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    void goLevel(pathOf(a.href), true);
+  });
+
+  // 뒤로·앞으로 가기: 장면 단계면 같은 화면 안에서, 글 목록 페이지면 새로 불러온다
+  addEventListener('popstate', () => {
+    const path = pathOf(location.href);
+    const node = findStage(tree, path);
+    if (path === current) return;
+    if (path && (!node || node.leaf || location.pathname.includes('/_notes/'))) return location.reload();
+    void goLevel(path, false);
+  });
+
+  // 뒤로 가기로 돌아왔을 때(bfcache) 전환 중이던 상태가 남지 않게
   addEventListener('pageshow', (e) => {
     if (!e.persisted) return;
-    stage.classList.remove('is-leaving');
-    stage.querySelector('.is-picked')?.classList.remove('is-picked');
+    busy = false;
+    space.classList.remove('is-exiting', 'is-hidden', 'is-entering');
+    chipsEl.classList.add('is-in');
   });
+
+  // 처음 화면
+  space.classList.add('is-floating');
+  field.load(lis(), hrefOf(current));
+  if (!reduce) requestAnimationFrame(frame); // 움직임 줄이기: 별은 scene.ts가 한 장면만 그리고 태그는 제자리에 있다
 }

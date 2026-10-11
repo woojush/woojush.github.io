@@ -1,0 +1,237 @@
+/* Knowledge 주제 장면 (TopicSpace.astro). JS가 만드는 태그도 같은 클래스를 쓰므로 전역 스타일이다.
+ * 태그 규격은 lifestories.org/discover를 따른다: 이름 칸 + 4px 간격 + 글 수 칸, 대문자·넓은 자간. 색은 tokens.css의 --tag-*. */
+
+html:has([data-space]) {
+  overflow: hidden;
+}
+
+body:has([data-space]) .site-footer {
+  display: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.space {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--bg);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.space.is-floating {
+  cursor: grab;
+}
+
+.space.is-dragging {
+  cursor: grabbing;
+}
+
+/* 별(canvas)과 태그 층은 전환 때 같이 울렁인다 (--wob-s / --wob-r은 topic-stage.ts가 매 프레임 넣는다) */
+.sky,
+.field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: scale(var(--wob-s, 1)) rotate(var(--wob-r, 0deg));
+}
+
+/* JS가 없을 때: 가운데에 모아 둔 평범한 목록 */
+.field nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.field ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 1rem;
+  justify-content: center;
+  max-width: 40rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.space.is-floating .field nav,
+.space.is-floating .field ul {
+  position: absolute;
+  inset: 0;
+  display: block;
+  max-width: none;
+}
+
+.space.is-floating .tag-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: translate;
+}
+
+.tag-item {
+  position: relative;
+}
+
+.tag {
+  display: inline-flex;
+  gap: 0.25rem;
+  height: 2.125rem;
+  color: var(--tag-text);
+  font-size: 0.6875rem;
+  font-weight: var(--fw-strong);
+  letter-spacing: 0.21em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: transform 160ms var(--ease);
+}
+
+.tag:hover,
+.tag:focus-visible {
+  transform: scale(1.05);
+}
+
+.tag:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.tag-name,
+.tag-count {
+  display: flex;
+  align-items: center;
+}
+
+.tag-name {
+  padding: 0 0.875rem;
+  background: var(--hue);
+  border-radius: 3px;
+}
+
+.tag-count {
+  justify-content: center;
+  min-width: 2.25rem;
+  padding: 0 0.625rem;
+  background: var(--tag-count-bg);
+  backdrop-filter: blur(15px);
+  border-radius: 5px;
+  color: var(--tag-count-text);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color 160ms var(--ease),
+    color 160ms var(--ease);
+}
+
+/* 마우스를 올리면: 글 수 칸이 하얗게, 아래에 안내 문구 */
+.tag:hover .tag-count,
+.tag:focus-visible .tag-count {
+  background: var(--tag-count-hover-bg);
+  color: var(--tag-count-hover-text);
+}
+
+.tag-hint {
+  position: absolute;
+  top: calc(100% + 0.625rem);
+  left: 50%;
+  translate: -50% 0;
+  color: var(--text);
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  text-shadow: 0 0 8px var(--bg);
+  transition: opacity 200ms var(--ease);
+  white-space: nowrap;
+}
+
+.tag-item:hover .tag-hint,
+.tag:focus-visible + .tag-hint {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .tag-hint {
+    display: none;
+  }
+}
+
+.space-note {
+  position: absolute;
+  top: 4.75rem;
+  left: 50%;
+  translate: -50% 0;
+  width: min(36rem, 90%);
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--fs-s);
+  line-height: var(--lh-s);
+  pointer-events: none;
+  text-align: center;
+}
+
+/* 좁은 화면에서는 탭 바가 헤더 아래 줄로 내려오므로 안내 문구도 그만큼 내린다 */
+@media (max-width: 640px) {
+  .space-note {
+    top: 7.25rem;
+  }
+}
+
+.space-note:empty {
+  display: none;
+}
+
+/* ── 전환 (JS가 .space에 클래스를 붙인다) ── */
+.space.is-exiting .tag,
+.space.is-hidden .tag {
+  pointer-events: none;
+}
+
+.space.is-hidden .tag-item {
+  visibility: hidden;
+}
+
+/* 나갈 때: 바깥쪽으로 흩어지며 작아지고 사라진다 (태그마다 지연·시간·방향이 다르다) */
+.space.is-exiting .tag-item {
+  animation: tag-out var(--dur, 300ms) cubic-bezier(0.5, 0, 0.75, 0) var(--delay, 0ms) both;
+}
+
+/* 들어올 때: 0.4배에서 점점 커져 제 크기에서 멈춘다 */
+.space.is-entering .tag-item {
+  animation: tag-in var(--dur, 1200ms) cubic-bezier(0.16, 1, 0.3, 1) var(--delay, 0ms) both;
+}
+
+@keyframes tag-out {
+  to {
+    opacity: 0;
+    transform: translate(var(--ex, 0px), var(--ey, 0px)) scale(0.75);
+  }
+}
+
+@keyframes tag-in {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag,
+  .tag-count,
+  .tag-hint {
+    transition: none;
+  }
+}

@@ -1,11 +1,11 @@
 ---
-// KNOWLEDGE 첫 화면: 분야들이 글자와 글 수만 달고 천천히 떠다닌다. 누르면 그 분야의 하위 주제가 떠다니는 화면으로, 더 누르면 끝에서 글 목록이 나온다.
-// 분야는 글의 topic 경로에서 자동으로 생기고, 글이 없는 분야는 나타나지 않는다. 이름·설명·순서는 src/data/topics.yaml, 가공은 lib/topics.ts.
+// KNOWLEDGE 첫 화면: 별이 가득한 화면 위로 분야들이 이름과 글 수만 달고 떠다닌다. 누르면 그 분야의 하위 주제가 떠다니는 화면으로, 더 누르면 끝에서 글 목록이 나온다.
+// 분야는 글의 topic 경로에서 자동으로 생기고, 글이 없는 분야는 나타나지 않는다. 이름·설명·순서·색은 src/data/topics.yaml, 가공은 lib/topics.ts.
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import TopicStage from '@/components/knowledge/TopicStage.astro';
+import TopicSpace from '@/components/knowledge/TopicSpace.astro';
 import { getEntries, getTopicsConfig } from '@/lib/content';
 import { validateLinks } from '@/lib/links';
-import { buildTopicTree } from '@/lib/topics';
+import { buildTopicTree, stageData } from '@/lib/topics';
 
 await validateLinks();
 const entries = await getEntries('knowledge');
@@ -14,15 +14,14 @@ const tree = buildTopicTree(entries, config.topics);
 ---
 
 <BaseLayout title="Knowledge" description="배운 것을 개념 단위로 쌓은 노트의 분야별 목록">
-  <h1>Knowledge</h1>
-  {config.lead && <p class="lead">{config.lead}</p>}
-  {tree.length > 0 && <TopicStage nodes={tree} />}
-</BaseLayout>
-
-<style>
-  .lead {
-    margin-bottom: var(--space-5);
-    font-size: var(--fs-m);
-    line-height: var(--lh-m);
+  {
+    tree.length > 0 ? (
+      <TopicSpace tree={stageData(tree)} path="" title="Knowledge" note={config.lead} chips={[]} total={0} />
+    ) : (
+      <>
+        <h1>Knowledge</h1>
+        {config.lead && <p>{config.lead}</p>}
+      </>
+    )
   }
-</style>
+</BaseLayout>

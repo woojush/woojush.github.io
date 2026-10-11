@@ -2,65 +2,74 @@
 // 주제 페이지 하나. 하위 주제가 있으면 그것들이 떠다니는 화면(+ 이 주제에 직접 속한 글 목록), 없으면(끝) 글 목록이다.
 // 주소는 /knowledge/topics/<경로>/ — 글의 주소(/knowledge/<slug>/)와 무관하다 (CLAUDE.md §3-2).
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import TopicStage from '@/components/knowledge/TopicStage.astro';
+import TopicSpace from '@/components/knowledge/TopicSpace.astro';
+import TopicChips from '@/components/knowledge/TopicChips.astro';
 import EntryRow from '@/components/knowledge/EntryRow.astro';
 import { getEntries, getTopicsConfig } from '@/lib/content';
 import { validateLinks } from '@/lib/links';
-import { STATUS_ORDER, buildTopicTree, countByStatus, flattenTree, topicHref, type TopicNode } from '@/lib/topics';
+import { STATUS_ORDER, buildTopicTree, chipsFor, countByStatus, flattenTree, stageData, topicHref, type TopicNode } from '@/lib/topics';
 
 export async function getStaticPaths() {
   const entries = await getEntries('knowledge');
   const config = await getTopicsConfig();
-  return flattenTree(buildTopicTree(entries, config.topics)).map(({ node, ancestors }) => ({
-    params: { path: node.path },
-    props: { node, ancestors },
-  }));
+  return flattenTree(buildTopicTree(entries, config.topics)).flatMap(({ node, ancestors }) => [
+    { params: { path: node.path }, props: { node, ancestors, ownOnly: false } },
+    // 하위 주제가 있는 주제에 직접 속한 글의 목록 ("_"는 slug에 못 쓰므로 주제 이름과 겹치지 않는다)
+    ...(node.children.length > 0 && node.notes.length > 0 ? [{ params: { path: `${node.path}/_notes` }, props: { node, ancestors, ownOnly: true } }] : []),
+  ]);
 }
 
 await validateLinks();
-const { node, ancestors } = Astro.props as { node: TopicNode; ancestors: TopicNode[] };
-const isLeaf = node.children.length === 0;
+const { node, ancestors, ownOnly } = Astro.props as { node: TopicNode; ancestors: TopicNode[]; ownOnly: boolean };
+const config = await getTopicsConfig();
+const tree = buildTopicTree(await getEntries('knowledge'), config.topics);
+const isLeaf = node.children.length === 0 || ownOnly;
+const chips = chipsFor(node.path, tree);
 const counts = countByStatus(node.notes);
 const href = (id: string) => `/knowledge/${id}/`;
 ---
 
-<BaseLayout title={node.name} description={node.description ?? `${node.name} 노트 목록`}>
-  <nav class="crumbs" aria-label="Topic">
-    <a href="/knowledge/">Knowledge</a>
-    {
-      ancestors.map((a) => (
-        <>
-          <span aria-hidden="true">/</span>
-          <a href={topicHref(a.path)}>{a.name}</a>
-        </>
-      ))
-    }
-  </nav>
-  <h1>{node.name}</h1>
-  {node.description && <p class="lead">{node.description}</p>}
-
-  {!isLeaf && <TopicStage nodes={node.children} />}
-
-  {
-    node.notes.length > 0 && (
-      <section class="notes">
-        {isLeaf && (
+{
+  isLeaf ? (
+    <BaseLayout title={node.name} description={node.description ?? `${node.name} 노트 목록`}>
+      <nav class="crumbs" aria-label="Topic">
+        <a href="/knowledge/">Knowledge</a>
+        {
+          ancestors.map((a) => (
+            <>
+              <span aria-hidden="true">/</span>
+              <a href={topicHref(a.path)}>{a.name}</a>
+            </>
+          ))
+        }
+        {ownOnly && (
           <>
-            <p class="stats">
-              {node.count}개의 노트 · {STATUS_ORDER.filter((s) => counts[s] > 0).map((s) => `${s} ${counts[s]}`).join(' · ')}
-            </p>
-            <p class="legend">seed는 막 적은 노트, growing은 고쳐 가는 중, evergreen은 오래 두고 볼 정리입니다.</p>
+            <span aria-hidden="true">/</span>
+            <a href={topicHref(node.path)}>{node.name}</a>
           </>
         )}
+      </nav>
+      <h1>{ownOnly ? `${node.name} · Notes` : node.name}</h1>
+      {node.description && <p class="lead">{node.description}</p>}
+      <section class="notes">
+        <p class="stats">
+          {node.notes.length}개의 노트 · {STATUS_ORDER.filter((s) => counts[s] > 0).map((s) => `${s} ${counts[s]}`).join(' · ')}
+        </p>
+        <p class="legend">seed는 막 적은 노트, growing은 고쳐 가는 중, evergreen은 오래 두고 볼 정리입니다.</p>
         <ul class="rows">
           {node.notes.map((n) => (
             <EntryRow href={href(n.id)} title={n.data.title} status={n.data.status} date={n.data.updated ?? n.data.date} description={n.data.description} />
           ))}
         </ul>
       </section>
-    )
-  }
-</BaseLayout>
+      <TopicChips chips={chips} total={node.notes.length} />
+    </BaseLayout>
+  ) : (
+    <BaseLayout title={node.name} description={node.description ?? `${node.name} 노트 목록`}>
+      <TopicSpace tree={stageData(tree)} path={node.path} title={node.name} note={node.description} chips={chips} total={node.count} />
+    </BaseLayout>
+  )
+}
 
 <style>
   .crumbs {

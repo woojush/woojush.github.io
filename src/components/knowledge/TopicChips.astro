@@ -1,0 +1,123 @@
+---
+// 좌측 하단의 "Total: N + 칩(✕)". 지금 들어와 있는 주제 경로를 칩으로 보여 주고(lifestories.org/discover와 같은 규격),
+// 칩을 누르면(✕) 그 칩의 바로 위 단계로 돌아간다. N은 지금 주제 아래 전체 글 수다.
+// 칩은 평범한 링크라서 글 목록 페이지에서도 그대로 쓰고, 장면 페이지에서는 스크립트(topic-stage.ts)가 같은 모양으로 다시 그린다.
+import type { Chip } from '@/lib/topics';
+
+interface Props {
+  chips: readonly Chip[];
+  total: number;
+}
+
+const { chips, total } = Astro.props;
+---
+
+<div class="chips" data-chips aria-label="Selected topics" role="group">
+  {
+    chips.length > 0 && (
+      <>
+        <span class="chips-total" style="--i:0">Total: {total}</span>
+        {chips.map((c, i) => (
+          <a class="chip" href={c.upHref} style={`--i:${i + 1}`} aria-label={`${c.name} 해제`}>
+            <span class="chip-label">{c.name}</span>
+            <svg class="chip-x" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+              <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none" />
+            </svg>
+          </a>
+        ))}
+      </>
+    )
+  }
+</div>
+<noscript><style>.chips > * { opacity: 1 !important; translate: 0 !important; }</style></noscript>
+
+<script>
+  // 처음 나타날 때 아래에서 올라오게: 한 프레임 뒤에 is-in을 붙인다
+  document.querySelectorAll<HTMLElement>('[data-chips]').forEach((el) => requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-in'))));
+</script>
+
+<style is:global>
+  /* 글 목록 페이지: 고정된 칩이 푸터 링크를 가리지 않게 푸터를 칩 높이만큼 띄운다 */
+  body:has([data-chips]) .site-footer {
+    padding-bottom: 3.5rem;
+  }
+
+  .chips {
+    position: fixed;
+    left: 1.25rem;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 4;
+    display: flex;
+    flex-wrap: wrap-reverse;
+    gap: 0.125rem;
+    align-items: center;
+    pointer-events: none;
+    font-size: var(--fs-s);
+  }
+
+  .chips > * {
+    opacity: 0;
+    translate: 0 2.5rem;
+    transition:
+      opacity 0.3s cubic-bezier(0.895, 0.03, 0.685, 0.22),
+      translate 0.4s cubic-bezier(0.36, 0, 0.66, -0.4);
+    transition-delay: calc(var(--i, 0) * 0.05s);
+  }
+
+  .chips.is-in > * {
+    opacity: 1;
+    translate: 0;
+    transition:
+      opacity 0.5s cubic-bezier(0.165, 0.84, 0.44, 1),
+      translate 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition-delay: calc(var(--i, 0) * 0.05s);
+  }
+
+  .chips-total {
+    display: inline-flex;
+    align-items: center;
+    height: 1.875rem;
+    padding: 0 0.25rem;
+    margin-right: 0.625rem;
+    color: var(--chip-text);
+    font-weight: var(--fw-strong);
+    white-space: nowrap;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    height: 1.875rem;
+    padding: 0 0.625rem;
+    background: var(--chip-bg);
+    backdrop-filter: blur(15px);
+    border-radius: 2.5rem;
+    color: var(--chip-text);
+    font-weight: var(--fw-strong);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .chips.is-in > .chip {
+    pointer-events: auto;
+  }
+
+  .chip:hover {
+    background: rgba(72, 72, 69, 0.9);
+  }
+
+  .chip-x {
+    flex: none;
+    margin-left: 0.25rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chips > *,
+    .chips.is-in > * {
+      transition: none;
+    }
+  }
+</style>

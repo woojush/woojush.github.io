@@ -33,6 +33,8 @@ const MAX_DEPTH = 3;
 const ACRONYMS = new Set(['ai', 'ml', 'nlp', 'cv', 'rl', 'gpu', 'cpu', 'ros', 'ros2', 'bci']);
 
 export const topicHref = (path: string): string => `/knowledge/topics/${path}/`;
+/** 하위 주제가 있는 주제에 직접 속한 글의 목록 주소 ("_"는 slug에 못 쓰므로 주제 이름과 겹치지 않는다) */
+export const ownNotesHref = (path: string): string => `/knowledge/topics/${path}/_notes/`;
 
 const segmentsOf = (topic: string): string[] => topic.split('/').slice(0, MAX_DEPTH);
 
@@ -157,4 +159,90 @@ export function neighborsInTopic(entries: readonly Note[], current: Note): { pre
   const list = sortNotes(entries.filter((e) => e.data.topic === current.data.topic));
   const i = list.findIndex((e) => e.id === current.id);
   return { prev: i > 0 ? list[i - 1] : undefined, next: i >= 0 && i < list.length - 1 ? list[i + 1] : undefined };
+}
+
+// ───────── 떠다니는 장면용 데이터 ─────────
+
+/** 브라우저로 넘기는 가벼운 트리 (장면 스크립트가 같은 화면 안에서 단계를 오가는 데 쓴다) */
+export interface StageNode {
+  path: string;
+  name: string;
+  color: TopicHue;
+  count: number;
+  description?: string;
+  /** 하위 주제가 없으면 글 목록 페이지로 이동하는 끝이다 */
+  leaf: boolean;
+  /** 이 주제에 직접 속한 글의 수 (하위 주제가 있어도 글이 있을 수 있다. 있으면 하위가 하나여도 건너뛰지 않는다) */
+  ownNotes: number;
+  children: StageNode[];
+}
+
+export function stageData(tree: readonly TopicNode[]): StageNode[] {
+  return tree.map((n) => ({
+    path: n.path,
+    name: n.name,
+    color: n.color,
+    count: n.count,
+    description: n.description,
+    leaf: n.children.length === 0,
+    ownNotes: n.notes.length,
+    children: stageData(n.children),
+  }));
+}
+
+/** 경로의 각 단계(칩): 이름, 그 칩을 지우면 가는 곳(바로 위 단계) */
+export interface Chip {
+  path: string;
+  name: string;
+  /** ✕를 누르면 가는 주소 */
+  upHref: string;
+}
+
+export function chipsFor(path: string, tree: readonly TopicNode[]): Chip[] {
+  const segs = path ? path.split('/') : [];
+  const chips: Chip[] = [];
+  let level: readonly TopicNode[] = tree;
+  for (let i = 0; i < segs.length; i++) {
+    const p = segs.slice(0, i + 1).join('/');
+    const node = level.find((n) => n.path === p);
+    if (!node) break;
+    chips.push({ path: p, name: node.name, upHref: i === 0 ? '/knowledge/' : topicHref(segs.slice(0, i).join('/')) });
+    level = node.children;
+  }
+  return chips;
+}
+
+/** 한 화면에 떠다니는 태그 하나 */
+export interface Tag {
+  name: string;
+  count: number;
+  color: TopicHue;
+  href: string;
+  /** 같은 화면 안에서 더 들어갈 주제의 경로. 글 목록 페이지로 가는 끝이면 null */
+  path: string | null;
+}
+
+/** parent(없으면 첫 화면)의 하위 주제들을 태그로 만든다. 하위가 있는 주제에 직접 속한 글이 있으면 "Notes" 태그가 하나 더 붙는다 */
+export function levelTags(parent: StageNode | null, nodes: readonly StageNode[]): Tag[] {
+  const tags: Tag[] = nodes.map((n) => ({
+    name: n.name,
+    count: n.count,
+    color: n.color,
+    href: topicHref(n.path),
+    path: n.leaf ? null : n.path,
+  }));
+  if (parent && parent.ownNotes > 0) tags.push({ name: 'Notes', count: parent.ownNotes, color: parent.color, href: ownNotesHref(parent.path), path: null });
+  return tags;
+}
+
+/** 경로로 노드를 찾는다 ('' 이거나 없으면 null) */
+export function findStage(tree: readonly StageNode[], path: string): StageNode | null {
+  let level = tree;
+  let node: StageNode | null = null;
+  for (const p of path ? path.split('/').map((_, i, segs) => segs.slice(0, i + 1).join('/')) : []) {
+    node = level.find((n) => n.path === p) ?? null;
+    if (!node) return null;
+    level = node.children;
+  }
+  return node;
 }

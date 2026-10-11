@@ -1,6 +1,6 @@
 ---
 // KNOWLEDGE 첫 화면: 별이 가득한 화면 위로 분야들이 이름과 글 수만 달고 떠다닌다. 누르면 그 분야의 하위 주제가 떠다니는 화면으로, 더 누르면 끝에서 글 목록이 나온다.
-// 분야는 글의 topic 경로에서 자동으로 생기고, 글이 없는 분야는 나타나지 않는다. 이름·설명·순서·색은 src/data/topics.yaml, 가공은 lib/topics.ts.
+// 분야는 글의 topic 경로에서 자동으로 생기고, 글이 없는 분야는 나타나지 않는다. 이름·순서·색은 src/data/topics.yaml, 가공은 lib/topics.ts.
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import TopicSpace from '@/components/knowledge/TopicSpace.astro';
 import { getEntries, getTopicsConfig } from '@/lib/content';

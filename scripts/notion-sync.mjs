@@ -44,7 +44,7 @@ for (const r of catRows) {
     continue;
   }
   const color = p.Color?.select?.name;
-  cats.set(id, { id, name, slug, order: p.Order?.number ?? 1e9, description: text(p.Description), color: HUES.has(color) ? color : undefined, parent: rel(p.Parent)[0] });
+  cats.set(id, { id, name, slug, order: p.Order?.number ?? 1e9, color: HUES.has(color) ? color : undefined, parent: rel(p.Parent)[0] });
 }
 const pathOf = (c, seen = new Set()) => {
   if (seen.has(c.id)) throw new Error(`카테고리 "${c.name}"의 Parent가 순환합니다.`);
@@ -117,7 +117,6 @@ const walk = (parent) =>
 const topicLines = walk('').map((c) => {
   const f = [`path: ${c.path}`, `name: ${yamlStr(c.name)}`];
   if (c.color) f.push(`color: ${c.color}`);
-  if (c.description) f.push(`description: ${yamlStr(c.description)}`);
   return `  - { ${f.join(', ')} }`;
 });
 const topicsYaml = [

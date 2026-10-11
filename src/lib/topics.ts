@@ -3,7 +3,7 @@
 // topic은 `분야/세부분야[/더 세부]` 경로(최대 3단계, 그 이상은 3단계로 모음)이고, 경로의 각 단계가 하나의 주제 페이지다.
 // 하위 주제가 있는 페이지는 하위 주제들이 떠다니는 화면이고, 하위 주제가 없는 페이지(끝)는 글 목록이다.
 // 주제 페이지의 주소는 /knowledge/topics/<경로>/ 이고, 글의 주소는 topic과 무관하다 (CLAUDE.md §3-2).
-// 표시 이름·설명·순서는 data/topics.yaml, 없으면 경로를 보기 좋게 바꿔 쓴다.
+// 표시 이름·순서·색은 data/topics.yaml, 없으면 경로를 보기 좋게 바꿔 쓴다.
 import type { CollectionEntry } from 'astro:content';
 
 export type Note = CollectionEntry<'knowledge'>;
@@ -12,14 +12,12 @@ export type TopicHue = 'walnut' | 'moss' | 'slate' | 'clay' | 'sand' | 'plum' | 
 export interface TopicConfigItem {
   path: string;
   name: string;
-  description?: string;
   color?: TopicHue;
 }
 
 export interface TopicNode {
   path: string;
   name: string;
-  description?: string;
   /** 태그 색 (없으면 부모 색을 이어받아 항상 채워진다) */
   color: TopicHue;
   /** 이 노드 아래 전체 글 수 (하위 포함) */
@@ -127,7 +125,6 @@ export function buildTopicTree(entries: readonly Note[], config: readonly TopicC
         return {
           path,
           name: topicName(path, config),
-          description: config.find((t) => t.path === path)?.description,
           color,
           count: kid.notes.length + children.reduce((sum, c) => sum + c.count, 0),
           notes: sortNotes(kid.notes),
@@ -169,7 +166,6 @@ export interface StageNode {
   name: string;
   color: TopicHue;
   count: number;
-  description?: string;
   /** 하위 주제가 없으면 글 목록 페이지로 이동하는 끝이다 */
   leaf: boolean;
   /** 이 주제에 직접 속한 글의 수 (하위 주제가 있어도 글이 있을 수 있다. 있으면 하위가 하나여도 건너뛰지 않는다) */
@@ -183,7 +179,6 @@ export function stageData(tree: readonly TopicNode[]): StageNode[] {
     name: n.name,
     color: n.color,
     count: n.count,
-    description: n.description,
     leaf: n.children.length === 0,
     ownNotes: n.notes.length,
     children: stageData(n.children),

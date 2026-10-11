@@ -1,7 +1,7 @@
 // Knowledge의 topic 트리와 정렬. DOM·getCollection 없이 데이터만 다루는 순수 함수다 (docs/05 4.3절).
 //
-// topic은 `분야/세부분야[/묶음]` 경로다. 화면은 세 걸음이다: 분야 목록(/knowledge/) → 세부분야 목록(분야 페이지) → 글 목록(세부분야 페이지).
-// 세 번째 조각(묶음)은 따로 페이지를 만들지 않고, 세부분야 페이지의 글 목록 안에서 소제목으로만 쓴다. 4단계 이상은 3단계로 모은다.
+// topic은 `분야/세부분야[/더 세부]` 경로(최대 3단계, 그 이상은 3단계로 모음)이고, 경로의 각 단계가 하나의 주제 페이지다.
+// 하위 주제가 있는 페이지는 하위 주제들이 떠다니는 화면이고, 하위 주제가 없는 페이지(끝)는 글 목록이다.
 // 주제 페이지의 주소는 /knowledge/topics/<경로>/ 이고, 글의 주소는 topic과 무관하다 (CLAUDE.md §3-2).
 // 표시 이름·설명·순서는 data/topics.yaml, 없으면 경로를 보기 좋게 바꿔 쓴다.
 import type { CollectionEntry } from 'astro:content';
@@ -13,29 +13,23 @@ export interface TopicConfigItem {
   description?: string;
 }
 
-/** 세부분야 페이지 안의 소제목 하나 */
-export interface NoteGroup {
-  path: string;
-  name: string;
-  notes: Note[];
-}
-
 export interface TopicNode {
   path: string;
   name: string;
   description?: string;
   /** 이 노드 아래 전체 글 수 (하위 포함) */
   count: number;
-  /** 이 노드에 직접 속한 글 (정렬됨). 분야 노드에서는 세부분야 없이 분야에만 속한 글 */
+  /** 이 노드에 직접 속한 글 (정렬됨) */
   notes: Note[];
-  /** 세부분야 노드의 글을 묶음(topic의 세 번째 조각)별로 나눈 것. 묶음이 없으면 비어 있고 notes만 쓴다 */
-  groups: NoteGroup[];
   children: TopicNode[];
 }
 
+const MAX_DEPTH = 3;
 const ACRONYMS = new Set(['ai', 'ml', 'nlp', 'cv', 'rl', 'gpu', 'cpu', 'ros', 'ros2', 'bci']);
 
 export const topicHref = (path: string): string => `/knowledge/topics/${path}/`;
+
+const segmentsOf = (topic: string): string[] => topic.split('/').slice(0, MAX_DEPTH);
 
 function segmentLabel(segment: string): string {
   return segment
@@ -50,9 +44,9 @@ export function topicName(path: string, config: readonly TopicConfigItem[]): str
   return segmentLabel(path.split('/').at(-1) ?? path);
 }
 
-/** 글의 topic 경로를 2단계까지의 breadcrumb으로 만든다 (각각 주제 페이지로 간다) */
+/** 글의 topic 경로를 단계별 breadcrumb으로 만든다 (각각 주제 페이지로 간다) */
 export function topicCrumbs(topic: string, config: readonly TopicConfigItem[]): { path: string; name: string; href: string }[] {
-  const segs = topic.split('/').slice(0, 2);
+  const segs = segmentsOf(topic);
   return segs.map((_, i) => {
     const path = segs.slice(0, i + 1).join('/');
     return { path, name: topicName(path, config), href: topicHref(path) };
@@ -101,64 +95,44 @@ function configIndex(path: string, config: readonly TopicConfigItem[]): number {
   return i < 0 ? Infinity : i;
 }
 
-const pathCompare = (config: readonly TopicConfigItem[]) => (a: { path: string; name: string }, b: { path: string; name: string }) =>
-  configIndex(a.path, config) - configIndex(b.path, config) || a.name.localeCompare(b.name);
-
-const describe = (path: string, config: readonly TopicConfigItem[]) => config.find((t) => t.path === path)?.description;
-
-/** 세부분야 안의 글을 묶음(세 번째 조각) 순서대로, 묶음 안에서는 sortNotes 순서로 나눈다. 묶음 없는 글은 맨 앞 */
-function splitGroups(sub: string, notes: readonly Note[], config: readonly TopicConfigItem[]): NoteGroup[] {
-  const by = new Map<string, Note[]>();
-  for (const n of notes) {
-    const third = n.data.topic.split('/')[2] ?? '';
-    by.set(third, [...(by.get(third) ?? []), n]);
+export function buildTopicTree(entries: readonly Note[], config: readonly TopicConfigItem[]): TopicNode[] {
+  interface Trie {
+    notes: Note[];
+    kids: Map<string, Trie>;
   }
-  return [...by]
-    .map(([third, list]) => {
-      const path = third ? `${sub}/${third}` : sub;
-      return { path, name: third ? topicName(path, config) : '', notes: sortNotes(list) };
-    })
-    .sort((a, b) => (a.name === '' ? -1 : b.name === '' ? 1 : pathCompare(config)(a, b)));
+  const root: Trie = { notes: [], kids: new Map() };
+  for (const entry of entries) {
+    let node = root;
+    for (const seg of segmentsOf(entry.data.topic)) {
+      const next: Trie = node.kids.get(seg) ?? { notes: [], kids: new Map() };
+      node.kids.set(seg, next);
+      node = next;
+    }
+    node.notes.push(entry);
+  }
+
+  const convert = (trie: Trie, prefix: string): TopicNode[] =>
+    [...trie.kids]
+      .map(([seg, kid]) => {
+        const path = prefix ? `${prefix}/${seg}` : seg;
+        const children = convert(kid, path);
+        return {
+          path,
+          name: topicName(path, config),
+          description: config.find((t) => t.path === path)?.description,
+          count: kid.notes.length + children.reduce((sum, c) => sum + c.count, 0),
+          notes: sortNotes(kid.notes),
+          children,
+        };
+      })
+      .sort((a, b) => configIndex(a.path, config) - configIndex(b.path, config) || a.name.localeCompare(b.name));
+
+  return convert(root, '');
 }
 
-export function buildTopicTree(entries: readonly Note[], config: readonly TopicConfigItem[]): TopicNode[] {
-  type Field = { direct: Note[]; subs: Map<string, Note[]> };
-  const fields = new Map<string, Field>();
-  for (const entry of entries) {
-    const [field, sub] = entry.data.topic.split('/');
-    const f: Field = fields.get(field) ?? { direct: [], subs: new Map<string, Note[]>() };
-    if (sub) f.subs.set(sub, [...(f.subs.get(sub) ?? []), entry]);
-    else f.direct.push(entry);
-    fields.set(field, f);
-  }
-
-  const nodes: TopicNode[] = [];
-  for (const [field, f] of fields) {
-    const children: TopicNode[] = [...f.subs].map(([sub, notes]) => {
-      const path = `${field}/${sub}`;
-      const groups = splitGroups(path, notes, config);
-      return {
-        path,
-        name: topicName(path, config),
-        description: describe(path, config),
-        count: notes.length,
-        notes: groups.flatMap((g) => g.notes),
-        groups: groups.some((g) => g.name !== '') ? groups : [],
-        children: [],
-      };
-    });
-    children.sort(pathCompare(config));
-    nodes.push({
-      path: field,
-      name: topicName(field, config),
-      description: describe(field, config),
-      count: f.direct.length + children.reduce((sum, c) => sum + c.count, 0),
-      notes: sortNotes(f.direct),
-      groups: [],
-      children,
-    });
-  }
-  return nodes.sort(pathCompare(config));
+/** 트리의 모든 노드를 (조상 목록과 함께) 펼친다. 주제 페이지를 만들 때 쓴다 */
+export function flattenTree(tree: readonly TopicNode[], ancestors: TopicNode[] = []): { node: TopicNode; ancestors: TopicNode[] }[] {
+  return tree.flatMap((node) => [{ node, ancestors }, ...flattenTree(node.children, [...ancestors, node])]);
 }
 
 // ───────── 목록 페이지용 요약 ─────────
@@ -171,11 +145,9 @@ export function countByStatus(entries: readonly Note[]): Record<(typeof STATUS_O
   return counts;
 }
 
-/** 같은 세부분야(묶음 순서 포함) 안에서 정렬된 순서 기준의 이전·다음 글 */
-export function neighborsInTopic(entries: readonly Note[], current: Note, config: readonly TopicConfigItem[]): { prev?: Note; next?: Note } {
-  const sub = current.data.topic.split('/').slice(0, 2).join('/');
-  const same = entries.filter((e) => e.data.topic.split('/').slice(0, 2).join('/') === sub);
-  const list = splitGroups(sub, same, config).flatMap((g) => g.notes);
+/** 같은 topic 안에서 정렬된 순서 기준의 이전·다음 글 */
+export function neighborsInTopic(entries: readonly Note[], current: Note): { prev?: Note; next?: Note } {
+  const list = sortNotes(entries.filter((e) => e.data.topic === current.data.topic));
   const i = list.findIndex((e) => e.id === current.id);
   return { prev: i > 0 ? list[i - 1] : undefined, next: i >= 0 && i < list.length - 1 ? list[i + 1] : undefined };
 }

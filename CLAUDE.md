@@ -12,7 +12,7 @@
 - **탭 바 v4 구현됨** (2026-10-10, `tabbar-v4` 브랜치): 사용자 지시로 lifestories.org의 상단 알약을 그대로 따랐다. 평소에는 화면 위 가운데에 떠 있는 작은 알약(가운데 허브)이고, 마우스가 올라가면 스프링으로 늘어나며 글자가 모인다. 글자에 마우스를 올리면 알약 아래쪽에서 은은한 빛이 따라온다. **home은 메뉴에서 뺐고** 이름과 허브가 홈 링크다. 모양은 `src/styles/nav.css`, 값은 `tokens.css`의 탭 바 토큰, 동작은 `src/scripts/nav.ts`. 이 효과는 `docs/07` §3 c·`DESIGN.md`의 승인된 예외다.
 - **About 구현됨** (2026-10-10, `about-page` 브랜치): 구성은 Intro → Interests → Why this site → Path(Timeline) → Elsewhere. 문구는 사용자가 직접 쓴 것이다. Intro의 "Robot AI 엔지니어"는 사용자의 표현이며, 사이트 전체의 주제를 한 분야로 제한하지 않는 §1 원칙은 그대로다.
 - **메인 인트로 → 홈 화면 구현됨** (2026-10-10): 첫 방문에 문구가 점점 커지고 그 속도에 맞춰 별이 날아온다. 메인 문장이 나타나고 1.8초 뒤(3.8초) 작은 문장이 나타나며, 작은 문장이 다 나타나고 1.3초 뒤(6.0초) 4초 동안 블랙홀에 빨려 들어가듯(별은 선으로 늘어나 휘감김, 확대 300배) 폭발적으로 확대되어 어두운 배경 속으로 사라지면, **같은 페이지(`/`)에서** 프로필(사진·설명)·Now·Projects(active)·Recent가 나타난다. 이동은 없다. 인트로는 움직임 줄이기 설정일 때만 하지 않고, 홈에 올 때마다 한다(누르거나 Enter·Space·Esc로 건너뛴다). 세부는 `docs/07` "메인 인트로 → 홈 화면", 시간표는 `src/scripts/intro-timeline.ts`.
-- **Knowledge 구현됨** (2026-10-11): 목록은 topic 경로(`분야/세부분야[/묶음]`)에서 만든 세 걸음 구조(첫 화면=분야 행 → 분야 페이지=세부분야 행 → 세부분야 페이지=글 목록, 주소 `/knowledge/topics/<경로>/`), 글 페이지는 breadcrumb·수식(KaTeX)·코드(Shiki 두 테마)·우측 목차·Related(역링크 자동)·이전/다음. 이를 위해 Phase 2·3의 일부(읽기 환경, 트리, Related)를 Knowledge 한정으로 앞당겼다(사용자 승인). Projects·Writing 상세는 아직 최소 틀이고 `/tags/`·Mermaid·검색은 하지 않았다. 첫 공개 노트는 MML(Mathematics for Machine Learning) 2·3장 정리 17개(`ai/mathematics/linear-algebra` 6, `ai/mathematics/analytic-geometry` 11, 전부 `status: growing`, 2026-10-11)다. 구조는 `docs/01` §4.3, 작성법은 아래 §9.
+- **Knowledge 구현됨** (2026-10-11): 목록은 topic 경로(`분야/세부분야[/더 세부]`, 최대 3단계)에서 만든 단계별 화면(첫 화면=분야들이 글자와 글 수만 달고 천천히 떠다님 → 누르면 하위 주제가 떠다니는 화면 → … → 끝(하위 없음)에서 글 목록, 주소 `/knowledge/topics/<경로>/`, lifestories.org 참고, 사용자 지시), 글 페이지는 breadcrumb·수식(KaTeX)·코드(Shiki 두 테마)·우측 목차·Related(역링크 자동)·이전/다음. 이를 위해 Phase 2·3의 일부(읽기 환경, 트리, Related)를 Knowledge 한정으로 앞당겼다(사용자 승인). Projects·Writing 상세는 아직 최소 틀이고 `/tags/`·Mermaid·검색은 하지 않았다. 첫 공개 노트는 MML(Mathematics for Machine Learning) 2·3장 정리 17개(`ai/mathematics/linear-algebra` 6, `ai/mathematics/analytic-geometry` 11, 전부 `status: growing`, 2026-10-11)다. 구조는 `docs/01` §4.3, 작성법은 아래 §9.
 - GitHub·이메일·LinkedIn은 공개 확정, `site.ts`의 `links`에 추가했다(푸터와 About의 Elsewhere가 같이 쓴다).
 - 다음은 **하위 페이지별 디자인 설계** 단계(Projects·Writing)이고, 그 뒤에 **Phase 2·3의 남은 부분**(Projects·Writing 상세에 읽기 환경·Related 적용, `/tags/`)이다. 읽기 환경(`ArticleLayout`·prose·KaTeX)과 트리·Related는 Knowledge에서 이미 만들어 두었으니 재사용한다. 사용자 승인 전에는 넘어가지 않는다.
 - 사용자는 대부분의 기능·디자인을 Claude가 맥락과 취향을 반영해 먼저 결정하고, 결과물을 보고 사용자가 판단하는 방식을 원한다. 질문은 꼭 필요한 것만 한다.
@@ -228,6 +228,9 @@ npm run preview      # 빌드 결과 미리보기
 - **코드:** Shiki `vitesse-light`/`vitesse-dark`를 `defaultColor: false`로 내보내 CSS 변수(`--shiki-light/dark`)로 두고, `prose.css`가 `data-theme`에 맞는 쪽을 쓴다.
 - MDX에서 컴포넌트를 쓰면 빌드에 `use astro:head-inject` MODULE_LEVEL_DIRECTIVE 경고가 뜨지만 스타일은 정상적으로 들어간다(확인함). 무시한다.
 - 관계 검증(`lib/links.ts`): 없는 글을 가리키는 `links`, 선행(prerequisite) 순환은 빌드가 멈춘다. 캐시를 두지 않는다(dev에서 콘텐츠가 바뀌어도 맞게).
+
+- **떠다니는 주제 화면**(`TopicStage.astro` + `scripts/topic-stage.ts`): 마크업은 평범한 링크 목록이고 스크립트가 `.is-floating`을 붙여 절대 위치로 띄운다. 처음 배치는 주소에서 만든 고정 난수, 속도 7~14px/초, 벽·서로에게 튕김, 마우스·포커스가 있는 것은 멈춤, 움직임 줄이기면 정지, 클릭 시 나머지가 사라지는 360ms 전환 뒤 이동. 글자 크기는 글 수에 비례(1~1.35배). 이 모션은 Knowledge 한정 승인 예외다.
+- 이번 세션 환경에서는 `/opt/pw-browsers/chromium`과 Playwright(python)로 실제 화면 확인이 가능했다(`launch(executable_path='/opt/pw-browsers/chromium')`). 움직이는 요소는 `click(force=True)`가 필요하다.
 
 ## 14. Phase 0에서 의도적으로 하지 않은 것
 

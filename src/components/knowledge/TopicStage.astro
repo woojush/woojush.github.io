@@ -1,0 +1,123 @@
+---
+// 하위 주제들이 화면 안에서 천천히 떠다니는 장면. 글자(주제 이름)와 글 수만 보인다. 누르면 그 주제 페이지로 들어간다.
+// 마크업은 평범한 링크 목록이라 스크립트가 없거나 움직임 줄이기 설정이어도 그대로 쓸 수 있다.
+// 떠다니는 동작은 src/scripts/topic-stage.ts. 이 장면은 Knowledge 한정으로 승인된 모션이다(CLAUDE.md §8, docs/07 §3).
+import { topicHref, type TopicNode } from '@/lib/topics';
+
+interface Props {
+  nodes: readonly TopicNode[];
+}
+
+const { nodes } = Astro.props;
+const max = Math.max(1, ...nodes.map((n) => n.count));
+// 글이 많은 주제일수록 글자가 조금 더 크다 (1 ~ 1.35배)
+const scale = (count: number) => (1 + 0.35 * (count / max)).toFixed(2);
+---
+
+<nav class="stage" aria-label="Topics" data-stage>
+  <ul>
+    {
+      nodes.map((n, i) => (
+        <li style={`--k:${scale(n.count)};--i:${i}`}>
+          <a href={topicHref(n.path)}>
+            <span class="name">{n.name}</span>
+            <span class="count" aria-label={`${n.count}개의 노트`}>{n.count}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script>
+  import '@/scripts/topic-stage';
+</script>
+
+<style>
+  .stage ul {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-width: none;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6em;
+    min-height: var(--tap);
+    padding: 0.35em 1em;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: calc(var(--fs-l) * var(--k, 1));
+    line-height: var(--lh-l);
+    text-decoration: none;
+    transition: border-color var(--duration) var(--ease);
+  }
+
+  a:hover {
+    border-color: var(--text-muted);
+  }
+
+  .count {
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── 떠다니는 상태 (스크립트가 .is-floating을 붙인다) ── */
+  .stage:global(.is-floating) {
+    position: relative;
+    height: clamp(22rem, calc(100svh - 24rem), 40rem);
+    overflow: hidden;
+  }
+
+  .stage:global(.is-floating) ul {
+    display: block;
+  }
+
+  .stage:global(.is-floating) li {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: 92%;
+    will-change: translate;
+  }
+
+  .stage:global(.is-floating) a {
+    max-width: 100%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .stage:global(.is-floating) li {
+      animation: drift-in var(--duration-slow) var(--ease-out) both;
+      animation-delay: calc(var(--i) * 90ms);
+    }
+
+    .stage:global(.is-floating) li a {
+      transition:
+        border-color var(--duration) var(--ease),
+        opacity 320ms var(--ease),
+        scale 380ms var(--ease-custom);
+    }
+
+    /* 하나를 누르면 나머지는 사라지고, 누른 것은 커지며 사라진다. 그 사이에 다음 페이지로 간다 */
+    .stage:global(.is-leaving) li a {
+      opacity: 0;
+    }
+
+    .stage:global(.is-leaving) li:global(.is-picked) a {
+      scale: 1.4;
+    }
+  }
+
+  @keyframes drift-in {
+    from {
+      opacity: 0;
+    }
+  }
+</style>

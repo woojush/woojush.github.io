@@ -22,7 +22,7 @@ const config = await getTopicsConfig();
 const all = await getEntries('knowledge');
 const crumbs = topicCrumbs(entry.data.topic, config.topics);
 const groups = await getRelations(entry.id);
-const { prev, next } = neighborsInTopic(all, entry, config.topics);
+const { prev, next } = neighborsInTopic(all, entry);
 const when = entry.data.updated ?? entry.data.date;
 const toItem = (n: (typeof all)[number] | undefined) => (n ? { href: `/knowledge/${n.id}/`, title: n.data.title } : undefined);
 ---

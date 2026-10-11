@@ -1,81 +1,63 @@
 ---
-// 주제 페이지 하나. 분야면 세부분야 목록, 세부분야면 글 목록(묶음이 있으면 소제목으로 나눈다).
+// 주제 페이지 하나. 하위 주제가 있으면 그것들이 떠다니는 화면(+ 이 주제에 직접 속한 글 목록), 없으면(끝) 글 목록이다.
 // 주소는 /knowledge/topics/<경로>/ — 글의 주소(/knowledge/<slug>/)와 무관하다 (CLAUDE.md §3-2).
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import TopicRow from '@/components/knowledge/TopicRow.astro';
+import TopicStage from '@/components/knowledge/TopicStage.astro';
 import EntryRow from '@/components/knowledge/EntryRow.astro';
 import { getEntries, getTopicsConfig } from '@/lib/content';
 import { validateLinks } from '@/lib/links';
-import { STATUS_ORDER, buildTopicTree, countByStatus, topicHref, type TopicNode } from '@/lib/topics';
+import { STATUS_ORDER, buildTopicTree, countByStatus, flattenTree, topicHref, type TopicNode } from '@/lib/topics';
 
 export async function getStaticPaths() {
   const entries = await getEntries('knowledge');
   const config = await getTopicsConfig();
-  const tree = buildTopicTree(entries, config.topics);
-  return tree.flatMap((field) => [
-    { params: { path: field.path }, props: { node: field, parent: undefined } },
-    ...field.children.map((sub) => ({ params: { path: sub.path }, props: { node: sub, parent: field } })),
-  ]) satisfies { params: { path: string }; props: { node: TopicNode; parent?: TopicNode } }[];
+  return flattenTree(buildTopicTree(entries, config.topics)).map(({ node, ancestors }) => ({
+    params: { path: node.path },
+    props: { node, ancestors },
+  }));
 }
 
 await validateLinks();
-const { node, parent } = Astro.props as { node: TopicNode; parent?: TopicNode };
-const isField = parent === undefined;
+const { node, ancestors } = Astro.props as { node: TopicNode; ancestors: TopicNode[] };
+const isLeaf = node.children.length === 0;
 const counts = countByStatus(node.notes);
 const href = (id: string) => `/knowledge/${id}/`;
-const lists = node.groups.length > 0 ? node.groups : [{ path: node.path, name: '', notes: node.notes }];
 ---
 
 <BaseLayout title={node.name} description={node.description ?? `${node.name} 노트 목록`}>
   <nav class="crumbs" aria-label="Topic">
     <a href="/knowledge/">Knowledge</a>
     {
-      parent && (
+      ancestors.map((a) => (
         <>
           <span aria-hidden="true">/</span>
-          <a href={topicHref(parent.path)}>{parent.name}</a>
+          <a href={topicHref(a.path)}>{a.name}</a>
         </>
-      )
+      ))
     }
   </nav>
   <h1>{node.name}</h1>
   {node.description && <p class="lead">{node.description}</p>}
 
+  {!isLeaf && <TopicStage nodes={node.children} />}
+
   {
-    isField ? (
-      <>
-        {node.children.length > 0 && (
-          <ul class="rows">
-            {node.children.map((sub) => (
-              <TopicRow href={topicHref(sub.path)} name={sub.name} count={sub.count} description={sub.description} meta={sub.groups.map((g) => g.name).join(' · ')} />
-            ))}
-          </ul>
+    node.notes.length > 0 && (
+      <section class="notes">
+        {isLeaf && (
+          <>
+            <p class="stats">
+              {node.count}개의 노트 · {STATUS_ORDER.filter((s) => counts[s] > 0).map((s) => `${s} ${counts[s]}`).join(' · ')}
+            </p>
+            <p class="legend">seed는 막 적은 노트, growing은 고쳐 가는 중, evergreen은 오래 두고 볼 정리입니다.</p>
+          </>
         )}
-        {node.notes.length > 0 && (
-          <ul class="rows notes">
-            {node.notes.map((n) => (
-              <EntryRow href={href(n.id)} title={n.data.title} status={n.data.status} date={n.data.updated ?? n.data.date} description={n.data.description} />
-            ))}
-          </ul>
-        )}
-      </>
-    ) : (
-      <>
-        <p class="stats">
-          {node.count}개의 노트 · {STATUS_ORDER.filter((s) => counts[s] > 0).map((s) => `${s} ${counts[s]}`).join(' · ')}
-        </p>
-        <p class="legend">seed는 막 적은 노트, growing은 고쳐 가는 중, evergreen은 오래 두고 볼 정리입니다.</p>
-        {lists.map((g) => (
-          <section class="group">
-            {g.name && <h2>{g.name}</h2>}
-            <ul class="rows notes">
-              {g.notes.map((n) => (
-                <EntryRow href={href(n.id)} title={n.data.title} status={n.data.status} date={n.data.updated ?? n.data.date} description={n.data.description} />
-              ))}
-            </ul>
-          </section>
-        ))}
-      </>
+        <ul class="rows">
+          {node.notes.map((n) => (
+            <EntryRow href={href(n.id)} title={n.data.title} status={n.data.status} date={n.data.updated ?? n.data.date} description={n.data.description} />
+          ))}
+        </ul>
+      </section>
     )
   }
 </BaseLayout>
@@ -127,17 +109,7 @@ const lists = node.groups.length > 0 ? node.groups : [{ path: node.path, name: '
     border-bottom: 1px solid var(--rule);
   }
 
-  .group {
-    margin-top: var(--space-6);
-  }
-
-  .group h2 {
-    margin: 0 0 var(--space-2);
-    font-size: var(--fs-l);
-    line-height: var(--lh-l);
-  }
-
   .notes {
-    margin-bottom: var(--space-4);
+    margin-top: var(--space-6);
   }
 </style>

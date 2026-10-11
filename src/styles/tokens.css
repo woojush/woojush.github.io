@@ -160,5 +160,5 @@
   --book-ink: #2a2318; /* 밝은 종이 책등 위의 제목 */
   --book-print: #e6dec9; /* 천 책등에 인쇄한 제목 */
   --book-foil: #bf9f5c; /* 가죽 책등의 금박 제목 */
-  --font-spine: 'Noto Serif KR', 'Noto Serif CJK KR', 'Nanum Myeongjo', AppleMyungjo, 'Batang', var(--font-sans); /* 책등 제목 (명조 계열) */
+  --font-spine: 'Nanum Myeongjo', 'Noto Serif KR', 'Noto Serif CJK KR', AppleMyungjo, 'Batang', var(--font-sans); /* 책등 제목 (명조 계열) */
 }

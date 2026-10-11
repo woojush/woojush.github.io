@@ -10,7 +10,7 @@ const CATEGORIES_DB = '166b9336-ea3d-4110-8a58-9275fae88f35';
 const NOTES_DB = 'be04da52-a2f1-4422-bf11-b350b6ee880a';
 const HUES = new Set(['walnut', 'moss', 'slate', 'clay', 'sand', 'plum', 'stone']);
 const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const MAX_DEPTH = 3;
+const MAX_DEPTH = 5;
 
 const token = process.env.NOTION_TOKEN;
 if (!token) {

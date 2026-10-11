@@ -1,6 +1,6 @@
 // Knowledge의 topic 트리와 정렬. DOM·getCollection 없이 데이터만 다루는 순수 함수다 (docs/05 4.3절).
 //
-// topic은 `분야/세부분야[/더 세부]` 경로(최대 3단계, 그 이상은 3단계로 모음)이고, 경로의 각 단계가 하나의 주제 페이지다.
+// topic은 `분야/세부분야[/더 세부]` 경로(최대 5단계, 그 이상은 5단계로 모음)이고, 경로의 각 단계가 하나의 주제 페이지다.
 // 하위 주제가 있는 페이지는 하위 주제들이 떠다니는 화면이고, 하위 주제가 없는 페이지(끝)는 글 목록이다.
 // 주제 페이지의 주소는 /knowledge/topics/<경로>/ 이고, 글의 주소는 topic과 무관하다 (CLAUDE.md §3-2).
 // 표시 이름·순서·색은 data/topics.yaml, 없으면 경로를 보기 좋게 바꿔 쓴다.
@@ -27,7 +27,7 @@ export interface TopicNode {
   children: TopicNode[];
 }
 
-const MAX_DEPTH = 3;
+const MAX_DEPTH = 5;
 const ACRONYMS = new Set(['ai', 'ml', 'nlp', 'cv', 'rl', 'gpu', 'cpu', 'ros', 'ros2', 'bci']);
 
 export const topicHref = (path: string): string => `/knowledge/topics/${path}/`;

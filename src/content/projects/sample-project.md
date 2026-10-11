@@ -5,7 +5,7 @@ status: active
 date: 2026-10-04
 tags: [sample]
 links:
-  - { type: knowledge, slug: sample-rank-nullity, rel: builds-on }
+  - { type: knowledge, slug: rank-nullity, rel: builds-on }
 draft: true
 ---
 

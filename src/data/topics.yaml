@@ -5,6 +5,7 @@ lead: 배운 것을 개념 단위로 쌓는 곳. 덜 익은 노트도 그대로 
 topics:
   - { path: mathematics, name: Mathematics }
   - { path: mathematics/linear-algebra, name: Linear Algebra }
+  - { path: mathematics/analytic-geometry, name: Analytic Geometry }
   - { path: mathematics/probability, name: Probability }
   - { path: mathematics/optimization, name: Optimization }
   - { path: computer-science, name: Computer Science }

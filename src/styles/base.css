@@ -163,15 +163,6 @@ a {
   transform: none;
 }
 
-/* ───────── 테마 전환 순간 ─────────
- * theme-toggle.ts가 테마를 바꾸는 한 프레임 동안만 붙인다. 배경과 글자색이 같이 바뀌게 전환을 끈다.
- */
-:root[data-theme-switching] *,
-:root[data-theme-switching] *::before,
-:root[data-theme-switching] *::after {
-  transition: none !important;
-}
-
 /* ───────── reduced motion ───────── */
 @media (prefers-reduced-motion: reduce) {
   *,

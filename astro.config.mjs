@@ -25,7 +25,7 @@ export default defineConfig({
       remarkPlugins: [remarkMath],
       rehypePlugins: [rehypeHeadingAnchors, [rehypeKatex, { strict: 'ignore' }], rehypeMathErrors],
     }),
-    // 코드: 두 테마의 색을 변수로 같이 내보내고, prose.css가 data-theme에 맞는 쪽을 쓴다.
-    shikiConfig: { themes: { light: 'vitesse-light', dark: 'vitesse-dark' }, defaultColor: false },
+    // 코드: 어두운 테마 하나만 쓴다(라이트 테마는 없앴다). 색은 CSS 변수(--shiki-dark)로 내보내고 prose.css가 쓴다.
+    shikiConfig: { themes: { dark: 'vitesse-dark' }, defaultColor: false },
   },
 });

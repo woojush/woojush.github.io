@@ -98,17 +98,11 @@
   font-size: inherit;
 }
 
-/* Shiki는 두 테마의 색을 변수로 내보낸다. 어두운 테마가 기본이다 */
+/* Shiki는 색을 변수(--shiki-dark)로 내보낸다 */
 .prose pre span {
   color: var(--shiki-dark);
   font-style: var(--shiki-dark-font-style);
   font-weight: var(--shiki-dark-font-weight);
-}
-
-:root[data-theme='light'] .prose pre span {
-  color: var(--shiki-light);
-  font-style: var(--shiki-light-font-style);
-  font-weight: var(--shiki-light-font-weight);
 }
 
 /* ───────── 표 ───────── */

@@ -37,14 +37,17 @@ body:has([data-space]) .site-footer {
   cursor: grabbing;
 }
 
-/* 별(canvas)과 태그 층은 전환 때 같이 울렁인다 (--wob-s / --wob-r은 topic-stage.ts가 매 프레임 넣는다) */
+/* 별(canvas)은 전환 때 1초 동안 살짝 확대됐다 돌아온다 (--wob-s는 topic-stage.ts가 매 프레임 넣는다). 태그 층은 움직이지 않는다 */
 .sky,
 .field {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  transform: scale(var(--wob-s, 1)) rotate(var(--wob-r, 0deg));
+}
+
+.sky {
+  transform: scale(var(--wob-s, 1));
 }
 
 /* JS가 없을 때: 가운데에 모아 둔 평범한 목록 */
@@ -173,21 +176,22 @@ body:has([data-space]) .site-footer {
   filter: brightness(0.6);
 }
 
+/* 아래로 조금(0.5rem)만 내려가 있다가 1.8초에 걸쳐 천천히 올라온다 */
 .tag-item:hover .tag-ghost {
-  animation: tag-ghost-rise 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: tag-ghost-rise 1800ms cubic-bezier(0.33, 0.6, 0.3, 1) both;
 }
 
 @keyframes tag-ghost-rise {
   0% {
     opacity: 0;
-    transform: translateY(1.5rem);
+    transform: translateY(0.5rem);
   }
   35% {
     opacity: 0.8;
   }
   100% {
     opacity: 0.45;
-    transform: translateY(0.3125rem);
+    transform: translateY(0.125rem);
   }
 }
 
@@ -270,9 +274,11 @@ body:has([data-space]) .site-footer {
   animation: tag-out var(--dur, 300ms) cubic-bezier(0.5, 0, 0.75, 0) var(--delay, 0ms) both;
 }
 
-/* 들어올 때: 0.4배에서 점점 커져 제 크기에서 멈춘다 */
+/* 들어올 때: 0.4배에서 점점 커져 제 크기에서 멈춘다. 처음이 완만해야(기울기 0에서 시작) 튀어 오르는 느낌이 없다 */
 .space.is-entering .tag-item {
-  animation: tag-in var(--dur, 1200ms) cubic-bezier(0.16, 1, 0.3, 1) var(--delay, 0ms) both;
+  animation:
+    tag-in var(--dur, 1200ms) cubic-bezier(0.3, 0, 0.1, 1) var(--delay, 0ms) both,
+    tag-fade calc(var(--dur, 1200ms) * 0.45) ease-out var(--delay, 0ms) both;
 }
 
 @keyframes tag-out {
@@ -284,8 +290,13 @@ body:has([data-space]) .site-footer {
 
 @keyframes tag-in {
   from {
-    opacity: 0;
     scale: 0.4;
+  }
+}
+
+@keyframes tag-fade {
+  from {
+    opacity: 0;
   }
 }
 

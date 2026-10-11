@@ -1,10 +1,9 @@
 ---
-// 모든 페이지의 공통 틀: <html>, <head>, 첫 페인트 전 테마 지정, skip link, header / main / footer.
+// 모든 페이지의 공통 틀: <html>, <head>, skip link, header / main / footer.
 // 콘텐츠 조회는 하지 않는다 (docs/05_folder_structure.md 4.2절).
 import '@/styles/tokens.css';
 import '@/styles/fonts.css';
 import '@/styles/base.css';
-import themeInit from '@/scripts/theme-init.js?raw';
 import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import { site } from '@/data/site';
@@ -27,8 +26,6 @@ const pageTitle = title === site.name ? title : `${title} — ${site.name}`;
     <meta name="generator" content={Astro.generator} />
     {description && <meta name="description" content={description} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    {/* 페이지가 그려지기 전에 data-theme을 지정한다 (다크 모드에서 흰 화면이 번쩍이지 않게). 반드시 인라인 */}
-    <script is:inline set:html={themeInit} />
     <title>{pageTitle}</title>
   </head>
   <body>

@@ -7,7 +7,8 @@
 //  - 마지막 확대(블랙홀로 빨려 들어가는 구간)에서는 별이 짧은 줄(streak)로 늘어나 가운데에서 쏟아지고 장면이 점점 빠르게 회전한다.
 //  - 별은 화면 전체에 고르게 흩어진다(멀리 있을 때의 화면 위치를 고르게 뽑고, 다가오며 바깥으로 흘러간다). 가장자리 별도 보인다.
 //  - 선택(post): 가장자리로 갈수록 색이 어긋나는 색수차 + 가장자리 비네팅 + 잔 그레인(lifestories.org와 같은 후처리). 전환 때 setFx로 세게 한다.
-//  - 색은 CSS 토큰 --particle(rgb 채널). 테마가 바뀌면 다시 읽는다.
+//  - 선택(post): 전환 때 누른 자리에서 물결(ripple)이 퍼져 나간다(lifestories.org와 같은 방식: 링 모양 파동이 화면을 일그러뜨리고 그 띠에서 번지며 색이 갈라진다).
+//  - 색은 CSS 토큰 --particle(rgb 채널). 테마는 어두운 하나뿐이다.
 //  - prefers-reduced-motion이면 한 장면만 그린다. WebGL이 없으면 startScene이 던지고, 부르는 쪽이 캔버스를 숨긴다.
 import {
   AdditiveBlending,
@@ -15,7 +16,6 @@ import {
   BufferGeometry,
   Color,
   LineSegments,
-  NormalBlending,
   OrthographicCamera,
   Mesh,
   NoBlending,
@@ -23,6 +23,7 @@ import {
   Points,
   Scene,
   ShaderMaterial,
+  Vector3,
   WebGLRenderTarget,
   WebGLRenderer,
 } from 'three';
@@ -115,6 +116,8 @@ export interface SceneHandle {
   update(flySpeed: number, boost: number, dt: number, clock: number, alpha: number): void;
   /** 후처리(색수차·비네팅·그레인)를 세게 하는 정도(0~1). startScene에서 post를 켠 경우에만 의미가 있다 */
   setFx(amount: number): void;
+  /** 화면의 (x, y)(px)에서 물결을 일으킨다 (post 옵션이 있을 때만) */
+  ripple(x: number, y: number): void;
 }
 
 // 후처리: 별 장면을 한 번 텍스처에 그린 뒤, 화면 가장자리로 갈수록 R·B 채널을 반대 방향으로 밀어 색이 어긋나게 하고(색수차),
@@ -135,7 +138,10 @@ const POST_FRAG = /* glsl */ `
   uniform float uGrain;   // 그레인 세기
   uniform float uAspect;  // 가로/세로
   uniform float uTime;
-  uniform float uLight;   // 1이면 밝은 테마(별이 어두운 점): 비네팅·그레인을 쓰지 않는다
+  uniform vec3 uRip;      // 물결: 누른 자리(x, y: 0~1, y는 위쪽이 1)와 시작 시각(초). z가 0이면 없음
+  uniform float uNow;     // 지금 시각(초)
+  uniform float uRipBlur; // 물결 띠에서의 번짐 반경
+  uniform float uRipCA;   // 물결 띠에서의 색 갈라짐
   varying vec2 vUv;
   // 사선·격자 무늬가 없는 노이즈 (Hoskins hash). interleaved gradient noise는 사선 줄무늬가 보여 쓰지 않는다
   float ign(vec2 p) {
@@ -144,41 +150,67 @@ const POST_FRAG = /* glsl */ `
     return fract((p3.x + p3.y) * p3.z);
   }
   void main() {
+    // ── 물결 (lifestories.org와 같은 모양: 속도 0.56/초, 파장 약 0.31, 폭 0.25, 0.9/초로 잦아듦, 0.5초에 걸쳐 생겨남, 4.5초) ──
+    vec2 uv = vUv;
+    float rm = 0.0;
+    vec2 rdir = vec2(0.0);
+    if (uRip.z > 0.0) {
+      float age = uNow - uRip.z;
+      if (age >= 0.0 && age < 4.5) {
+        vec2 rd = (vUv - uRip.xy) * vec2(uAspect, 1.0);
+        float dist = length(rd);
+        float x = dist - age * 0.56;
+        float attack = smoothstep(0.0, 0.5, age);
+        float env = exp(-(x * x) / 0.0625) * exp(-age * 0.9) * attack;
+        if (dist > 0.0005) {
+          rdir = rd / dist / vec2(uAspect, 1.0);
+          uv += rdir * sin(x * 20.0) * env * 0.02;
+          rm = env;
+        }
+      }
+    }
     vec2 c = vUv - 0.5;
     float r2 = dot(c, c) * 4.0;          // 가운데 0 → 모서리 약 2
     float rr = sqrt(r2);
     float edge = smoothstep(0.6, 1.35, rr); // 번짐은 중심에서 더 멀리 떨어진 곳부터
-    vec2 off = c * uCA * r2;
+    vec2 off = c * uCA * r2 + rdir * uRipCA * rm;
     // 가장자리일수록 퍼지는 원형 번짐: R·B는 반대로 어긋난 중심에서, G는 제자리에서 모은다
-    float rad = uBlur * edge * edge;
+    float rad = max(uBlur * edge * edge, uRipBlur * rm);
     vec4 sr = vec4(0.0);
     vec4 sg = vec4(0.0);
     vec4 sb = vec4(0.0);
     // 점마다 나선을 무작위로 돌려 한 별이 여러 개의 점(눈송이 무늬)으로 갈라지지 않고 곱게 번지게 한다
     float rot = ign(gl_FragCoord.xy * 0.91 + 17.0) * 6.2831853;
-    for (int i = 0; i < 12; i++) {
-      float ang = float(i) * 2.39996 + rot;
-      float d = sqrt((float(i) + 0.5) / 12.0);
-      vec2 o = vec2(cos(ang), sin(ang) * uAspect) * d * rad;
-      sr += texture2D(uTex, vUv + off + o);
-      sg += texture2D(uTex, vUv + o * 0.8);
-      sb += texture2D(uTex, vUv - off + o * 1.15);
+    if (rad < 0.0006) {
+      // 번질 곳이 아니면 세 번만 읽는다 (화면 대부분이 여기라 비용이 크게 준다)
+      sr = texture2D(uTex, uv + off);
+      sg = texture2D(uTex, uv);
+      sb = texture2D(uTex, uv - off);
+    } else {
+      for (int i = 0; i < 12; i++) {
+        float ang = float(i) * 2.39996 + rot;
+        float d = sqrt((float(i) + 0.5) / 12.0);
+        vec2 o = vec2(cos(ang), sin(ang) * uAspect) * d * rad;
+        sr += texture2D(uTex, uv + off + o);
+        sg += texture2D(uTex, uv + o * 0.8);
+        sb += texture2D(uTex, uv - off + o * 1.15);
+      }
+      sr /= 12.0;
+      sg /= 12.0;
+      sb /= 12.0;
     }
-    sr /= 12.0;
-    sg /= 12.0;
-    sb /= 12.0;
-    vec3 col = vec3(sr.r, sg.g * (1.0 + 0.3 * edge * (1.0 - uLight)), sb.b);
-    // 어두운 테마: 별은 빛(더하기)이라 밝기가 곧 불투명도. 밝은 테마: 저장된 알파를 쓴다
-    float a = mix(max(col.r, max(col.g, col.b)), max(sr.a, max(sg.a, sb.a)), uLight);
+    vec3 col = vec3(sr.r, sg.g * (1.0 + 0.3 * edge), sb.b);
+    // 별은 빛(더하기)이라 밝기가 곧 불투명도
+    float a = max(col.r, max(col.g, col.b));
     float vr = smoothstep(0.0, 1.5, rr); // 0에서 기울기가 0이라 비네팅이 시작되는 경계선(등고선)이 생기지 않는다
-    float v = uVig * vr * vr * (1.0 - uLight);
+    float v = uVig * vr * vr;
     float n1 = ign(gl_FragCoord.xy + fract(uTime * 0.37) * 211.0) - 0.5;
     float n2 = ign(gl_FragCoord.yx * 1.31 + fract(uTime * 0.53) * 173.0) - 0.5;
-    float g = n1 * uGrain * (0.35 + 0.65 * edge) * (1.0 - uLight);
+    float g = n1 * uGrain * (0.35 + 0.65 * edge);
     vec3 n = vec3(g, g * 0.6 + n2 * uGrain * edge * 0.8, g);
     col = col * (1.0 - v) + max(n, 0.0) * 0.9;
     float outA = 1.0 - (1.0 - a) * (1.0 - v);
-    outA = max(outA, max(col.r, max(col.g, col.b)) * (1.0 - uLight));
+    outA = max(outA, max(col.r, max(col.g, col.b)));
     // 비네팅이 만드는 단계(밴딩)가 등고선처럼 보이지 않게 어둠 쪽 알파에 미세한 디더를 섞는다
     outA = clamp(outA + n1 * 0.11 * min(1.0, v * 10.0), 0.0, 1.0);
     gl_FragColor = vec4(col, outA);
@@ -324,7 +356,10 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
             uVig: { value: 0.3 },
             uGrain: { value: 0.03 },
             uTime: { value: 0 },
-            uLight: { value: 0 },
+            uRip: { value: new Vector3(0.5, 0.5, 0) },
+            uNow: { value: 0 },
+            uRipBlur: { value: 0.011 },
+            uRipCA: { value: 0.01 },
           },
         });
         const quad = new Mesh(new PlaneGeometry(2, 2), mat);
@@ -336,24 +371,16 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
     : null;
   let fx = 0;
 
-  function readTheme(): void {
+  function readColor(): void {
     const rgb = css('--particle').split(',').map((n) => Number(n.trim()));
     if (rgb.length === 3 && rgb.every((n) => !Number.isNaN(n))) material.uniforms.uColor.value = new Color(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
-    // 어두운 배경에서는 빛으로 더하고, 밝은 배경에서는 어두운 점으로 얹는다
-    const light = root.getAttribute('data-theme') === 'light';
-    material.blending = light ? NormalBlending : AdditiveBlending;
-    material.uniforms.uOpacity.value = light ? 0.7 : 0.95;
-    lineMaterial.blending = material.blending;
-    material.needsUpdate = true;
-    lineMaterial.needsUpdate = true;
-    if (post) post.mat.uniforms.uLight.value = light ? 1 : 0;
-    if (reduce.matches) render();
+    material.uniforms.uOpacity.value = 0.95;
   }
 
   function resize(): void {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
-    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const dpr = Math.min(devicePixelRatio || 1, post ? 1.5 : 2); // 후처리는 화면 전체를 여러 번 읽으므로 해상도 배율을 낮춘다
     renderer.setPixelRatio(dpr);
     renderer.setSize(w, h, false);
     material.uniforms.uDpr.value = dpr;
@@ -384,6 +411,7 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
     pu.uVig.value = 0.16 + 0.34 * fx;
     pu.uGrain.value = 0.03 + 0.07 * fx;
     pu.uTime.value = material.uniforms.uTime.value;
+    pu.uNow.value = performance.now() / 1000;
     renderer.setRenderTarget(post.target);
     renderer.render(scene, camera);
     renderer.setRenderTarget(null);
@@ -430,13 +458,18 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
   });
   addEventListener('resize', resize);
   reduce.addEventListener('change', () => reduce.matches && still());
-  new MutationObserver(readTheme).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
   resize();
-  readTheme();
+  readColor();
   if (reduce.matches) still();
   function setFx(amount: number): void {
     fx = Math.min(1, Math.max(0, amount));
   }
-  return { update, setFx };
+  /** 화면의 (x, y)(px, 뷰포트 기준)에서 물결을 일으킨다. post가 꺼져 있으면 아무 일도 없다 */
+  function ripple(x: number, y: number): void {
+    if (!post) return;
+    const r = canvas.getBoundingClientRect();
+    post.mat.uniforms.uRip.value.set((x - r.left) / Math.max(1, r.width), 1 - (y - r.top) / Math.max(1, r.height), performance.now() / 1000);
+  }
+  return { update, setFx, ripple };
 }

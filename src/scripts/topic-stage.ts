@@ -1,6 +1,8 @@
 // Knowledge 주제 장면의 지휘자 (lifestories.org/discover의 전환을 참고했다).
-// 태그를 누르면: ① 태그들이 바깥으로 흩어지며 사라지는 동안(약 0.6초) 별이 울렁이고 → ② 0.4초 동안 별만 남아 울렁이다가
-// ③ 새 태그들이 0.4배에서 점점 커지며 나타나 제 크기에서 멈춘다. 좌측 하단 칩은 전환 중 내려갔다가 새 경로로 다시 올라온다.
+// 태그를 누르면: ① 누른 자리에서 물결(ripple)이 퍼져 나가고 별이 서서히 빨라지며 화면이 살짝 확대됐다 돌아오는 동안(1초 남짓)
+// 태그들이 바깥으로 흩어지며 사라지고 → ② 잠깐 별만 남았다가 ③ 새 태그들이 0.4배에서 부드럽게 커지며 나타나 제 크기에서 멈춘다.
+// 모든 값은 갑자기 켜지지 않고 부드럽게 올랐다 내려간다(lifestories.org 분석: 물결은 0.5초에 걸쳐 생기고, 확대는 1초에 걸쳐 22% 지점에서 정점을 찍는다).
+// 좌측 하단 칩은 전환 중 내려갔다가 새 경로로 다시 올라온다.
 // 하위가 하나뿐이어도 건너뛰지 않고, 끝(글 목록)은 평범한 페이지 이동이다. 뒤로 가기·앞으로 가기도 같은 화면 안에서 처리한다.
 // 별은 scene.ts(메인과 같은 three.js 장면), 태그의 움직임·끌기는 topic-float.ts.
 import { startScene, type SceneHandle } from '@/scripts/scene';
@@ -24,7 +26,7 @@ if (space && dataEl?.textContent && list && chipsEl) {
   let busy = false;
 
   const EXIT_MS = 650; // 태그가 흩어져 사라지는 데 걸리는 시간(지연 포함)
-  const STARS_ONLY_MS = 400; // 별만 남아 울렁이는 시간
+  const STARS_ONLY_MS = 250; // 별만 남아 있는 시간(짧게 둬서 장면이 끊겨 보이지 않게 한다)
   const ENTER_MS = 1700; // 태그가 나타나 제 크기가 되기까지(지연 포함)
   const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
   const html = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
@@ -42,34 +44,43 @@ if (space && dataEl?.textContent && list && chipsEl) {
   }
   const field = createField(space);
   let clock = 0;
-  let burst = 0; // 전환 때 1에서 0으로 잦아든다: 별이 빨리 흘러오고 장면이 출렁인다
-  let wobbleAt = -1;
+  let motionAt = -1; // 전환이 시작된 시각(clock 기준). 음수면 전환 중이 아니다
+  const smooth = (x: number) => {
+    const u = Math.min(1, Math.max(0, x));
+    return u * u * (3 - 2 * u);
+  };
+  /** 별의 속도·후처리 세기: 0.45초에 걸쳐 부드럽게 올랐다가 천천히 가라앉는다 (갑자기 켜지지 않는다) */
+  const pulse = (t: number) => smooth(t / 0.45) * Math.exp(-Math.max(0, t - 0.45) * 1.7);
+  /** 화면 확대: 1초 동안 22% 지점에서 정점(+4%)을 찍고 돌아온다 (lifestories의 zoom punch와 같은 모양) */
+  const punch = (t: number) => {
+    const u = t / 1.0;
+    if (u <= 0 || u >= 1) return 0;
+    return smooth(u < 0.22 ? u / 0.22 : 1 - (u - 0.22) / 0.78);
+  };
 
   let last = performance.now();
   function frame(now: number) {
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
     clock += dt;
-    burst = Math.max(0, burst - dt / 1.5);
-    let ws = 1;
-    let wr = 0;
-    if (wobbleAt >= 0) {
-      const t = clock - wobbleAt;
-      const w = Math.exp(-2.4 * t) * Math.sin(2 * Math.PI * 1.7 * t);
-      ws = 1 + 0.045 * w;
-      wr = 1.1 * w;
-      if (t > 2.5) wobbleAt = -1;
+    let burst = 0;
+    let zoom = 1;
+    if (motionAt >= 0) {
+      const t = clock - motionAt;
+      burst = pulse(t);
+      zoom = 1 + 0.04 * punch(t);
+      if (t > 4) motionAt = -1;
     }
-    space!.style.setProperty('--wob-s', ws.toFixed(4));
-    space!.style.setProperty('--wob-r', `${wr.toFixed(3)}deg`);
+    space!.style.setProperty('--wob-s', zoom.toFixed(4));
     scene?.setFx(burst);
     scene?.update(0.35 + 8 * burst * burst, 0.14 * burst, dt, clock, 1);
     field.tick(dt);
     requestAnimationFrame(frame);
   }
-  const startMotion = () => {
-    burst = 1;
-    wobbleAt = clock;
+  /** 전환 시작: (x, y)는 누른 자리(뷰포트 px). 물결이 거기서 퍼진다 */
+  const startMotion = (x: number, y: number) => {
+    motionAt = clock;
+    scene?.ripple(x, y);
   };
 
   // ── 태그 ──
@@ -141,8 +152,10 @@ if (space && dataEl?.textContent && list && chipsEl) {
     }
   }
 
-  /** 다음 단계로 (push: 주소를 새로 쌓을지. 뒤로 가기에서는 false) */
-  async function goLevel(path: string, push: boolean) {
+  const center = (): [number, number] => [innerWidth / 2, innerHeight / 2];
+
+  /** 다음 단계로 (push: 주소를 새로 쌓을지. 뒤로 가기에서는 false, from: 물결이 시작될 자리) */
+  async function goLevel(path: string, push: boolean, from: [number, number] = center()) {
     if (busy) return;
     busy = true;
     chipsEl!.classList.remove('is-in');
@@ -152,7 +165,7 @@ if (space && dataEl?.textContent && list && chipsEl) {
       renderChips(path);
       chipsIn();
     } else {
-      startMotion();
+      startMotion(...from);
       scatter();
       space!.classList.add('is-exiting');
       await wait(EXIT_MS);
@@ -175,12 +188,12 @@ if (space && dataEl?.textContent && list && chipsEl) {
   }
 
   /** 끝(글 목록)이나 이 주제의 직접 글 목록은 평범한 페이지 이동 */
-  async function goPage(href: string) {
+  async function goPage(href: string, from: [number, number] = center()) {
     if (busy) return;
     busy = true;
     chipsEl!.classList.remove('is-in');
     if (!reduce) {
-      startMotion();
+      startMotion(...from);
       scatter();
       space!.classList.add('is-exiting');
       await wait(EXIT_MS);
@@ -194,8 +207,14 @@ if (space && dataEl?.textContent && list && chipsEl) {
     e.preventDefault();
     // 하위가 있으면(하나뿐이어도) 반드시 별 세계를 거쳐 들어가고, 하위가 없는 끝이나 직접 글 목록만 페이지로 간다
     const node = a.dataset.path ? findStage(tree, a.dataset.path) : null;
-    if (node && !node.leaf) return void goLevel(node.path, true);
-    void goPage(a.href);
+    const from: [number, number] = [e.clientX, e.clientY]; // 키보드로 누르면 (0, 0)이라 태그 가운데에서 시작한다
+    if (!from[0] && !from[1]) {
+      const r = a.getBoundingClientRect();
+      from[0] = r.x + r.width / 2;
+      from[1] = r.y + r.height / 2;
+    }
+    if (node && !node.leaf) return void goLevel(node.path, true, from);
+    void goPage(a.href, from);
   });
 
   // 칩의 ✕: 바로 위 단계로 (건너뛰지 않고 그 단계 그대로)
@@ -203,7 +222,8 @@ if (space && dataEl?.textContent && list && chipsEl) {
     const a = (e.target as Element).closest<HTMLAnchorElement>('a.chip');
     if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
-    void goLevel(pathOf(a.href), true);
+    const r = a.getBoundingClientRect();
+    void goLevel(pathOf(a.href), true, [r.x + r.width / 2, r.y + r.height / 2]);
   });
 
   // 뒤로·앞으로 가기: 장면 단계면 같은 화면 안에서, 글 목록 페이지면 새로 불러온다

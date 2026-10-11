@@ -67,15 +67,14 @@ personal-site/
    │     └─ [tag].astro
    │
    ├─ layouts/
-   │  ├─ BaseLayout.astro        ← <html>, <head>, 테마 초기화, header/footer, 본문 슬롯
+   │  ├─ BaseLayout.astro        ← <html>, <head>, header/footer, 본문 슬롯
    │  └─ ArticleLayout.astro     ← 글 상세 공통: 제목/메타/TOC/본문/Related/prev-next
    │
    ├─ components/
    │  ├─ layout/                 ← 사이트 뼈대
    │  │  ├─ Header.astro
    │  │  ├─ Footer.astro
-   │  │  ├─ Nav.astro
-   │  │  └─ ThemeToggle.astro
+   │  │  └─ Nav.astro
    │  ├─ content/                ← 콘텐츠 표시용 (데이터를 props로 받음)
    │  │  ├─ EntryRow.astro       ← 목록의 한 행 (날짜/제목/상태)
    │  │  ├─ EntryList.astro      ← EntryRow의 묶음
@@ -101,8 +100,6 @@ personal-site/
    │  └─ format.ts               ← 날짜 포맷 등
    │
    ├─ scripts/                   ← 브라우저에서 도는 아주 작은 스크립트
-   │  ├─ theme-init.js           ← 첫 페인트 전 실행(인라인)
-   │  ├─ theme-toggle.ts
    │  └─ mermaid-loader.ts       ← mermaid 블록이 있을 때만 지연 로드
    │
    └─ styles/
@@ -160,7 +157,7 @@ Section 계층     NowBlock, TopicTree, Timeline,     (페이지의 한 구역)
                  Related, TableOfContents
    ▼
 Atom 계층        EntryRow, TagList, ArticleMeta,    (더 이상 쪼개지지 않는 조각)
-                 ThemeToggle, Nav
+                 Nav
    ▼
 MDX 계층         Embed, Callout, Figure             (글 본문 안에서만 쓰임)
 ```
@@ -171,7 +168,7 @@ MDX 계층         Embed, Callout, Figure             (글 본문 안에서만 �
 
 | 컴포넌트 | 입력(props) | 하는 일 | 하지 않는 일 |
 |----------|------------|---------|-------------|
-| `BaseLayout` | `title`, `description` | head, 테마 초기화, 헤더/푸터, 본문 슬롯 | 콘텐츠 조회 |
+| `BaseLayout` | `title`, `description` | head, 헤더/푸터, 본문 슬롯 | 콘텐츠 조회 |
 | `ArticleLayout` | entry 메타, 헤딩 목록, backlinks | 제목/메타/TOC/본문/Related/이전·다음 배치 | 본문 렌더링 규칙 (prose.css 담당) |
 | `EntryRow` | `title`, `href`, `date`, `trailing`(상태·kind 텍스트) | 한 행 그리기 | 어떤 컬렉션인지 알기 |
 | `TopicTree` | topic 트리(노드 배열) | 2단계 트리 렌더링 | topic 경로 파싱 (`lib/topics.ts` 담당) |
@@ -179,7 +176,6 @@ MDX 계층         Embed, Callout, Figure             (글 본문 안에서만 �
 | `Related` | 관계 목록(`rel`, `type`, `title`, `href`) | `rel`별로 묶어 표시. 비면 렌더링하지 않음 | 관계 계산 |
 | `TableOfContents` | 헤딩 배열 | 목차 + 현재 섹션 강조 | |
 | `Embed` | `src`, `title`, `height`, `caption?` | iframe + 프레임 + 캡션 | 시각화 내용 |
-| `ThemeToggle` | 없음 | dark↔light 전환 (2026-10-10 이후, system 없음) | |
 
 ### 4.3 이름 규칙
 

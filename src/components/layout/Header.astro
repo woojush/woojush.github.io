@@ -1,9 +1,7 @@
 ---
-// 사이트 헤더: 이름(좌) + 테마 토글(우). 탭 바는 데스크톱에서 화면 위 가운데에 떠 있고(nav.css), 모바일에서는 이름 아래 한 줄이다.
-// DOM 순서가 곧 Tab 순서다: 이름 → [모바일 토글] → 메뉴 → [데스크톱 토글].
-// 두 토글 중 화면 폭에 맞는 하나만 보인다 (ThemeToggle.astro 참고).
+// 사이트 헤더: 이름(좌). 탭 바는 데스크톱에서 화면 위 가운데에 떠 있고(nav.css), 모바일에서는 이름 아래 한 줄이다.
+// DOM 순서가 곧 Tab 순서다: 이름 → 메뉴. 오른쪽은 비어 있다(테마 토글은 라이트 테마와 함께 없앴다).
 import Nav from './Nav.astro';
-import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
   name: string;
@@ -17,9 +15,7 @@ const { name, items, currentPath } = Astro.props;
 <header class="site-header">
   <div class="page header-inner">
     <a class="site-name" href="/">{name}</a>
-    <ThemeToggle placement="mobile" />
     <Nav items={items} currentPath={currentPath} />
-    <ThemeToggle placement="desktop" />
   </div>
 </header>
 
@@ -38,7 +34,7 @@ const { name, items, currentPath } = Astro.props;
     padding-block: var(--space-2);
   }
 
-  /* 이름을 왼쪽에 두고, 나머지(토글/메뉴)를 오른쪽으로 민다 */
+  /* 이름을 왼쪽에 두고, 나머지(메뉴)를 오른쪽으로 민다 */
   .site-name {
     display: inline-flex;
     align-items: center;

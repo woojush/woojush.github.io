@@ -4,7 +4,7 @@
 // 곡선은 intro-timeline.ts, 별 그리기는 scene.ts. 여기서는 시계·문구(CSS 변수)·상태 전환만 맡는다.
 //
 // 인트로를 할지는 HomeHero.astro의 인라인 스크립트가 첫 페인트 전에 정해 <html data-intro="play">를 붙인다
-// (움직임 줄이기 / 뒤로 가기 / 사이트 안에서 온 경우에는 붙지 않고 홈 화면이 바로 보인다).
+// (브라우저 세션에서 처음 들어왔을 때만 붙는다. 사이트 안에서 홈으로 돌아오거나 새로고침하거나 움직임 줄이기면 붙지 않고 홈 화면이 바로 보인다).
 import { startScene, type SceneHandle } from '@/scripts/scene';
 import { T_END, flySpeed, introFrame } from '@/scripts/intro-timeline';
 

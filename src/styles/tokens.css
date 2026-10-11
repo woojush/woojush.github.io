@@ -11,8 +11,7 @@
  * 포인트 색(--accent)은 링크, 포커스 링, 선택 영역, 현재 위치 표시에만 쓴다.
  * 상태(seed/growing/evergreen)는 색이 아니라 텍스트로 표시한다.
  *
- * 테마 2상태: dark(기본) / light. <html data-theme="dark|light">는 첫 페인트 전에 theme-init.js가 지정한다.
- * data-theme이 없으면(JS 꺼짐) dark로 보인다. 값은 한 곳(아래 두 블록)에만 있다.
+ * 테마는 dark 하나뿐이다(2026-10-11 사용자 지시로 라이트 테마를 없앴다). 방문자가 테마를 고를 수 없다.
  */
 :root {
   color-scheme: dark;
@@ -25,7 +24,7 @@
   --accent: #e0a96d;
   --code-bg: #1c1b19;
   --particle: 235, 231, 223; /* 메인 별가루 색 (rgb 채널) */
-  /* Knowledge 떠다니는 태그(lifestories 규격): 색 이름별 이름 칸 바탕, 글 수 칸, 좌측 하단 칩. 두 테마 모두 같은 값이다 */
+  /* Knowledge 떠다니는 태그(lifestories 규격): 색 이름별 이름 칸 바탕, 글 수 칸, 좌측 하단 칩.  */
   --tag-walnut: #6a4a30;
   --tag-moss: #304e45;
   --tag-slate: #1e425a;
@@ -40,21 +39,6 @@
   --tag-count-hover-text: #2f2f2d;
   --chip-bg: rgba(47, 47, 45, 0.8);
   --chip-text: #faf9f6;
-}
-
-:root[data-theme='light'] {
-  color-scheme: light;
-
-  --bg: #f3f3f1;
-  --surface: #e8e8e4;
-  --text: #1c1b19;
-  --text-muted: #65645f;
-  --rule: #d6d6d1;
-  --accent: #86561f;
-  --code-bg: #ebebe7;
-  --particle: 28, 27, 25;
-  --nav-pill-bg: rgba(110, 110, 110, 0.16);
-  --nav-dot: rgba(234, 234, 227, 0.7);
 }
 
 /* ───────── 서체 ───────── */

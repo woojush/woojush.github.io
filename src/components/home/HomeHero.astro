@@ -23,12 +23,18 @@ const words = title.flatMap((seg) =>
 ---
 
 {/* 인트로를 할지 첫 페인트 전에 정한다(홈 화면이 먼저 번쩍이지 않게). 반드시 인라인.
-    움직임 줄이기 설정일 때만 하지 않고(홈 화면이 바로 보인다), 그 밖에는 홈에 올 때마다 한다.
-    스크립트가 8초 안에 시작하지 않으면 홈 화면을 보여준다. */}
+    브라우저 세션(탭)에서 처음 들어왔을 때만 한다: 사이트 안에서 이름·허브로 홈에 돌아오거나 새로고침하면 홈 화면이 바로 보인다.
+    움직임 줄이기 설정이면 하지 않는다. 스크립트가 8초 안에 시작하지 않으면 홈 화면을 보여준다. */}
 <script is:inline>
   (() => {
     const root = document.documentElement;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    try {
+      if (sessionStorage.getItem('intro-seen') === '1') return;
+      sessionStorage.setItem('intro-seen', '1');
+    } catch {
+      // 저장소를 못 쓰면(사생활 보호 모드 등) 매번 한다
+    }
     root.dataset.intro = 'play';
     setTimeout(() => {
       if (root.dataset.intro === 'play' && !('introStarted' in root.dataset)) root.dataset.intro = 'done';

@@ -15,6 +15,7 @@
 - **Knowledge 구현됨** (2026-10-11): 목록은 topic 경로(`분야/세부분야[/더 세부…]`, 최대 5단계)에서 만든 단계별 화면(첫 화면=분야들이 글자와 글 수만 달고 천천히 떠다님 → 누르면 하위 주제가 떠다니는 화면 → … → 끝(하위 없음)에서 글 목록, 주소 `/knowledge/topics/<경로>/`, lifestories.org 참고, 사용자 지시), 글 페이지는 breadcrumb·수식(KaTeX)·코드(Shiki 두 테마)·우측 목차·Related(역링크 자동)·이전/다음. 이를 위해 Phase 2·3의 일부(읽기 환경, 트리, Related)를 Knowledge 한정으로 앞당겼다(사용자 승인). Projects·Writing 상세는 아직 최소 틀이고 `/tags/`·Mermaid·검색은 하지 않았다. 첫 공개 노트는 MML(Mathematics for Machine Learning) 2·3장 정리 17개(`ai/mathematics/linear-algebra` 6, `ai/mathematics/analytic-geometry` 11, 전부 `status: growing`, 2026-10-11)다. 구조는 `docs/01` §4.3, 작성법은 아래 §9.
 - **Knowledge 노션 연동 준비** (2026-10-11): 사용자가 노션에서 글을 쓰고 사이트가 가져오는 방식으로 간다(외부 서비스 의존 승인됨, MML만 먼저). 노션에 `Knowledge (woojush.github.io)` 페이지 아래 **Categories**(Name·Slug·Order·Color·Parent↔Children·Notes·Note count; 2026-10-11 사용자 지시로 카테고리 Description을 노션과 코드에서 모두 없앴다. Level·Path는 노션에서만 보기 편하게 계산되는 속성이라 동기화가 읽지 않는다)와 **Notes**(Name·Slug·Category↔Notes·Status·Order·Description·Tags·Publish·Prerequisites↔Required by) DB를 만들었고 예시 행만 있다. 기존 MML 노트 17개는 삭제했다(사용자가 노션으로 직접 옮긴다). **동기화 구현됨**(2026-10-11, 실제 Actions 실행으로 검증): GitHub **Actions → Sync Notion**이 **30분마다 자동으로(매시 11분·41분; 정각·30분은 GitHub가 예약 실행을 자주 건너뛰어 피했다)** 돌고(수동 Run workflow도 가능, 바뀐 내용이 없으면 빌드·배포 없이 끝남, 60일간 저장소 활동이 없으면 GitHub가 예약 실행을 멈춤) `scripts/notion-sync.mjs`(+`scripts/notion/{api,render}.mjs`, 의존성 없이 fetch)로 노션을 읽어 `src/content/knowledge/*.md`·`src/data/topics.yaml`·`public/images/knowledge/`·`public/labs/<slug>/`를 **통째로 다시 만들고**, check·build가 통과하면 main에 커밋한 뒤 deploy를 시작한다(실패하면 main은 그대로). 시크릿은 `NOTION_TOKEN`(읽기 전용 통합, DB ID는 스크립트 상단). **Knowledge 파일은 전부 생성물이므로 손으로 고치지 않는다**(노션에서 고친다). Publish 체크된 글만 올라가고, 노션 블록은 사이트 디자인으로 변환된다(토글→details, 콜아웃→`.callout`(prose.css), 수식→KaTeX, 이미지·HTML 파일→저장소로 내려받음). 지원하지 않는 블록은 경고 후 건너뛴다.
 - **Knowledge 장면 (lifestories.org/discover 기준, 2026-10-11, 사용자 지시)**: 별 장면(`scene.ts`)이 **화면 전체**(고정, 푸터 숨김)를 채우고 그 위로 태그가 떠다닌다. 태그는 **이름 칸(색, 둥근 3px)과 글 수 칸(짙은 회색)이 4px 떨어진** 작은 직사각이고 크기가 모두 같다. 마우스를 올리면 글 수 칸이 흰색이 되고 "Click to reveal notes about this topic"가 아래에 뜬다. 끌어서 화면을 옮길 수 있다(관성, 가장자리를 넘으면 반대편). 색은 `topics.yaml`의 `color`(walnut·moss·slate·clay·sand·plum·stone, 없으면 부모 색, 최상위는 stone, 값은 `tokens.css`의 `--tag-*`). 태그를 누르면 ① 태그들이 바깥으로 흩어지며 사라지는 동안(약 0.65초) **누른 자리에서 물결(ripple)이 퍼지고**(별이 일그러지고 그 띠에서 번지며 색이 갈라진다) 별이 서서히 빨라지며 별 층이 1초 동안 +4% 확대됐다 돌아오고 ② 0.25초 동안 별만 남았다가 ③ 새 태그들이 0.4배에서 부드럽게(처음 기울기 0) 커져 제 크기에서 멈춘다. 이 모양은 2026-10-11 lifestories 코드 분석에 맞췄다(물결 속도 0.56/초·진폭 0.02·0.5초에 걸쳐 생김·4.5초, 확대는 1초에 22% 지점이 정점인 smoothstep, 번짐 반경 15px·색 갈라짐 0.016). 값은 전부 갑자기 켜지지 않고 올랐다 내려간다("덜커덩" 방지). 좌측 하단 칩(`TopicChips.astro`): `Total: N`(그 주제 아래 글 수)과 지금까지 들어온 주제들의 칩, 칩의 ✕는 한 단계 위로 간다(전환 중에는 내려갔다가 다시 올라옴; 글 목록 페이지에서는 푸터를 z-index 0으로 내려 칩이 클릭을 받는다). **하위가 하나뿐이어도 건너뛰지 않는다**(사용자 지시: 하위가 있으면 반드시 별 세계를 거친다. 끝 단계만 글 목록 페이지로 간다). 하위와 직접 글이 같이 있으면 "Notes" 태그가 생기고 `/knowledge/topics/<경로>/_notes/`로 간다. 별 장면(`scene.ts`)은 2026-10-11에 바뀌었다: 별을 화면 전체에 고르게 뽑고(가장 먼 깊이의 화면 위치를 고르게, `p = s·DFAR/D0`) 개수 11000(좁은 화면 4500)·최소 2.4px·더 또렷하게, **홈과 Knowledge가 공유**한다. Knowledge만 `startScene(canvas,{post:true})`로 후처리(가장자리 색수차·원형 번짐(초록 기운)·비네팅·그레인, 비네팅 밴딩은 디더링으로 가림, lifestories 방식)를 켜고 `setFx(burst)`로 전환 때 세게 한다. 홈의 인트로·블랙홀 코드는 그대로다. 호버하면 복제본(`.tag-ghost`)이 원본 **뒤**에서 0.5rem 아래에서 시작해 1.8초 동안 천천히 올라와 0.125rem만 비치는 층으로 남는다(2026-10-11 사용자 지시로 낙차를 ¼로, 속도를 느리게). 후처리 해상도는 최대 배율 1.5로 제한했고 번질 곳이 아니면 3탭만 읽는다(비용 절감). 안내 문구(설명)는 전환 중 숨겨진 사이에 새 단계 것으로 바뀐다. 탭 바는 lifestories 실측에 맞춰 rem 값에 1.125(루트 18px 기준)를 곱했고(알약 293×45px, 배경 `rgba(25,25,25,.4)`, 글자 18px) 호버 너비만 한글 때문에 424px이다; 요소 구성(projects·about·knowledge·writing)은 그대로다. 못 한 것: 빈 곳을 눌러 한 단계 위로 가기(lifestories 기능), 실제 터치·실기기 확인.
+- **Writing 책장 구현됨** (2026-10-11, 사용자 지시): `/writing/`은 4층 책장(시·산문·에세이·책갈피 라벨, 글은 세로 제목 책등)이고 글 페이지는 Form마다 모양이 다른 조용한 읽기 화면이다. 구성·움직임은 `docs/07` "Writing: 책장", 층·책등 계산은 `src/lib/writing.ts`, 그리는 곳은 `components/writing/Bookcase.astro`와 `pages/writing/`. 노션 Writing DB → `src/content/writing/*.md`는 같은 **Sync Notion** 워크플로가 읽는다(`scripts/notion/writing.mjs`; 이미지는 `public/images/writing/<slug>/`). Writing DB를 못 읽으면 경고만 남기고 Writing 파일은 그대로 두며 Knowledge 동기화는 계속된다. 통합(integration)이 Writing DB에 연결돼 있어야 읽힌다. 기존 `technical`·`career`·`learning`·`reflection` kind와 샘플 글은 없앴다. 못 한 것: 실제 글로 본 확인(임시 글 15개로 PC·모바일 화면을 확인하고 지웠다), 네이버 글 이전.
 - GitHub·이메일·LinkedIn은 공개 확정, `site.ts`의 `links`에 추가했다(푸터와 About의 Elsewhere가 같이 쓴다).
 - 다음은 **하위 페이지별 디자인 설계** 단계(Projects·Writing)이고, 그 뒤에 **Phase 2·3의 남은 부분**(Projects·Writing 상세에 읽기 환경·Related 적용, `/tags/`)이다. 읽기 환경(`ArticleLayout`·prose·KaTeX)과 트리·Related는 Knowledge에서 이미 만들어 두었으니 재사용한다. 사용자 승인 전에는 넘어가지 않는다.
 - 사용자는 대부분의 기능·디자인을 Claude가 맥락과 취향을 반영해 먼저 결정하고, 결과물을 보고 사용자가 판단하는 방식을 원한다. 질문은 꼭 필요한 것만 한다.
@@ -113,7 +114,7 @@ Knowledge에서 추가됨: `src/layouts/ArticleLayout.astro`, `src/components/{k
 |--------|-----------|
 | knowledge | `topic`(필수, kebab 경로) `status`(필수: `seed` \| `growing` \| `evergreen`) `order`(선택, 같은 topic 안의 순서) |
 | projects | `summary`(필수) `status`(필수: `active`\|`paused`\|`done`\|`archived`) `period{start,end?}` `repo` `demo` `featured` |
-| writing | `kind`(필수: `technical`\|`essay`\|`career`\|`learning`\|`reflection`) |
+| writing | `kind`(필수: `poem`\|`prose`\|`essay`\|`bookmark` = 책장의 층 시·산문·에세이·책갈피) `source`(선택: 책갈피 출처 또는 원문 주소) |
 
 - `links`: `{ type: knowledge|project|writing, slug, rel?: related|prerequisite|builds-on|explains }`
 - **knowledge `status`는 색상 코드가 아니다.** 텍스트로만 표시한다.
@@ -159,9 +160,10 @@ Minimal · Technical · Editorial · Calm · Personal · Typography-driven · �
 3. 본문은 case study. 필요한 것만 (Overview / Problem / Motivation / Architecture / Implementation / What I learned / What failed / Future improvements). GitHub·Demo는 frontmatter에 쓴다.
 
 ### 새 Writing 추가
-1. `src/content/writing/<slug>.md` 생성
-2. 필수: `title`, `date`, `kind`. 본문 형식은 자유.
-- Knowledge = 배운 것, Writing = 내 생각. 판별 질문: "틀릴 수 있는 의견을 담고 있는가?" 그렇다면 Writing.
+Writing도 **노션이 원본**이다(`Site › Writing` DB, Publish 체크 + Slug + Form 필수). `src/content/writing/`은 동기화가 만드는 생성물이라 손으로 고치지 않는다.
+1. 노션 Writing DB에 행을 만들고 Form(시·산문·에세이·책갈피), Slug(영문 소문자-하이픈), Written(날짜)을 채운 뒤 Publish를 체크한다. Description·Tags·Source는 선택이다.
+2. 시는 줄마다 Enter, 연 구분은 빈 줄이다. 문단 안의 Shift+Enter 줄바꿈은 모든 Form에서 살아남는다.
+- Knowledge = 배운 것, Writing = 내 글(1인칭). 판별 질문: "글에서 '나'를 빼도 글이 남는가?" 남으면 Knowledge, 안 남으면 Writing.
 
 ### 글 사이 연결
 한쪽 frontmatter에 `links` 한 줄만 추가한다. 반대쪽 표시는 자동(Phase 3부터).
@@ -243,7 +245,7 @@ npm run preview      # 빌드 결과 미리보기
 - 2026-10-11 오작동 정리: 인트로 중 푸터 숨김 수정, Knowledge 전환은 시작 때 주소를 바꾸고 전환 중 뒤로·앞으로 가기는 끝난 뒤 처리, `404.astro` 추가, 외부 링크(`http`)는 `target=_blank rel=noopener noreferrer`. 노션 예시 행("(예시)")은 사용자 콘텐츠라 그대로 둔다.
 
 - `npm audit`가 high 3건을 보고한다: `http-cache-semantics`(astro의 의존성)의 max-stale 처리 취약점. 빌드 시점에만 쓰이고 정적 산출물에는 포함되지 않는다. `npm audit fix --force`는 astro 2.x로 **다운그레이드**하므로 쓰지 않는다. 패치된 버전이 나오면 Astro 업그레이드로 해결한다.
-- 샘플 콘텐츠(`sample-*`: project 1, writing 1)는 전부 `draft: true`인 검증용 임시 자료다(knowledge 샘플은 실제 노트가 생겨 삭제했고, 이 둘의 `links`는 실제 노트 `rank-nullity`를 가리킨다). 실제 글이 생기면 삭제한다.
+- 샘플 콘텐츠(`sample-*`: project 1)는 `draft: true`인 검증용 임시 자료다(knowledge·writing 샘플은 삭제했다). 실제 프로젝트가 생기면 삭제한다.
 
 ## 16. 디자인 스킬 사용 규칙
 

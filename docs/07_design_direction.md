@@ -78,3 +78,13 @@ lifestories.org/discover의 별(먼지) 장면을 기준으로 하되 코드는 
 - 한 줄 소개는 About의 `lead`, 짧은 설명은 `site.ts`의 `profile.summary`.
 - 사진은 사용자가 `public/images/profile.(jpg|jpeg|png|webp)`로 직접 올린 경우에만 보인다(`src/lib/profile.ts`). 4:5 세로, 120×150px, 얇은 선만 두른다.
 - 코드: `src/components/home/{HomeProfile,HomeNow,HomeList}.astro`, 조회는 `src/lib/content.ts`의 `getNow`·`getActiveProjects`·`getRecentPosts`.
+
+## Writing: 책장 (2026-10-11 사용자 지시)
+
+Knowledge가 별 장면 속을 떠다니며 고르는 **탐색형**이라면, Writing은 책장 앞에 서서 훑는 **서가형**이다. 별 장면·떠다님은 없다.
+
+- **구성:** 4층 책장(윗널·옆널은 `--tag-walnut`, 안쪽 면은 `--surface`). 층마다 라벨(이름 칸 `시`·`산문`·`에세이`·`책갈피` + 글 수 칸 + 작은 영어 부제)이 붙고, 글이 없는 층은 그리지 않는다. 글이 하나도 없으면 책장도 그리지 않는다(빈 상태는 숨긴다).
+- **책등:** 글 1편 = 책등 1개. 제목은 세로쓰기이고 길면 칸이 늘어난다(최대 4칸). 크기와 색은 slug 해시로 정해 늘 같은 모양이다(`src/lib/writing.ts`). 색은 기존 태그 색(moss·slate·plum·stone·sand·clay)만 쓰고 새 색을 만들지 않았다. 최신 글이 왼쪽이고, 한 층이 넘치면 다음 줄에 널빤지가 한 장 더 깔린다.
+- **움직임(승인된 예외):** 책등에 마우스를 올리면(키보드 포커스 포함) 0.5rem 올라오고 약간 밝아지며(140ms), 그 층 오른쪽 위에 제목·날짜·한 줄 설명이 뜬다. 이 효과만 있다. 터치 화면에서는 미리보기 없이 누르면 바로 글로 간다.
+- **널빤지:** 줄마다 반복해서 깔기 위해 하드 스톱 `linear-gradient`로 단색 띠를 그린다(그라디언트 효과가 아니다).
+- **글 페이지:** 조용한 읽기 화면. breadcrumb(`Writing / 시`) → 제목·날짜 → 본문 → 출처 → 같은 층의 `Newer`/`Older` → 책장으로 돌아가기. 시는 줄과 연을 그대로(폭 28rem, 줄간격 2), 산문은 좁고 느슨하게(33rem), 에세이는 일반 폭, 책갈피는 인용문을 크게(`--fs-l`). 목차·Related·수식 같은 Knowledge용 요소는 쓰지 않는다.

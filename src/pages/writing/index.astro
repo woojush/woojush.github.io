@@ -1,19 +1,15 @@
 ---
+// WRITING 첫 화면: 책장. 층마다 시·산문·에세이·책갈피 라벨이 붙고 글이 책등으로 꽂혀 있다 (lib/writing.ts, components/writing/Bookcase.astro).
+// 글이 없는 층은 그리지 않고, 글이 하나도 없으면 책장도 그리지 않는다.
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Bookcase from '@/components/writing/Bookcase.astro';
 import { getEntries } from '@/lib/content';
+import { buildShelves } from '@/lib/writing';
 
-const entries = await getEntries('writing');
+const shelves = buildShelves(await getEntries('writing'));
 ---
 
-<BaseLayout title="Writing">
+<BaseLayout title="Writing" description="시, 산문, 에세이, 책갈피를 층마다 꽂아 둔 책장">
   <h1>Writing</h1>
-  {entries.length > 0 && (
-    <ul>
-      {entries.map((entry) => (
-        <li>
-          <a href={`/writing/${entry.id}/`}>{entry.data.title}</a>
-        </li>
-      ))}
-    </ul>
-  )}
+  <Bookcase shelves={shelves} />
 </BaseLayout>

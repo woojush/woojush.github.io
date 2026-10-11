@@ -1,9 +1,14 @@
 ---
+// 글 한 편(시·산문·에세이·책갈피). 읽는 데만 집중하는 조용한 화면: 층 이름(breadcrumb) → 제목·날짜 → 본문 → 출처 → 같은 층의 이웃 글.
+// 본문 모양은 Form마다 다르다 — 시는 줄과 연을 그대로, 산문은 좁고 느슨하게, 에세이는 일반 글 폭, 책갈피는 인용문을 크게.
+// URL은 파일명(entry.id)에서만 만들어진다. kind는 URL에 쓰지 않는다 (CLAUDE.md §3-2).
 import { render } from 'astro:content';
+import '@/styles/prose.css';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getEntries } from '@/lib/content';
+import { formatDate } from '@/lib/format';
+import { isUrl, neighborsOnShelf, pieceHref, shelfHref, shelfOf } from '@/lib/writing';
 
-// URL은 파일명(entry.id)에서만 만들어진다. topic 등 metadata는 URL에 쓰지 않는다.
 export async function getStaticPaths() {
   const entries = await getEntries('writing');
   return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
@@ -11,9 +16,227 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+const { kind, source } = entry.data;
+const shelf = shelfOf(kind);
+const { newer, older } = neighborsOnShelf(await getEntries('writing'), entry);
+const toItem = (n: typeof entry | undefined) => (n ? { href: pieceHref(n), title: n.data.title } : undefined);
+const nav = { newer: toItem(newer), older: toItem(older) };
 ---
 
 <BaseLayout title={entry.data.title} description={entry.data.description} lang={entry.data.lang}>
-  <h1>{entry.data.title}</h1>
-  <Content />
+  <article class="piece" data-kind={kind}>
+    <header class="head">
+      <nav class="crumbs" aria-label="Shelf">
+        <a href="/writing/">Writing</a>
+        <span aria-hidden="true">/</span>
+        <a href={shelfHref(kind)}>{shelf.label}</a>
+      </nav>
+      <h1>{entry.data.title}</h1>
+      <p class="meta">
+        <time datetime={entry.data.date.toISOString().slice(0, 10)}>{formatDate(entry.data.date)}</time>
+        {entry.data.tags.length > 0 && <span>{entry.data.tags.map((t) => `#${t}`).join(' ')}</span>}
+      </p>
+    </header>
+
+    <div class="prose body">
+      <Content />
+    </div>
+
+    {
+      source && (
+        <p class="source">
+          {isUrl(source) ? (
+            <a href={source} target="_blank" rel="noopener noreferrer">
+              Original
+            </a>
+          ) : (
+            <span>{source}</span>
+          )}
+        </p>
+      )
+    }
+
+    <nav class="shelf-nav" aria-label={`${shelf.label}, 같은 층`}>
+      {
+        nav.newer ? (
+          <a class="newer" href={nav.newer.href} rel="prev">
+            <span class="dir">Newer</span>
+            <span class="title">{nav.newer.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        nav.older && (
+          <a class="older" href={nav.older.href} rel="next">
+            <span class="dir">Older</span>
+            <span class="title">{nav.older.title}</span>
+          </a>
+        )
+      }
+    </nav>
+    <p class="back"><a href={shelfHref(kind)}>← {shelf.label} {shelf.en}</a></p>
+  </article>
 </BaseLayout>
+
+<style>
+  .head {
+    margin-bottom: var(--space-6);
+  }
+
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-2);
+    margin-bottom: var(--space-3);
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  .crumbs a {
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .crumbs a:hover {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  h1 {
+    margin-bottom: var(--space-3);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-4);
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  /* ───────── 본문: Form마다 폭과 숨결이 다르다 ───────── */
+  .body {
+    max-width: var(--measure);
+  }
+
+  .body :global(p) {
+    max-width: none;
+  }
+
+  /* 시: 줄바꿈과 연을 그대로 두고, 줄 사이를 넉넉히 */
+  [data-kind='poem'] .body {
+    max-width: 28rem;
+    font-size: var(--fs-m);
+    line-height: 2;
+  }
+
+  [data-kind='poem'] .body :global(p) {
+    margin-bottom: 2.25em;
+  }
+
+  /* 산문: 좁은 폭, 느슨한 줄 */
+  [data-kind='prose'] .body {
+    max-width: 33rem;
+    line-height: 2;
+  }
+
+  [data-kind='prose'] .body :global(p) {
+    margin-bottom: 1.6em;
+  }
+
+  [data-kind='essay'] .body {
+    line-height: 1.9;
+  }
+
+  /* 책갈피: 인용문이 주인공 */
+  [data-kind='bookmark'] .body {
+    max-width: 34rem;
+    font-size: var(--fs-l);
+    line-height: 1.7;
+  }
+
+  [data-kind='bookmark'] .body :global(blockquote) {
+    max-width: none;
+    padding-left: 0;
+    border-left: 0;
+    color: var(--text);
+  }
+
+  /* ───────── 출처 · 이웃 글 · 돌아가기 ───────── */
+  .source {
+    margin: var(--space-6) 0 0;
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  .source::before {
+    content: '— ';
+  }
+
+  .shelf-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-top: var(--space-7);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rule);
+  }
+
+  .shelf-nav a {
+    display: block;
+    min-height: var(--tap);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .older {
+    text-align: right;
+  }
+
+  .dir {
+    display: block;
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  .shelf-nav a:hover .title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .back {
+    margin: var(--space-5) 0 0;
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  .back a {
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .back a:hover {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  @media (max-width: 480px) {
+    .shelf-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .older {
+      text-align: left;
+    }
+  }
+</style>

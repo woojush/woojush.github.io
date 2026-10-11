@@ -1,5 +1,5 @@
 // Notion 블록 → 사이트의 Markdown/MDX. 사이트 디자인으로 다시 그리기 위한 변환기다.
-// ctx: { slug, idToSlug: Map<pageId, slug>, warn(msg), downloads: {url, dest}[] }
+// ctx: { slug, idToSlug: Map<pageId, slug>, warn(msg), downloads: {url, dest}[], area?: 'knowledge'(기본) | 'writing', labs?: false 면 HTML 파일 임베드를 쓰지 않는다 }
 
 const stripId = (id) => id.replaceAll('-', '');
 
@@ -108,16 +108,17 @@ function renderBlock(b, ctx) {
     case 'image': {
       const url = fileUrl(d);
       const name = `${hashName(b)}.${extOf(url, 'png')}`;
-      ctx.downloads.push({ url, dest: `public/images/knowledge/${ctx.slug}/${name}` });
+      const area = ctx.area ?? 'knowledge';
+      ctx.downloads.push({ url, dest: `public/images/${area}/${ctx.slug}/${name}` });
       const alt = richText(d.caption, ctx, { plain: true }).replace(/[\[\]]/g, '');
-      return [`![${alt}](/images/knowledge/${ctx.slug}/${name})`];
+      return [`![${alt}](/images/${area}/${ctx.slug}/${name})`];
     }
     case 'file':
     case 'embed':
     case 'pdf': {
       const url = b.type === 'embed' ? d.url : fileUrl(d);
       const name = d.name ?? '';
-      if (b.type === 'file' && /\.html?$/i.test(name || new URL(url).pathname)) {
+      if (ctx.labs !== false && b.type === 'file' && /\.html?$/i.test(name || new URL(url).pathname)) {
         const file = `${hashName(b)}.html`;
         ctx.downloads.push({ url, dest: `public/labs/${ctx.slug}/${file}` });
         const title = richText(d.caption, ctx, { plain: true }) || name.replace(/\.html?$/i, '') || ctx.slug;

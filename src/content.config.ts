@@ -78,7 +78,10 @@ const writing = defineCollection({
   loader: glob({ pattern: contentPattern, base: './src/content/writing' }),
   schema: z.object({
     ...common,
-    kind: z.enum(['technical', 'essay', 'career', 'learning', 'reflection']),
+    // 책장의 층(시·산문·에세이·책갈피). 노션 Writing DB의 Form에서 온다 (docs/02 3.3)
+    kind: z.enum(['poem', 'prose', 'essay', 'bookmark']),
+    // 책갈피의 인용 출처, 또는 원문(블로그 등) 주소. http로 시작하면 링크로 그린다
+    source: z.string().optional(),
   }),
 });
 

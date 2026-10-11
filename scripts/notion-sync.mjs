@@ -1,15 +1,16 @@
-// 노션 Categories·Notes DB → src/content/knowledge/*.md, src/data/topics.yaml, public/images|labs.
+// 노션 Categories·Notes DB → src/content/knowledge/*.md, src/data/topics.yaml, public/images|labs. Writing DB → src/content/writing/*.md (scripts/notion/writing.mjs).
 // 실행: NOTION_TOKEN=... node scripts/notion-sync.mjs   (GitHub Actions의 "Sync Notion" 워크플로가 호출한다)
 // 노션 쪽을 못 읽으면 아무 파일도 건드리지 않고 실패한다. Knowledge는 전부 이 스크립트가 만든다(손으로 쓴 노트는 지워진다).
 import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { createApi } from './notion/api.mjs';
 import { renderNote } from './notion/render.mjs';
+import { KEBAB, kstDate, rel, text, yamlStr } from './notion/util.mjs';
+import { readWriting } from './notion/writing.mjs';
 
 const CATEGORIES_DB = '166b9336-ea3d-4110-8a58-9275fae88f35';
 const NOTES_DB = 'be04da52-a2f1-4422-bf11-b350b6ee880a';
 const HUES = new Set(['walnut', 'moss', 'slate', 'clay', 'sand', 'plum', 'stone']);
-const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const MAX_DEPTH = 5;
 
 const token = process.env.NOTION_TOKEN;
@@ -23,12 +24,6 @@ const warn = (msg) => {
   warnings.push(msg);
   console.warn(`::warning::${msg}`);
 };
-
-// ── 속성 읽기 ──
-const text = (p) => (p?.rich_text ?? p?.title ?? []).map((t) => t.plain_text).join('').trim();
-const rel = (p) => (p?.relation ?? []).map((r) => r.id.replaceAll('-', ''));
-const kstDate = (iso) => new Date(new Date(iso).getTime() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-const yamlStr = (s) => JSON.stringify(s);
 
 // ── 카테고리 트리 ──
 const catRows = await api.queryAll(CATEGORIES_DB);
@@ -128,6 +123,12 @@ const topicsYaml = [
   '',
 ].join('\n');
 
+// ── Writing (책장). 읽지 못하면 Writing 파일만 그대로 두고 경고한다 — Knowledge 동기화는 계속된다 ──
+const writing = await readWriting({ api, warn }).catch((e) => {
+  warn(`Writing DB를 읽지 못해 Writing은 건드리지 않습니다: ${e.message.slice(0, 200)}`);
+  return null;
+});
+
 // ── 여기까지 노션을 다 읽었다. 이제 파일을 바꾼다 ──
 const wipe = async (dir) => {
   for (const f of await readdir(dir).catch(() => [])) if (f !== '.gitkeep') await rm(`${dir}/${f}`, { recursive: true, force: true });
@@ -142,6 +143,12 @@ const write = async (file, content) => {
 };
 for (const o of outputs) await write(o.file, o.content);
 await write('src/data/topics.yaml', topicsYaml);
+if (writing) {
+  await wipe('src/content/writing');
+  await wipe('public/images/writing');
+  for (const o of writing.outputs) await write(o.file, o.content);
+  downloads.push(...writing.downloads);
+}
 
 // 노션의 파일 주소는 한 시간쯤 뒤 만료되므로 지금 저장소로 내려받는다
 for (const d of downloads) {
@@ -153,4 +160,4 @@ for (const d of downloads) {
   await write(d.dest, Buffer.from(await res.arrayBuffer()));
 }
 
-console.log(`카테고리 ${cats.size}개, 글 ${notes.length}편, 파일 ${downloads.length}개, 경고 ${warnings.length}건`);
+console.log(`카테고리 ${cats.size}개, 글 ${notes.length}편, Writing ${writing ? writing.outputs.length + '편' : '건너뜀'}, 파일 ${downloads.length}개, 경고 ${warnings.length}건`);

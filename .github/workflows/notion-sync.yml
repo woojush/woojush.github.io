@@ -1,6 +1,6 @@
 name: Sync Notion
 
-# 노션 Categories·Notes DB를 읽어 Knowledge 글을 만들고, 빌드가 통과하면 main에 커밋한 뒤 배포를 시작한다.
+# 노션 Categories·Notes·Writing DB를 읽어 Knowledge·Writing 글을 만들고, 빌드가 통과하면 main에 커밋한 뒤 배포를 시작한다.
 # 30분마다(매시 11분·41분) 자동으로 실행되고, Actions 탭 → "Sync Notion" → Run workflow 로 바로 실행할 수도 있다.
 # 필요한 비밀값: NOTION_TOKEN (Settings → Secrets → Actions)
 # 바뀐 내용이 없으면 빌드·커밋·배포 없이 끝난다. 주의: GitHub는 저장소에 60일 동안 활동이 없으면 예약 실행을 멈춘다(커밋이 생기면 다시 켜진다).
@@ -64,7 +64,7 @@ jobs:
           git add -A
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Knowledge: 노션 동기화"
+          git commit -m "Notion: 동기화"
           git push origin HEAD:main
           # GITHUB_TOKEN으로 push하면 deploy 워크플로가 자동으로 시작되지 않으므로 직접 시작한다
           gh workflow run deploy.yml --ref main

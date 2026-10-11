@@ -1,0 +1,235 @@
+---
+// Writing의 책장: 층마다 Form(시·산문·에세이·책갈피) 라벨이 붙고, 그 층에 글이 책등으로 꽂혀 있다. 글이 없는 층은 그리지 않는다.
+// 책등을 누르면 글로 간다. 마우스를 올리면(키보드 포커스도) 책이 살짝 올라오고 그 층 오른쪽 위에 제목·날짜·한 줄 설명이 뜬다.
+// 층 구성·책등 크기와 색은 lib/writing.ts가 정하고, 여기는 그리기만 한다. 색은 기존 태그 색 토큰만 쓴다.
+import type { Shelf } from '@/lib/writing';
+
+interface Props {
+  shelves: Shelf[];
+}
+
+const { shelves } = Astro.props;
+---
+
+{
+  shelves.length > 0 && (
+    <div class="case">
+      {shelves.map((shelf) => (
+        <section class="tier" id={shelf.id} aria-labelledby={`${shelf.id}-label`} style={`--row-h:${shelf.rowH}rem`}>
+          <header class="tier-head">
+            <h2 id={`${shelf.id}-label`}>
+              <span class="name">{shelf.label}</span>
+              <span class="count">{shelf.books.length}</span>
+            </h2>
+            <span class="en">{shelf.en}</span>
+          </header>
+          <ul class="row">
+            {shelf.books.map((book) => (
+              <li>
+                <a
+                  class="spine"
+                  href={book.href}
+                  aria-label={`${book.title}, ${book.when}`}
+                  style={`--w:${book.width}rem;--h:${book.height}rem;--cols:${book.cols};--spine:var(--tag-${book.hue})`}
+                >
+                  <span class="spine-title">{book.title}</span>
+                </a>
+                <span class="peek" aria-hidden="true">
+                  <strong>{book.title}</strong>
+                  <time>{book.when}</time>
+                  {book.description && <span class="peek-desc">{book.description}</span>}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  /* 책장 본체: 한 단계 올라온 면 + 월넛 테두리(윗널·옆널). 아랫널은 마지막 층의 널빤지가 맡는다 */
+  .case {
+    --board-h: 0.5rem;
+    background: var(--surface);
+    border: var(--board-h) solid var(--tag-walnut);
+    border-bottom: 0;
+  }
+
+  .tier {
+    position: relative; /* 책등을 가리키는 .peek이 이 층의 오른쪽 위에 앉는다 */
+    padding-top: var(--space-4);
+  }
+
+  /* 층 라벨: Knowledge 태그와 같은 말씨 — 이름 칸(월넛)과 글 수 칸이 4px 떨어져 있다 */
+  .tier-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    padding-inline: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  h2 {
+    display: flex;
+    gap: var(--space-1);
+    margin: 0;
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  .name,
+  .count {
+    padding: 0.15rem var(--space-3);
+    border-radius: 3px;
+    color: var(--tag-text);
+  }
+
+  .name {
+    background: var(--tag-walnut);
+    font-weight: var(--fw-strong);
+  }
+
+  .count {
+    background: var(--tag-count-bg);
+    min-width: 2.25rem;
+    text-align: center;
+  }
+
+  .en {
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  /* 한 층: 책등이 바닥(널빤지)에 서 있고, 넘치면 다음 줄에 같은 널빤지가 한 장 더 깔린다.
+     널빤지는 단색 띠다(그라디언트 효과가 아니라 줄마다 반복하려고 쓴 하드 스톱). */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    column-gap: 0.3rem;
+    max-width: none; /* main의 ul 폭 제한(680px)을 풀어 널빤지가 책장 끝까지 간다 */
+    margin: 0;
+    padding: 0 var(--space-4);
+    list-style: none;
+    background: linear-gradient(
+        to bottom,
+        transparent calc(100% - var(--board-h)),
+        var(--tag-walnut) calc(100% - var(--board-h))
+      )
+      0 0 / 100% calc(var(--row-h, 13rem) + var(--board-h)) repeat-y;
+  }
+
+  .row > li {
+    display: flex;
+    align-items: flex-end;
+    height: var(--row-h, 13rem);
+    margin: 0 0 var(--board-h);
+  }
+
+  .spine {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--w);
+    height: var(--h);
+    background: var(--spine);
+    border-radius: 3px 3px 0 0;
+    color: var(--tag-text);
+    text-decoration: none;
+    transform-origin: bottom;
+    transition:
+      transform var(--duration) var(--ease-out),
+      filter var(--duration) var(--ease);
+  }
+
+  /* 책등의 제본 띠 두 줄 (위·아래) */
+  .spine::before,
+  .spine::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    border-top: 1px solid color-mix(in srgb, var(--tag-text) 26%, transparent);
+  }
+
+  .spine::before {
+    top: 0.7rem;
+  }
+
+  .spine::after {
+    bottom: 0.7rem;
+  }
+
+  /* 제목은 세로쓰기. 길면 줄(칸)이 늘어나고, 칸 수를 넘으면 잘린다 */
+  .spine-title {
+    writing-mode: vertical-rl;
+    height: calc(var(--h) - 2.5rem);
+    max-width: calc(var(--cols) * 1.35rem);
+    overflow: hidden;
+    font-size: var(--fs-s);
+    line-height: 1.35rem;
+    letter-spacing: 0.04em;
+    word-break: break-all;
+    text-align: start;
+  }
+
+  .spine:hover,
+  .spine:focus-visible {
+    transform: translateY(-0.5rem);
+    filter: brightness(1.18);
+  }
+
+  /* 층 오른쪽 위에 뜨는 미리보기. 마우스가 없는 화면에서는 쓰지 않는다 */
+  .peek {
+    display: none;
+  }
+
+  @media (hover: hover) and (min-width: 641px) {
+    .peek {
+      position: absolute;
+      top: var(--space-4);
+      right: var(--space-4);
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-3);
+      max-width: calc(100% - 15rem);
+      overflow: hidden;
+      color: var(--text-muted);
+      font-size: var(--fs-s);
+      line-height: var(--lh-s);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--duration) var(--ease);
+    }
+
+    .peek strong {
+      flex: none;
+      max-width: 18rem;
+      overflow: hidden;
+      color: var(--text);
+      font-weight: var(--fw-strong);
+      text-overflow: ellipsis;
+    }
+
+    .peek-desc {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .spine:hover + .peek,
+    .spine:focus-visible + .peek {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .tier-head,
+    .row {
+      padding-inline: var(--space-3);
+    }
+  }
+</style>

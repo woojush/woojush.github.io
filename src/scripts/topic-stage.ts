@@ -24,6 +24,7 @@ if (space && dataEl?.textContent && list && chipsEl) {
   const siteName = document.title.split(' — ').at(-1) ?? '';
   let current = space.dataset.path ?? '';
   let busy = false;
+  let queued: string | null = null; // 전환 중에 뒤로·앞으로 가기를 누르면 끝난 뒤에 이 단계로 간다
 
   const EXIT_MS = 650; // 태그가 흩어져 사라지는 데 걸리는 시간(지연 포함)
   const STARS_ONLY_MS = 250; // 별만 남아 있는 시간(짧게 둬서 장면이 끊겨 보이지 않게 한다)
@@ -158,6 +159,8 @@ if (space && dataEl?.textContent && list && chipsEl) {
   async function goLevel(path: string, push: boolean, from: [number, number] = center()) {
     if (busy) return;
     busy = true;
+    // 주소는 전환이 시작될 때 바로 바꾼다(끝에서 바꾸면 전환 중 뒤로 가기와 꼬인다)
+    if (push) history.pushState(null, '', hrefOf(path));
     chipsEl!.classList.remove('is-in');
     if (reduce) {
       place(path);
@@ -182,9 +185,13 @@ if (space && dataEl?.textContent && list && chipsEl) {
       await wait(ENTER_MS);
       space!.classList.remove('is-entering');
     }
-    if (push) history.pushState(null, '', hrefOf(path));
     current = path;
     busy = false;
+    if (queued !== null) {
+      const next = queued;
+      queued = null;
+      if (next !== current) void goLevel(next, false);
+    }
   }
 
   /** 끝(글 목록)이나 이 주제의 직접 글 목록은 평범한 페이지 이동 */
@@ -230,6 +237,11 @@ if (space && dataEl?.textContent && list && chipsEl) {
   addEventListener('popstate', () => {
     const path = pathOf(location.href);
     const node = findStage(tree, path);
+    if (busy) {
+      if (path && (!node || node.leaf || location.pathname.includes('/_notes/'))) return location.reload();
+      queued = path;
+      return;
+    }
     if (path === current) return;
     if (path && (!node || node.leaf || location.pathname.includes('/_notes/'))) return location.reload();
     void goLevel(path, false);

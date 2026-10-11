@@ -17,7 +17,7 @@ const year = new Date().getFullYear();
           <ul class="footer-links">
             {links.map((link) => (
               <li>
-                <a class="footer-link" href={link.href}>
+                <a class="footer-link" href={link.href} {...(/^https?:/.test(link.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
                   {link.label}
                 </a>
               </li>

@@ -119,12 +119,12 @@ export function flySpeed(rate: number): number {
 // ───────── 홈에서 Knowledge로 (흰 세계 → 별 세계) ─────────
 //
 // 두 막이다. ① 홈에서(exitFrame, 0.55초): 요약정리가 흰 바탕 위에서 가운데로 가라앉으며 사라지고 곧바로 Knowledge로 이동한다(흰 바탕은 그대로).
-// ② Knowledge에서(arriveFrame, 약 3.05초): 흰 화면으로 시작해, 흰 빛이 가운데부터 구름처럼 걷히며 그 속에서 별이 드러난다.
+// ② Knowledge에서(arriveFrame, 약 2.85초): 흰 화면으로 시작해, 흰 빛이 가운데부터 구름처럼 걷히며 그 속에서 별이 드러난다.
 // 별은 줄(꼬리)로 길게 늘어난 빠른 비행에서 시작해 평소 속도로 잦아들고, 걷힐 때쯤 태그가 피어난다. 효과가 도착한 쪽에서 돌기 때문에 이동을 기다리는 시간이 없고
 // 마지막 장면이 Knowledge의 별 장면 자체라서 이어붙인 자국이 없다.
 export const EXIT_SECONDS = 0.55;
 export const ARRIVE_HOLD = 0; // 도착하자마자 걷히기 시작한다(2026-10-11 사용자 지시: 흰 화면을 0.7초 덜 보이게)
-export const ARRIVE_SECONDS = 3.05; // 흰 빛이 걷히는 데 걸리는 시간
+export const ARRIVE_SECONDS = 2.85; // 흰 빛이 걷히는 데 걸리는 시간
 export const ARRIVE_BLOOM_AT = 0.45; // 걷힘의 이 비율에서 태그가 피어나기 시작한다
 export const EXIT_CRUISE = 0.35; // Knowledge 장면(topic-stage.ts)의 평소 비행 속도. 여기서 끊김 없이 이어진다
 const ARRIVE_SPEED = 9; // 걷히기 시작할 때 별의 추가 속도(깊이 단위/초)

@@ -1,7 +1,9 @@
 ---
-// 메인(/)의 인트로: 배경 별가루 + 점점 커지는 큰 문구 (한 번만, docs/07). 끝나면 어두운 배경 속으로 사라지고 홈 화면이 나타난다.
+// 메인(/)의 인트로: 배경 별가루 + 점점 커지는 큰 문구 (한 번만, docs/07). 끝에서 가운데의 빛이 흰 세계로 커져 화면을 덮고 요약정리 화면이 나타난다.
+// 같은 층(별·흰 세계)이 홈에서 Knowledge로 나갈 때의 탈출 효과(src/scripts/home-exit.ts)에도 쓰인다.
 // 문구는 data/site.ts의 hero를 받아 그리기만 한다. 확대 곡선과 상태 전환은 src/scripts/home-intro.ts,
-// 배경(별 입자 장면)은 src/scripts/scene.ts. 여기서는 모양만 정하고 확대(--zoom)·사라짐(--hero-fade)은 그 스크립트가 CSS 변수로 넣는다.
+// 배경(별 입자 장면)은 src/scripts/scene.ts. 여기서는 모양만 정하고 확대(--zoom)·사라짐(--hero-fade)·흰 세계 크기(--world)는 스크립트가 CSS 변수로 넣는다.
+// 인트로를 할지는 index.astro의 <head> 인라인 스크립트가 첫 페인트 전에 정한다.
 interface Segment {
   text: string;
   strong?: boolean;
@@ -22,29 +24,9 @@ const words = title.flatMap((seg) =>
 );
 ---
 
-{/* 인트로를 할지 첫 페인트 전에 정한다(홈 화면이 먼저 번쩍이지 않게). 반드시 인라인.
-    브라우저 세션(탭)에서 처음 들어왔을 때만 한다: 사이트 안에서 이름·허브로 홈에 돌아오거나 새로고침하면 홈 화면이 바로 보인다.
-    움직임 줄이기 설정이면 하지 않는다. 스크립트가 8초 안에 시작하지 않으면 홈 화면을 보여준다. */}
-<script is:inline>
-  (() => {
-    const root = document.documentElement;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    try {
-      if (sessionStorage.getItem('intro-seen') === '1') return;
-      sessionStorage.setItem('intro-seen', '1');
-    } catch {
-      // 저장소를 못 쓰면(사생활 보호 모드 등) 매번 한다
-    }
-    root.dataset.intro = 'play';
-    setTimeout(() => {
-      if (root.dataset.intro === 'play' && !('introStarted' in root.dataset)) root.dataset.intro = 'done';
-    }, 8000);
-  })();
-</script>
-
+{/* 쌓는 순서(아래에서 위): 별 → 비네팅 → 문구 → 흰 세계. 흰 세계가 커지면서 문구를 덮어 삼킨다(흰 바탕 위에 밝은 문구의 잔상이 비치지 않게) */}
 <canvas class="scene" data-scene aria-hidden="true"></canvas>
 <div class="vignette" aria-hidden="true"></div>
-<div class="blackhole" aria-hidden="true" data-blackhole></div>
 
 <section class="hero" data-hero>
   <div class="hero-inner" data-hero-inner>
@@ -61,23 +43,28 @@ const words = title.flatMap((seg) =>
   </div>
 </section>
 
+<div class="world-disc" aria-hidden="true" data-world-disc></div>
+
 <script>
   import '@/scripts/home-intro.ts';
+  import '@/scripts/home-exit.ts';
 </script>
 
 <style>
-  /* 인트로 층은 인트로가 도는 동안(data-intro="play")에만 있다. 끝나거나 하지 않으면 통째로 숨긴다 */
+  /* 별·흰 세계 층은 인트로(data-intro="play")나 탈출(data-intro="exit")이 도는 동안에만 있다. 끝나거나 하지 않으면 통째로 숨긴다 */
   .scene,
   .vignette,
-  .blackhole,
+  .world-disc,
   .hero {
     display: none;
   }
 
   :global(:root[data-intro='play']) .scene,
   :global(:root[data-intro='play']) .vignette,
-  :global(:root[data-intro='play']) .blackhole,
-  :global(:root[data-intro='play']) .hero {
+  :global(:root[data-intro='play']) .world-disc,
+  :global(:root[data-intro='exit']) .scene,
+  :global(:root[data-intro='exit']) .vignette,
+  :global(:root[data-intro='exit']) .world-disc {
     display: block;
   }
 
@@ -85,13 +72,10 @@ const words = title.flatMap((seg) =>
     display: flex;
   }
 
-  /* 인트로 중에는 아래 홈 화면과 푸터를 감추고 스크롤을 막는다 (끝나면 홈 화면이 나타난다) */
-  :global(:root[data-intro='play']) {
+  /* 인트로·탈출 중에는 스크롤을 막는다 (요약정리 화면과 푸터가 나타나고 사라지는 건 index.astro·home-world.ts) */
+  :global(:root[data-intro='play']),
+  :global(:root[data-intro='exit']) {
     overflow: hidden;
-  }
-
-  :global(:root[data-intro='play'] .site-footer) {
-    visibility: hidden;
   }
 
   .scene {
@@ -117,18 +101,20 @@ const words = title.flatMap((seg) =>
     background-repeat: no-repeat, repeat;
   }
 
-  /* 마지막 확대에서 가운데에서 번져 나오는 어둠(블랙홀). 0이면 보이지 않고, 1이면 화면 전체가 배경색이다.
-   * 별(캔버스) 위, 문구 아래에 둔다. 가장자리는 부드럽게 풀어 번지는 것처럼 보이게 한다 */
-  .blackhole {
+  /* 흰 세계: 마지막 확대에서 가운데의 작은 빛이 별과 같이 가속하며 커져 화면 전체를 덮는다(탈출에서는 거꾸로 한 점으로 줄어든다).
+   * --world(0~1)가 0이면 보이지 않고, 반지름은 world × 170%(화면 모서리까지 거리 기준)다. 0.64 이상이면 번진 가장자리까지 화면 전체가 흰색이다(intro-timeline.ts의 WORLD_COVERED).
+   * 가장자리는 부드럽게 풀어 번지는 것처럼 보이게 하고, 작을 때는 더 넓게 번져 "빛"처럼 보인다.
+   * 별(캔버스)과 문구 위, 요약정리 화면 아래에 둔다(DOM 순서로 쌓는다: 모두 같은 z-index 0). */
+  .world-disc {
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: min(1, calc(var(--blackhole, 0) * 30));
+    opacity: min(1, calc(var(--world, 0) * 30));
     background: radial-gradient(
       circle farthest-corner at 50% 50%,
-      var(--bg) calc(var(--blackhole, 0) * 115% - 12%),
-      transparent calc(var(--blackhole, 0) * 115% + 22%)
+      var(--paper) calc(var(--world, 0) * 170% - 4% - (1 - var(--world, 0)) * 8%),
+      transparent calc(var(--world, 0) * 170% + 4% + (1 - var(--world, 0)) * 8%)
     );
   }
 
@@ -136,7 +122,7 @@ const words = title.flatMap((seg) =>
   .hero {
     position: fixed;
     inset: 0;
-    z-index: 1;
+    z-index: 0; /* 흰 세계(.world-disc)보다 DOM에서 앞에 있어 그 아래에 깔린다 */
     align-items: center;
     justify-content: center;
     padding-inline: var(--space-5);

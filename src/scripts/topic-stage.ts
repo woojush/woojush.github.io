@@ -5,6 +5,7 @@
 // 좌측 하단 칩은 전환 중 내려갔다가 새 경로로 다시 올라온다.
 // 하위가 하나뿐이어도 건너뛰지 않고, 끝(글 목록)은 평범한 페이지 이동이다. 뒤로 가기·앞으로 가기도 같은 화면 안에서 처리한다.
 // 별은 scene.ts(메인과 같은 three.js 장면), 태그의 움직임·끌기는 topic-float.ts.
+// 홈의 흰 세계에서 탈출 효과(home-exit.ts)로 들어오면(sessionStorage 'world-exit') 별이 페이드인 없이 이미 보이는 채로 시작하고 태그가 피어난다.
 import { startScene, type SceneHandle } from '@/scripts/scene';
 import { createField } from '@/scripts/topic-float';
 import { findStage, levelTags, topicHref, type StageNode, type Tag } from '@/lib/topics';
@@ -260,8 +261,28 @@ if (space && dataEl?.textContent && list && chipsEl) {
     chipsEl.classList.add('is-in');
   });
 
+  // 홈의 흰 세계에서 블랙홀을 벗어나 들어온 경우(home-exit.ts가 이동 직전에 시각을 남긴다): 별이 이미 보이는 채로 시작하고(페이드 없음)
+  // 태그가 피어난다. 오래된 표시(다른 경로로 들어온 경우)는 무시한다. 표시는 읽는 즉시 지운다
+  const arrivedFromWorld =
+    !reduce &&
+    (() => {
+      try {
+        const at = Number(sessionStorage.getItem('world-exit'));
+        sessionStorage.removeItem('world-exit');
+        return at > 0 && Date.now() - at < 12000;
+      } catch {
+        return false;
+      }
+    })();
+
   // 처음 화면
   space.classList.add('is-floating');
   field.load(lis(), hrefOf(current));
+  if (arrivedFromWorld) {
+    scene?.skipFade();
+    bloom();
+    space.classList.add('is-entering');
+    void wait(ENTER_MS).then(() => space.classList.remove('is-entering'));
+  }
   if (!reduce) requestAnimationFrame(frame); // 움직임 줄이기: 별은 scene.ts가 한 장면만 그리고 태그는 제자리에 있다
 }

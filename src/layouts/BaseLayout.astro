@@ -12,14 +12,16 @@ interface Props {
   title: string;
   description?: string;
   lang?: string;
+  /** 'light'면 흰 세계(흰 바탕)다. 홈의 요약정리와 projects만 쓴다. 비우면 어두운 세계(기본). tokens.css 참고 */
+  world?: 'light';
 }
 
-const { title, description, lang = site.defaultLang } = Astro.props;
+const { title, description, lang = site.defaultLang, world } = Astro.props;
 const pageTitle = title === site.name ? title : `${title} — ${site.name}`;
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} data-world={world}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -37,6 +39,8 @@ const pageTitle = title === site.name ? title : `${title} — ${site.name}`;
         }
       } catch (e) {}
     </script>
+    {/* 페이지별로 첫 페인트 전에 돌아야 하는 인라인 스크립트(홈의 인트로 판정). 반드시 <script is:inline slot="head"> */}
+    <slot name="head" />
     <title>{pageTitle}</title>
   </head>
   <body>

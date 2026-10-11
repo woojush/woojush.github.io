@@ -1,5 +1,6 @@
 ---
-// HOME. 첫 방문에는 인트로(HomeHero)가 먼저 돌고, 끝나면 같은 화면에서 프로필·NOW·프로젝트·최근 글이 나타난다.
+// HOME. 첫 방문에는 인트로(HomeHero)가 먼저 돌고, 끝나면 같은 화면에서 흰 세계가 번지며 프로필·NOW·프로젝트·최근 글(요약정리)이 나타난다.
+// 요약정리는 흰 세계다(<html data-world="light">, tokens.css). 인트로(별 세계)는 어두운 세계에서 시작한다.
 // 비어 있는 섹션은 그리지 않는다 (CLAUDE.md 8절).
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import HomeHero from '@/components/home/HomeHero.astro';
@@ -16,9 +17,34 @@ const projects = await getActiveProjects(3);
 const recent = await getRecentPosts(5);
 ---
 
-<BaseLayout title={site.name}>
+<BaseLayout title={site.name} world="light">
+  {/* 인트로를 할지 첫 페인트 전에 정한다(요약정리 화면이 먼저 번쩍이지 않게). 반드시 <head>의 인라인.
+      브라우저 세션(탭)에서 처음 들어왔을 때만 한다: 사이트 안에서 이름·허브로 홈에 돌아오거나 새로고침하면 요약정리 화면이 바로 보인다.
+      움직임 줄이기 설정이면 하지 않는다. 인트로는 어두운 세계에서 시작하므로 흰 세계(data-world)를 뗀다(home-intro.ts가 흰 세계가 화면을 덮으면 다시 켠다).
+      스크립트가 8초 안에 시작하지 않으면 요약정리 화면을 보여준다. */}
+  <script is:inline slot="head">
+    (() => {
+      const root = document.documentElement;
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      try {
+        if (sessionStorage.getItem('intro-seen') === '1') return;
+        sessionStorage.setItem('intro-seen', '1');
+      } catch (e) {
+        // 저장소를 못 쓰면(사생활 보호 모드 등) 매번 한다
+      }
+      root.dataset.intro = 'play';
+      delete root.dataset.world;
+      setTimeout(() => {
+        if (root.dataset.intro === 'play' && !('introStarted' in root.dataset)) {
+          root.dataset.intro = 'done';
+          root.dataset.world = 'light';
+        }
+      }, 8000);
+    })();
+  </script>
   <HomeHero title={site.hero.title} sub={site.hero.sub} />
-  <div class="home">
+  {/* data-world="light": 요약정리는 인트로·탈출 중에 페이지 바탕이 어두운 세계여도 흰 세계의 색을 쓴다 */}
+  <div class="home" data-home data-world="light">
     <HomeProfile name={site.name} lead={about.data.lead} summary={site.profile.summary} photo={getProfilePhoto()} />
     <HomeNow items={now.items} />
     <HomeList id="projects" heading="Projects" rows={projects} moreHref="/projects/" />
@@ -27,19 +53,35 @@ const recent = await getRecentPosts(5);
 </BaseLayout>
 
 <style>
-  /* 인트로가 끝나면(data-intro="done") 어둠 속에서 나타난다. 인트로가 도는 동안은 감춘다 */
+  /* 인트로: 흰 세계가 번지는 만큼 요약정리 화면(과 푸터)이 그 안에서 나타나 제 크기로 자리 잡는다.
+   * --home-p(0~1)는 home-intro.ts가, 확대의 기준점(--home-oy)은 home-world.ts가 넣는다. 끝나면(data-intro="done") 평소 모습이다. */
+  :global(:root[data-intro='play']) .home,
+  :global(:root[data-intro='play'] .site-footer) {
+    opacity: var(--home-p, 0);
+    pointer-events: none;
+  }
+
   :global(:root[data-intro='play']) .home {
-    visibility: hidden;
+    transform: scale(calc(0.9 + 0.1 * var(--home-p, 0)));
+    transform-origin: 50% var(--home-oy, 50vh);
+    will-change: opacity, transform;
   }
 
-  :global(:root[data-intro='done']) .home {
-    animation: home-in var(--duration-reveal) cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* 탈출(home-exit.ts): 거꾸로, 흰 세계가 줄어드는 만큼 요약정리 화면이 가운데로 말려 들어가며 사라진다 */
+  :global(:root[data-intro='exit']) .home,
+  :global(:root[data-intro='exit'] .site-footer) {
+    opacity: var(--home-p, 1);
+    pointer-events: none;
   }
 
-  @keyframes home-in {
-    from {
-      opacity: 0;
-      transform: scale(0.985);
-    }
+  :global(:root[data-intro='exit']) .home {
+    transform: scale(calc(0.9 + 0.1 * var(--home-p, 1)));
+    transform-origin: 50% var(--home-oy, 50vh);
+    will-change: opacity, transform;
+  }
+
+  /* 탈출 첫 순간에는 탭 바 뒤가 아직 흰색이다. 알약 유리가 뿌옇게 연해지지 않도록 흰 세계의 진한 값을 그대로 둔다(0.5초 전환은 다음 페이지에서) */
+  :global(:root[data-intro='exit']) {
+    --nav-pill-bg: rgba(25, 25, 25, 0.82);
   }
 </style>

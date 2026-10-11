@@ -5,7 +5,7 @@ import { getEntries } from '@/lib/content';
 const entries = await getEntries('projects');
 ---
 
-<BaseLayout title="Projects">
+<BaseLayout title="Projects" world="light">
   <h1>Projects</h1>
   {entries.length > 0 && (
     <ul>

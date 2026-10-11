@@ -53,12 +53,13 @@ const VERT = /* glsl */ `
   void main() {
     // 깊이: 날아온 만큼 가까워지고, 범위를 넘으면 먼 쪽으로 되돌아간다(끝없는 비행)
     float dist = uNear + mod(aZ - uFly, uDepth);
-    float distP = dist; // 화면에 놓는 깊이(줄의 꼬리는 더 멀다)
+    float distP = dist; // 화면에 놓는 깊이(줄의 꼬리는 앞으로 날 때 더 멀고, 뒤로 날 때(uTrail < 0) 더 가깝다)
     float tailKeep = 1.0;
     #ifdef STREAK
-    distP = dist + uTrail * aEnd;
-    // 꼬리가 깊이 범위를 넘어 되돌아간 별은 그리지 않는다(화면을 가로지르는 줄이 생기지 않게). 꼬리 쪽은 점점 옅어진다
-    tailKeep = (1.0 - aEnd * 0.9) * step(distP, uNear + uDepth) * smoothstep(0.0, 0.3, uBoost);
+    float tailD = dist + uTrail * aEnd;
+    distP = max(tailD, uNear);
+    // 꼬리가 깊이 범위를 넘어 되돌아간 별, 꼬리가 눈앞까지 닿는 별은 그리지 않는다(화면을 가로지르는 줄이 생기지 않게). 꼬리 쪽은 점점 옅어진다
+    tailKeep = (1.0 - aEnd * 0.9) * step(tailD, uNear + uDepth) * step(uNear * 1.5, tailD) * smoothstep(0.0, 0.3, uBoost);
     #endif
     float c = cos(uRoll), s = sin(uRoll);
     vec2 p = vec2(position.x * c - position.y * s, position.x * s + position.y * c);
@@ -118,6 +119,10 @@ export interface SceneHandle {
   setFx(amount: number): void;
   /** 화면의 (x, y)(px)에서 물결을 일으킨다 (post 옵션이 있을 때만) */
   ripple(x: number, y: number): void;
+  /** 캔버스 크기를 다시 맞춘다. 숨겨져 있던(display: none) 캔버스를 다시 보여줄 때 부른다 */
+  resize(): void;
+  /** 처음 나타날 때의 부드러운 페이드(1.6초)를 건너뛰고 별을 바로 보이게 한다. 다른 장면에서 이어 받을 때 쓴다 */
+  skipFade(): void;
 }
 
 // 후처리: 별 장면을 한 번 텍스처에 그린 뒤, 화면 가장자리로 갈수록 R·B 채널을 반대 방향으로 밀어 색이 어긋나게 하고(색수차),
@@ -459,12 +464,13 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
     u.uFly.value = fly;
     u.uBoost.value = boost;
     u.uPan.value = [px, py];
-    // 마지막 확대에서는 줄이 길어지고 장면이 점점 빨리 소용돌이친다
-    swirl += boost * boost * 2.5 * dt;
+    // 마지막 확대에서는 줄이 길어지고 장면이 점점 빨리 소용돌이친다. 뒤로 날 때(flySpeed < 0, 블랙홀을 벗어나올 때)는 반대로 돈다
+    swirl += Math.sign(flySpeed) * boost * boost * 2.5 * dt;
     u.uRoll.value = clock * 0.004 + swirl;
-    // 줄은 켜지는 순간 없이 boost를 따라 0부터 길어진다(임계값 없음). 밝기도 셰이더에서 같이 서서히 나타난다
+    // 줄은 켜지는 순간 없이 boost를 따라 0부터 길어진다(임계값 없음). 밝기도 셰이더에서 같이 서서히 나타난다.
+    // 뒤로 날 때는 줄이 반대쪽(가까운 쪽)으로 늘어나고, 화면 가장자리에서 길게 번지므로 길이를 더 짧게 제한한다
     const ramp = Math.min(1, boost / 0.35);
-    u.uTrail.value = Math.min(flySpeed * 0.06, 5) * ramp * ramp * (3 - 2 * ramp);
+    u.uTrail.value = Math.sign(flySpeed) * Math.min(Math.abs(flySpeed) * 0.06, flySpeed < 0 ? 2 : 5) * ramp * ramp * (3 - 2 * ramp);
     streaks.visible = boost > 0;
     const op = String(ease(intro) * alpha);
     if (op !== lastOpacity) {
@@ -493,5 +499,9 @@ export function startScene(canvas: HTMLCanvasElement, options: { post?: boolean 
     const r = canvas.getBoundingClientRect();
     post.mat.uniforms.uRip.value.set((x - r.left) / Math.max(1, r.width), 1 - (y - r.top) / Math.max(1, r.height), performance.now() / 1000);
   }
-  return { update, setFx, ripple };
+  function skipFade(): void {
+    intro = 1;
+    lastOpacity = '';
+  }
+  return { update, setFx, ripple, resize, skipFade };
 }

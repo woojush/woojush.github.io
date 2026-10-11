@@ -83,7 +83,7 @@
   margin: 0 0 var(--space-5);
   padding: var(--space-4);
   overflow-x: auto;
-  background: var(--code-bg) !important; /* Shiki가 넣는 배경 대신 토큰을 쓴다 */
+  background: var(--pre-bg) !important; /* Shiki가 넣는 배경 대신 토큰을 쓴다. 흰 세계에서도 어둡다(Shiki 색이 어두운 테마 하나라서) */
   border: 1px solid var(--rule);
   border-radius: var(--radius-s);
   font-family: var(--font-mono);

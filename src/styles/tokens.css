@@ -11,7 +11,8 @@
  * 포인트 색(--accent)은 링크, 포커스 링, 선택 영역, 현재 위치 표시에만 쓴다.
  * 상태(seed/growing/evergreen)는 색이 아니라 텍스트로 표시한다.
  *
- * 테마는 dark 하나뿐이다(2026-10-11 사용자 지시로 라이트 테마를 없앴다). 방문자가 테마를 고를 수 없다.
+ * 사이트는 어두운 세계가 기본이다. 방문자가 테마를 고를 수 없다(2026-10-11 사용자 지시로 토글·라이트 테마를 없앴다).
+ * 단 하나의 예외: **흰 세계**(아래 `[data-world='light']`). 홈의 요약정리와 projects 페이지만 흰 바탕이다(2026-10-11 사용자 지시).
  */
 :root {
   color-scheme: dark;
@@ -22,7 +23,9 @@
   --text-muted: #a09b90;
   --rule: #2e2c28;
   --accent: #e0a96d;
-  --code-bg: #1c1b19;
+  --code-bg: #1c1b19; /* 인라인 코드 바탕 */
+  --pre-bg: #1c1b19; /* 코드 블록 바탕(Shiki가 어두운 테마 하나라서 흰 세계에서도 어둡게 둔다) */
+  --paper: #ffffff; /* 흰 세계의 바탕. 인트로에서 가운데에서 번지는 흰 세계(.world-disc)도 이 색이다 */
   --particle: 235, 231, 223; /* 메인 별가루 색 (rgb 채널) */
   /* Knowledge 떠다니는 태그(lifestories 규격): 색 이름별 이름 칸 바탕, 글 수 칸, 좌측 하단 칩.  */
   --tag-walnut: #6a4a30;
@@ -39,6 +42,7 @@
   --tag-count-hover-text: #2f2f2d;
   --chip-bg: rgba(47, 47, 45, 0.8);
   --chip-text: #faf9f6;
+  --nav-text: #ebe7df; /* 탭 바 글자. 알약은 어느 세계에서나 어두운 유리라서 글자는 늘 밝다 */
 }
 
 /* ───────── 서체 ───────── */
@@ -130,4 +134,27 @@
   --glow-orange: rgba(179, 45, 0, 0.5);
   --glow-green: rgba(50, 98, 84, 0.6);
   --glow-blue: rgba(179, 18, 0, 0.7);
+}
+
+/* ───────── 흰 세계 (2026-10-11 사용자 지시) ─────────
+ * 홈의 요약정리와 projects만 흰 바탕이다. 별 세계(인트로·Knowledge)·about·writing은 어두운 바탕 그대로다.
+ * 켜는 방법: <html data-world="light">(BaseLayout의 world 속성)가 페이지 바탕·헤더·푸터를 바꾼다.
+ * 홈의 .home은 인트로·탈출 중에도 흰 세계 안에 있어야 하므로 스스로 이 속성을 가진다(index.astro).
+ * 값은 라이트 테마 때(2026-10-10)의 것에서 바탕만 순백으로 바꿨다. 대비(WCAG, 2026-10-11 계산, 바탕 #fff 기준): text 17.2, text-muted 5.9, accent 6.2 (surface #f2f0eb 위에서는 5.2, 5.5).
+ */
+:root[data-world='light'] {
+  color-scheme: light;
+}
+
+[data-world='light'] {
+  /* 글자색은 상속값이라 변수만 바꿔서는 안쪽 영역(.home 등)이 바깥(어두운 세계)의 색을 물려받는다 → 스스로 지정한다 */
+  color: var(--text);
+  --bg: var(--paper);
+  --surface: #f2f0eb;
+  --text: #1c1b19;
+  --text-muted: #65645f;
+  --rule: #e3e1db;
+  --accent: #86561f;
+  --code-bg: #f2f0eb;
+  --nav-pill-bg: rgba(25, 25, 25, 0.82); /* 흰 바탕 위에서도 밝은 글자가 읽히도록 알약을 더 진한 유리로 */
 }

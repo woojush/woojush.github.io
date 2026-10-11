@@ -1,7 +1,7 @@
 ---
 title: "Orthogonal / Orthonormal / Orthogonal Matrix"
 date: 2026-10-11
-topic: mathematics/analytic-geometry
+topic: ai/mathematics/analytic-geometry
 status: growing
 order: 6
 description: "직교·정규직교의 정의와, 길이·각도를 보존하는 직교행렬."

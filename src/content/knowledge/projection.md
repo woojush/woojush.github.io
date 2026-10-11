@@ -1,7 +1,7 @@
 ---
 title: "Projection"
 date: 2026-10-11
-topic: mathematics/analytic-geometry
+topic: ai/mathematics/analytic-geometry
 status: growing
 order: 8
 description: "벡터를 부분공간 위에서 가장 가까운 점으로 보내는 정사영. 정규방정식과 사영행렬."
@@ -302,7 +302,7 @@ $U = \operatorname{span} \left\{ \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}, \beg
 - Projection matrix $P_\pi$
 
 > #### ① Projection된 벡터 $\pi_U(x)$를 $U$의 basis $B$로 표현하기 위한 좌표 $\lambda$
-> $B^{\top}(x-\pi_U(x))=B^{\top}(x-B\lambda)=0 \,\,\rightarrow B^{\top}x=B^{\top}B\lambda \cdots ①$ 이므로, 제시된 벡터에 대해 식을 정리하여 풀면 된다.
+> $B^{\top}(x-\pi_U(x))=B^{\top}(x-B\lambda)=0 \,\,\rightarrow B^{\top}x=B^{\top}B\lambda \cdots (1)$ 이므로, 제시된 벡터에 대해 식을 정리하여 풀면 된다.
 > $U = \operatorname{span} \left\{ \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}, \begin{bmatrix} 0 \\ 1 \\ 2 \end{bmatrix} \right\}$이므로 공간 $B$ 를 구성하는 기저벡터 $b_1, b_2$에 대하여 정리하면
 > 행렬 $B=\begin{bmatrix} 1&0 \\ 1&1 \\ 1&2\end{bmatrix}$이다.
 > 따라서 ①의 양변을 정리해보면,

@@ -1,7 +1,7 @@
 ---
 title: "기저 변환"
 date: 2026-10-11
-topic: mathematics/linear-algebra
+topic: ai/mathematics/linear-algebra
 status: growing
 order: 6
 description: "같은 벡터와 선형사상을 다른 기저에서 표현할 때 좌표와 행렬이 어떻게 바뀌는가."

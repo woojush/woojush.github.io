@@ -1,7 +1,7 @@
 ---
 title: "Rank"
 date: 2026-10-11
-topic: mathematics/linear-algebra
+topic: ai/mathematics/linear-algebra
 status: growing
 order: 1
 description: "행렬이 실제로 몇 개의 독립된 정보를 가지는지 나타내는 수."

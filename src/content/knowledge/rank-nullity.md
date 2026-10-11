@@ -1,7 +1,7 @@
 ---
 title: "Rank-Nullity"
 date: 2026-10-11
-topic: mathematics/linear-algebra
+topic: ai/mathematics/linear-algebra
 status: growing
 order: 4
 description: "입력 차원 = Rank + Kernel의 차원. 입력 정보가 어떻게 나뉘는지 알려주는 정리."

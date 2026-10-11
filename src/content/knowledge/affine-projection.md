@@ -1,7 +1,7 @@
 ---
 title: "Projection onto Affine Subspaces"
 date: 2026-10-11
-topic: mathematics/analytic-geometry
+topic: ai/mathematics/analytic-geometry
 status: growing
 order: 10
 description: "원점을 지나지 않는 공간으로의 사영: 평행이동 → 기존 projection → 복원."

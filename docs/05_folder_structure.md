@@ -79,7 +79,7 @@ personal-site/
    │  ├─ content/                ← 콘텐츠 표시용 (데이터를 props로 받음)
    │  │  ├─ EntryRow.astro       ← 목록의 한 행 (날짜/제목/상태)
    │  │  ├─ EntryList.astro      ← EntryRow의 묶음
-   │  │  ├─ TopicTree.astro      ← 지식 트리
+   │  │  ├─ TopicRow.astro       ← 분야·세부분야 행
    │  │  ├─ Related.astro        ← links + backlinks 표시
    │  │  ├─ TagList.astro
    │  │  ├─ TableOfContents.astro

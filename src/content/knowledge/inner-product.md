@@ -1,7 +1,7 @@
 ---
 title: "Inner Product"
 date: 2026-10-11
-topic: mathematics/analytic-geometry
+topic: ai/mathematics/analytic-geometry
 status: growing
 order: 2
 description: "두 벡터를 실수 하나로 대응시켜 길이·각도·직교를 정의하게 하는 함수."

@@ -220,7 +220,7 @@ mathematics/linear-algebra:
 
 관례:
 
-- **topic 정하기:** 글 1편에 topic 하나, `분야/세부분야` 2단계. 분야는 학문 분과(mathematics, computer-science, machine-learning, robotics, neuroscience…), 세부분야는 교재 목차·분과 단위(linear-algebra, probability…). 시기·프로젝트·군 복무 같은 기준은 쓰지 않는다. 판별 질문: "이 개념을 어느 분과(교재의 어느 장)에서 배웠나?" 여러 분야에 걸치면 배운 곳 한 군데에 두고 다른 분야와는 `links`·`tags`로 잇는다.
+- **topic 정하기:** 글 1편에 topic 하나, `분야/세부분야[/묶음]`. 분야는 크게 나눈 갈래(ai, art, english…), 세부분야는 그 안의 과목·도구(mathematics, pytorch…), 묶음은 세부분야 글 목록 안의 소제목(교재의 장 등, 선택). 화면은 분야 → 세부분야 → 글 순으로 세 걸음이다. 시기·프로젝트·군 복무 같은 기준은 쓰지 않는다. 판별 질문: "이 개념을 어느 분과(교재의 어느 장)에서 배웠나?" 여러 분야에 걸치면 배운 곳 한 군데에 두고 다른 분야와는 `links`·`tags`로 잇는다.
 - **쓰지 않는 섹션은 제목째로 지운다.** 빈 섹션 제목을 남기지 않는다. seed 단계의 글은 Definition과 My understanding 두 개뿐이어도 정상이다.
 - 섹션 제목은 H2(`##`)만 쓴다. 우측 목차(TOC)는 H2·H3로 만들어지므로 제목 이름이 곧 목차 이름이 된다.
 

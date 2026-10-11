@@ -125,6 +125,7 @@ const topics = defineCollection({
         z.object({
           path: topicPath,
           name: z.string(),
+          description: z.string().optional(),
         }),
       )
       .default([]),

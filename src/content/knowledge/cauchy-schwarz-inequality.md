@@ -1,7 +1,7 @@
 ---
 title: "Cauchy–Schwarz Inequality"
 date: 2026-10-11
-topic: mathematics/analytic-geometry
+topic: ai/mathematics/analytic-geometry
 status: growing
 order: 4
 description: "|⟨x,y⟩| ≤ ‖x‖‖y‖. 일반 내적공간에서 사잇각을 정의할 수 있게 해 준다."

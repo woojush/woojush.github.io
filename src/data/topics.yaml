@@ -1,13 +1,10 @@
-# Knowledge 목록의 소개 문구와 topic 표시 이름·순서 (선택). 등록하지 않은 topic도 동작한다.
-# 글의 topic은 `분야/세부분야` 경로(예: mathematics/linear-algebra)이고, 여기서는 이름과 순서만 정한다.
-# 순서는 아래 나열 순서이며, 등록하지 않은 topic은 그 뒤에 이름순으로 붙는다.
+# Knowledge의 소개 문구와 주제(분야 → 세부분야 → 묶음)의 표시 이름·설명·순서. 등록하지 않은 topic도 동작한다(경로를 보기 좋게 바꿔 표시).
+# 글의 topic은 `분야/세부분야[/묶음]` 경로(예: ai/mathematics/linear-algebra)다. 분야 → 세부분야 → 글 순으로 세 걸음에 걸쳐 보인다.
+# 묶음(세 번째 조각)은 세부분야 페이지 안의 소제목이다. 순서는 아래 나열 순서이며, 등록하지 않은 것은 그 뒤에 이름순으로 붙는다.
+# 글이 없는 주제는 나타나지 않으므로, 앞으로 쓸 주제를 미리 적어 두어도 된다.
 lead: 배운 것을 개념 단위로 쌓는 곳. 덜 익은 노트도 그대로 올리고, 이해가 깊어지면 고쳐 씁니다.
 topics:
-  - { path: mathematics, name: Mathematics }
-  - { path: mathematics/linear-algebra, name: Linear Algebra }
-  - { path: mathematics/analytic-geometry, name: Analytic Geometry }
-  - { path: mathematics/probability, name: Probability }
-  - { path: mathematics/optimization, name: Optimization }
-  - { path: computer-science, name: Computer Science }
-  - { path: machine-learning, name: Machine Learning }
-  - { path: robotics, name: Robotics }
+  - { path: ai, name: AI, description: 인공지능과 로보틱스를 공부하며 쌓는 개념 }
+  - { path: ai/mathematics, name: Mathematics, description: 'Mathematics for Machine Learning을 따라 정리한 수학 기초' }
+  - { path: ai/mathematics/linear-algebra, name: 2. Linear Algebra }
+  - { path: ai/mathematics/analytic-geometry, name: 3. Analytic Geometry }

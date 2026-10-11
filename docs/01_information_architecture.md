@@ -136,14 +136,14 @@ Computer Science
 
 - 문서가 0개인 topic은 표시하지 않는다 (콘텐츠가 적을 때 빈 트리가 보이는 것을 방지).
 - 표시 이름/순서는 `data/topics.yaml`에서 지정한다. 등록되지 않은 topic도 동작하며, 경로 문자열을 보기 좋게 변환해 표시한다. → **새 분야를 추가할 때 "등록" 절차가 필수가 아니다.**
-- 트리 UI는 2단계까지 렌더링한다. 3단계 이상 경로가 와도 깨지지 않고 2단계 아래에 평평하게 모인다.
-- **구현 사실 (2026-10-11):** 목록 위쪽에 소개 문구(`data/topics.yaml`의 `lead`), 편수와 status별 개수, status 한 줄 설명이 나온다. 분야가 3개 이상이면 분야 점프 링크, 노트가 6편 이상이면 "Recently updated" 5편이 나온다. 세부분야는 접고 펼 수 있고(12편 초과면 처음에 접힘, `#topic-…` 앵커가 접힌 곳을 가리키면 펼침), 한 topic 안의 순서는 `order` → 선행 관계 → 날짜 오래된 순이다. 글이 0편이면 제목과 소개 문구만 보인다.
-- 글 페이지: 위에 breadcrumb(분야 / 세부분야, 목록의 해당 앵커로 이동), 제목, status·갱신일·태그. 본문 오른쪽에 따라다니는 목차(960px 이상, 제목 3개 이상일 때. 좁은 화면은 본문 위의 접힌 목차). 아래에 Related(선행·이어지는 개념·연결된 프로젝트·글)와 같은 topic의 이전/다음. 태그는 글자로만 표시한다(`/tags/`는 Phase 3).
+- **세 걸음으로 걷는다 (2026-10-11 변경):** `/knowledge/`는 분야만 큰 행으로 보여 주고, 분야를 누르면 세부분야 목록(`/knowledge/topics/<분야>/`), 세부분야를 누르면 비로소 글 목록(`/knowledge/topics/<분야>/<세부분야>/`)이 나온다. topic의 세 번째 조각(`ai/mathematics/linear-algebra`)은 따로 페이지를 만들지 않고 글 목록 안의 소제목이다. 4단계 이상은 3단계로 모인다. 주제 페이지 주소는 topic 경로에서 만들지만 글의 주소는 여전히 slug뿐이다(`topics`는 글 slug로 쓰지 않는다).
+- **구현 사실 (2026-10-11):** 첫 화면은 소개 문구(`data/topics.yaml`의 `lead`)와 분야 행(큰 이름·설명·안에 든 세부분야·글 수)뿐이다. 세부분야 페이지에는 편수·status별 개수·status 한 줄 설명이 나오고, 한 세부분야 안의 순서는 묶음 순서(topics.yaml 순서) → `order` → 선행 관계 → 날짜 오래된 순이다. 이름·설명·순서는 topics.yaml, 글이 0편인 주제는 나타나지 않는다.
+- 글 페이지: 위에 breadcrumb(분야 / 세부분야, 각 주제 페이지로 이동), 제목, status·갱신일·태그. 본문 오른쪽에 따라다니는 목차(960px 이상, 제목 3개 이상일 때. 좁은 화면은 본문 위의 접힌 목차). 아래에 Related(선행·이어지는 개념·연결된 프로젝트·글)와 같은 topic의 이전/다음. 태그는 글자로만 표시한다(`/tags/`는 Phase 3).
 
 **문서 페이지 (`/knowledge/[slug]`)**:
 
 ```
-Mathematics / Linear Algebra            ← topic 경로 (breadcrumb)
+AI / Mathematics                        ← topic 경로 (breadcrumb)
 Projection
 growing · updated 2026-09-24 · #linear-algebra #projection
 

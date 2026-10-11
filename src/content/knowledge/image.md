@@ -1,7 +1,7 @@
 ---
 title: "Image"
 date: 2026-10-11
-topic: mathematics/linear-algebra
+topic: ai/mathematics/linear-algebra
 status: growing
 order: 2
 description: "선형사상이 만들어낼 수 있는 모든 출력의 집합. 열공간(Column Space)과 같다."

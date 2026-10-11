@@ -1,7 +1,7 @@
 ---
 title: "Finite-dimensional Vector Spaces"
 date: 2026-10-11
-topic: mathematics/linear-algebra
+topic: ai/mathematics/linear-algebra
 status: growing
 order: 5
 description: "차원이 같은 유한차원 벡터공간은 좌표를 손실 없이 서로 대응시킬 수 있다."

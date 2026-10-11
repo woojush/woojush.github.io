@@ -1,7 +1,7 @@
 ---
 title: "Symmetric Positive Definite Matrices"
 date: 2026-10-11
-topic: mathematics/analytic-geometry
+topic: ai/mathematics/analytic-geometry
 status: growing
 order: 3
 description: "기저를 정하면 Inner Product는 대칭 양의 정부호(SPD) 행렬로 표현된다."

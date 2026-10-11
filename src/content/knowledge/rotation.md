@@ -1,7 +1,7 @@
 ---
 title: "Rotation"
 date: 2026-10-11
-topic: mathematics/analytic-geometry
+topic: ai/mathematics/analytic-geometry
 status: growing
 order: 11
 description: "회전은 표준기저가 어디로 가는지로 이해하는 직교변환이다."

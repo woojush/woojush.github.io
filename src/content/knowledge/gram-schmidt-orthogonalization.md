@@ -1,7 +1,7 @@
 ---
 title: "Gram-Schmidt Orthogonalization"
 date: 2026-10-11
-topic: mathematics/analytic-geometry
+topic: ai/mathematics/analytic-geometry
 status: growing
 order: 9
 description: "기저에서 이미 만든 공간의 성분을 projection으로 제거해 직교기저를 만드는 방법."

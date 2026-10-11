@@ -1,7 +1,7 @@
 ---
 title: "Kernel (Null Space)"
 date: 2026-10-11
-topic: mathematics/linear-algebra
+topic: ai/mathematics/linear-algebra
 status: growing
 order: 3
 description: "Ax=0을 만족하는 모든 입력의 집합. 선형사상에서 사라지는 정보."

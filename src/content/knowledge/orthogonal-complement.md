@@ -1,7 +1,7 @@
 ---
 title: "Orthogonal Complement"
 date: 2026-10-11
-topic: mathematics/analytic-geometry
+topic: ai/mathematics/analytic-geometry
 status: growing
 order: 7
 description: "부분공간 U와 모든 방향에서 수직인 벡터들의 공간 U⊥, 그리고 직합분해."

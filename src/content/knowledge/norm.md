@@ -1,7 +1,7 @@
 ---
 title: "Norm"
 date: 2026-10-11
-topic: mathematics/analytic-geometry
+topic: ai/mathematics/analytic-geometry
 status: growing
 order: 1
 description: "벡터의 크기를 정의하는 방법. Euclidean·Manhattan Norm."

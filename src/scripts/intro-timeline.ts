@@ -3,10 +3,10 @@
 //   0s      별이 먼저 나타난다
 //   2s      메인 문장이 나타나 천천히 커지기 시작한다 (T_TITLE)
 //   3.8s    메인 문장이 나타나고 1.8초 뒤, 작은 문장이 나타나 같이 커진다 (T_SUB)
-//   6.7s    작은 문장이 다 나타나고(0.9초) 2초가 지나면, 별들의 중심을 향한 마지막 확대(블랙홀)가 시작된다 (T_CLIMAX)
-//   6.7~10.7s 처음엔 느리게, 갈수록 폭발적으로 빨라져 마지막 1~2초는 블랙홀로 빨려 들어가듯 쏟아지고, 문구는 지나가 사라지고,
+//   6.0s    작은 문장이 다 나타나고(0.9초) 1.3초가 지나면, 별들의 중심을 향한 마지막 확대(블랙홀)가 시작된다 (T_CLIMAX)
+//   6.0~10.0s 처음엔 느리게, 갈수록 폭발적으로 빨라져 마지막 1~2초는 블랙홀로 빨려 들어가듯 쏟아지고, 문구는 지나가 사라지고,
 //           가운데에서 어둠이 번져 화면 전체가 어두운 배경이 된다
-//   10.7s   화면이 완전히 어두운 배경이 되고, 그 자리에 홈 화면이 나타난다 (T_END)
+//   10.0s   화면이 완전히 어두운 배경이 되고, 그 자리에 홈 화면이 나타난다 (T_END)
 //
 // "확대 속도 → 별의 속도": 문구가 로그 척도로 커지는 비율(rate, 1/s)이 곧 별이 날아오는 속도를 정한다.
 // 카메라가 앞으로 날아갈 때 가까운 물체는 비례해서 빠르게 커지므로, 문구와 별이 한 장면 안에서 맞물려 보인다.
@@ -14,7 +14,7 @@
 export const T_TITLE = 2;
 export const T_SUB = T_TITLE + 1.8; // 메인 문장이 나타나고 1.8초 뒤 (HomeHero.astro의 animation-delay와 같은 값)
 const SUB_APPEAR_SECONDS = 0.9; // 작은 문장이 나타나는 데 걸리는 시간 (HomeHero.astro의 appear)
-export const SUB_HOLD_SECONDS = 2; // 작은 문장이 다 나타난 뒤 이만큼 지나면 마지막 확대가 시작된다
+export const SUB_HOLD_SECONDS = 1.3; // 작은 문장이 다 나타난 뒤 이만큼 지나면 마지막 확대가 시작된다
 export const T_CLIMAX = T_SUB + SUB_APPEAR_SECONDS + SUB_HOLD_SECONDS;
 export const CLIMAX_SECONDS = 4; // 마지막 확대의 길이. 앞쪽은 거의 정지에 가깝고 가속이 뒤쪽 1~2초에 몰린다
 export const T_END = T_CLIMAX + CLIMAX_SECONDS;

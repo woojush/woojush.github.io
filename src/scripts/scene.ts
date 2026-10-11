@@ -51,7 +51,7 @@ const VERT = /* glsl */ `
     #ifdef STREAK
     distP = dist + uTrail * aEnd;
     // 꼬리가 깊이 범위를 넘어 되돌아간 별은 그리지 않는다(화면을 가로지르는 줄이 생기지 않게). 꼬리 쪽은 점점 옅어진다
-    tailKeep = (1.0 - aEnd * 0.9) * step(distP, uNear + uDepth);
+    tailKeep = (1.0 - aEnd * 0.9) * step(distP, uNear + uDepth) * smoothstep(0.0, 0.3, uBoost);
     #endif
     float c = cos(uRoll), s = sin(uRoll);
     vec2 p = vec2(position.x * c - position.y * s, position.x * s + position.y * c);
@@ -288,8 +288,10 @@ export function startScene(canvas: HTMLCanvasElement): SceneHandle {
     // 마지막 확대에서는 줄이 길어지고 장면이 점점 빨리 소용돌이친다
     swirl += boost * boost * 2.5 * dt;
     u.uRoll.value = clock * 0.004 + swirl;
-    u.uTrail.value = boost > 0.02 ? Math.min(flySpeed * 0.06, 5) : 0;
-    streaks.visible = u.uTrail.value > 0.05;
+    // 줄은 켜지는 순간 없이 boost를 따라 0부터 길어진다(임계값 없음). 밝기도 셰이더에서 같이 서서히 나타난다
+    const ramp = Math.min(1, boost / 0.35);
+    u.uTrail.value = Math.min(flySpeed * 0.06, 5) * ramp * ramp * (3 - 2 * ramp);
+    streaks.visible = boost > 0;
     canvas.style.opacity = String(ease(intro) * alpha);
     render();
   }

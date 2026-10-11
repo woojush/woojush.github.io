@@ -25,6 +25,19 @@
   --accent: #e0a96d;
   --code-bg: #1c1b19;
   --particle: 235, 231, 223; /* 메인 별가루 색 (rgb 채널) */
+  /* Knowledge 떠다니는 태그: 색 이름별 칸 바탕·글자색, 그리고 배경의 별 */
+  --tag-walnut: #5a4331;
+  --tag-moss: #2f4a3d;
+  --tag-slate: #34445a;
+  --tag-clay: #6a4332;
+  --tag-sand: #5c5233;
+  --tag-plum: #4d3b57;
+  --tag-stone: #3d3c38;
+  --tag-text: #ebe7df;
+  --tag-count-bg: #232220;
+  --tag-count-text: #a09b90;
+  --stage-bg: #0d0d0c;
+  --star: 235, 231, 223;
 }
 
 :root[data-theme='light'] {
@@ -38,6 +51,19 @@
   --accent: #86561f;
   --code-bg: #ebebe7;
   --particle: 28, 27, 25;
+  /* Knowledge 떠다니는 태그: 색 이름별 칸 바탕·글자색, 그리고 배경의 별 */
+  --tag-walnut: #cdb59b;
+  --tag-moss: #a9c2b0;
+  --tag-slate: #aebbcf;
+  --tag-clay: #d8b3a2;
+  --tag-sand: #d6cba1;
+  --tag-plum: #c8b7d2;
+  --tag-stone: #cfcfc8;
+  --tag-text: #1c1b19;
+  --tag-count-bg: #e2e2dd;
+  --tag-count-text: #65645f;
+  --stage-bg: #ecece8;
+  --star: 28, 27, 25;
   --nav-pill-bg: rgba(110, 110, 110, 0.16);
   --nav-dot: rgba(234, 234, 227, 0.7);
 }

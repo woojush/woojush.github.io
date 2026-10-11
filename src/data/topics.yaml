@@ -1,10 +1,11 @@
 # Knowledge의 소개 문구와 주제의 표시 이름·설명·순서. 등록하지 않은 topic도 동작한다(경로를 보기 좋게 바꿔 표시).
 # 글의 topic은 `분야/세부분야[/더 세부]` 경로(최대 3단계, 예: ai/mathematics/linear-algebra)다. 경로의 각 단계가 한 화면이고,
 # 하위 주제가 있는 화면은 그것들이 글자와 글 수로 떠다니며, 끝(하위 없음)에서 글 목록이 나온다.
+# color(선택): walnut·moss·slate·clay·sand·plum·stone. 비우면 부모 색을 따른다.
 # 순서는 아래 나열 순서(떠다니는 화면의 배치 순서)이고, 등록하지 않은 것은 그 뒤에 이름순으로 붙는다. 글이 없는 주제는 나타나지 않는다.
 lead: 배운 것을 개념 단위로 쌓는 곳. 덜 익은 노트도 그대로 올리고, 이해가 깊어지면 고쳐 씁니다.
 topics:
-  - { path: ai, name: AI, description: 인공지능과 로보틱스를 공부하며 쌓는 개념 }
+  - { path: ai, name: AI, color: moss, description: 인공지능과 로보틱스를 공부하며 쌓는 개념 }
   - { path: ai/mathematics, name: Mathematics, description: 'Mathematics for Machine Learning을 따라 정리한 수학 기초' }
   - { path: ai/mathematics/linear-algebra, name: 2. Linear Algebra }
   - { path: ai/mathematics/analytic-geometry, name: 3. Analytic Geometry }

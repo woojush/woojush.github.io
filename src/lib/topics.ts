@@ -7,16 +7,21 @@
 import type { CollectionEntry } from 'astro:content';
 
 export type Note = CollectionEntry<'knowledge'>;
+export type TopicHue = 'walnut' | 'moss' | 'slate' | 'clay' | 'sand' | 'plum' | 'stone';
+
 export interface TopicConfigItem {
   path: string;
   name: string;
   description?: string;
+  color?: TopicHue;
 }
 
 export interface TopicNode {
   path: string;
   name: string;
   description?: string;
+  /** 태그 색 (없으면 부모 색을 이어받아 항상 채워진다) */
+  color: TopicHue;
   /** 이 노드 아래 전체 글 수 (하위 포함) */
   count: number;
   /** 이 노드에 직접 속한 글 (정렬됨) */
@@ -111,15 +116,17 @@ export function buildTopicTree(entries: readonly Note[], config: readonly TopicC
     node.notes.push(entry);
   }
 
-  const convert = (trie: Trie, prefix: string): TopicNode[] =>
+  const convert = (trie: Trie, prefix: string, inherited: TopicHue): TopicNode[] =>
     [...trie.kids]
       .map(([seg, kid]) => {
         const path = prefix ? `${prefix}/${seg}` : seg;
-        const children = convert(kid, path);
+        const color = config.find((t) => t.path === path)?.color ?? inherited;
+        const children = convert(kid, path, color);
         return {
           path,
           name: topicName(path, config),
           description: config.find((t) => t.path === path)?.description,
+          color,
           count: kid.notes.length + children.reduce((sum, c) => sum + c.count, 0),
           notes: sortNotes(kid.notes),
           children,
@@ -127,7 +134,7 @@ export function buildTopicTree(entries: readonly Note[], config: readonly TopicC
       })
       .sort((a, b) => configIndex(a.path, config) - configIndex(b.path, config) || a.name.localeCompare(b.name));
 
-  return convert(root, '');
+  return convert(root, '', 'stone');
 }
 
 /** 트리의 모든 노드를 (조상 목록과 함께) 펼친다. 주제 페이지를 만들 때 쓴다 */

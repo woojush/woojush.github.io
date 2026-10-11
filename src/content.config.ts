@@ -126,6 +126,8 @@ const topics = defineCollection({
           path: topicPath,
           name: z.string(),
           description: z.string().optional(),
+          // 떠다니는 태그 색. 비우면 부모의 색을 따르고, 최상위가 비면 stone
+          color: z.enum(['walnut', 'moss', 'slate', 'clay', 'sand', 'plum', 'stone']).optional(),
         }),
       )
       .default([]),

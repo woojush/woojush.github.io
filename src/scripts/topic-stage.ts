@@ -124,7 +124,7 @@ if (space && dataEl?.textContent && list && chipsEl) {
     const node = findStage(tree, path);
     const name = node?.name ?? 'Knowledge';
     if (titleEl) titleEl.textContent = name;
-    if (noteEl) noteEl.textContent = node ? (node.description ?? '') : lead;
+    if (noteEl) noteEl.textContent = node ? '' : lead;
     document.title = node ? `${name} — ${siteName}` : `Knowledge — ${siteName}`;
   }
 

@@ -31,7 +31,7 @@ const href = (id: string) => `/knowledge/${id}/`;
 
 {
   isLeaf ? (
-    <BaseLayout title={node.name} description={node.description ?? `${node.name} 노트 목록`}>
+    <BaseLayout title={node.name} description={`${node.name} 노트 목록`}>
       <nav class="crumbs" aria-label="Topic">
         <a href="/knowledge/">Knowledge</a>
         {
@@ -50,7 +50,6 @@ const href = (id: string) => `/knowledge/${id}/`;
         )}
       </nav>
       <h1>{ownOnly ? `${node.name} · Notes` : node.name}</h1>
-      {node.description && <p class="lead">{node.description}</p>}
       <section class="notes">
         <p class="stats">
           {node.notes.length}개의 노트 · {STATUS_ORDER.filter((s) => counts[s] > 0).map((s) => `${s} ${counts[s]}`).join(' · ')}
@@ -65,8 +64,8 @@ const href = (id: string) => `/knowledge/${id}/`;
       <TopicChips chips={chips} total={node.notes.length} />
     </BaseLayout>
   ) : (
-    <BaseLayout title={node.name} description={node.description ?? `${node.name} 노트 목록`}>
-      <TopicSpace tree={stageData(tree)} path={node.path} title={node.name} note={node.description} chips={chips} total={node.count} />
+    <BaseLayout title={node.name} description={`${node.name} 노트 목록`}>
+      <TopicSpace tree={stageData(tree)} path={node.path} title={node.name} chips={chips} total={node.count} />
     </BaseLayout>
   )
 }
@@ -90,12 +89,6 @@ const href = (id: string) => `/knowledge/${id}/`;
   .crumbs a:hover {
     color: var(--text);
     text-decoration: underline;
-  }
-
-  .lead {
-    margin-bottom: var(--space-5);
-    font-size: var(--fs-m);
-    line-height: var(--lh-m);
   }
 
   .stats,

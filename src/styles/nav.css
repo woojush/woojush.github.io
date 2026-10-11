@@ -122,7 +122,7 @@
 
 .nav-link {
   position: relative;
-  display: inline-block;
+  display: block;
   color: var(--text);
   font-size: var(--fs-s);
   line-height: 1.15;
@@ -200,7 +200,6 @@
     width: var(--nav-w-rest);
     transform: translateX(-50%);
     transition: width var(--nav-spring-duration) var(--nav-spring);
-    view-transition-name: site-nav;
   }
 
   .nav:hover,
@@ -231,7 +230,7 @@
 
   .nav-pill {
     gap: 1.40625rem;
-    padding-inline: 1.40625rem;
+    padding-inline: 0.75rem;
     /* 가운데 허브 자리를 비운다 */
     mask: radial-gradient(circle, transparent 1.05469rem, #000 1.125rem);
   }
@@ -245,19 +244,19 @@
     display: flex;
     flex: 1 1 0;
     align-items: center;
-    gap: 1.40625rem;
+    gap: 0.90rem;
     margin: 0;
     padding: 0;
   }
 
   .nav-list-start {
     justify-content: flex-end;
-    margin-right: 1.40625rem;
+    margin-right: 0.90rem;
   }
 
   .nav-list-end {
     justify-content: flex-start;
-    margin-left: 1.40625rem;
+    margin-left: 0.90rem;
   }
 
   .nav-spacer {

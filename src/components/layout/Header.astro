@@ -47,6 +47,19 @@ const { name, items, currentPath } = Astro.props;
     text-decoration: none;
   }
 
+  /* 데스크톱: 이름은 화면 맨 위 맨 왼쪽 모서리에 고정된다 (탭 바와 같은 높이의 줄) */
+  @media (min-width: 641px) and (hover: hover) {
+    .site-name {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 4;
+      height: var(--header-h);
+      padding-inline: var(--space-5);
+      margin: 0;
+    }
+  }
+
   .site-name:hover {
     text-decoration: underline;
     text-decoration-thickness: 1px;

@@ -118,7 +118,7 @@
 :root {
   --nav-h: 2.8125rem; /* 알약 높이 45px (lifestories 실측) */
   --nav-w-rest: 18.28125rem; /* 평소 293px (lifestories 실측) */
-  --nav-w-open: 33rem; /* 호버 528px. 허브 양옆 글자 간격을 같게 하려고 가장 긴 묶음(knowledge+writing)의 두 배가 들어가게 넓혔다 (lifestories 원본은 405px) */
+  --nav-w-open: 26.5rem; /* 호버 424px (원본은 405px. 한글 라벨 4개가 들어가도록 조금 넓혔다) */
   --nav-spring: cubic-bezier(0.44, 1.85, 0.6, 1); /* 늘어나고 줄어들 때의 스프링(오버슈트 1회) */
   --nav-spring-duration: 600ms;
   --nav-label-spring: cubic-bezier(0.34, 1.4, 0.6, 1);

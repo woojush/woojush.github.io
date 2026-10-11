@@ -186,11 +186,19 @@ a {
 }
 
 ::view-transition-group(root) {
-  animation-duration: var(--duration-slow);
+  animation-duration: 320ms;
 }
 
-/* 떠 있는 탭 바는 페이지를 옮겨도 그대로 둔다 (두 페이지의 같은 요소끼리 교차 페이드하지 않는다) */
-::view-transition-old(site-nav),
+/* 떠 있는 탭 바는 페이지를 옮겨도 그 자리에 둔다. 이전 모습(old)은 아예 숨기고 새 모습만 보인다:
+ * 알약은 반투명이라 이전 모습이 비쳐 글자가 겹쳐 보이고, 그룹이 이전 크기에서 새 크기로 옮겨 가면 늘어난 글자가 보인다. */
+::view-transition-group(site-nav) {
+  animation: none;
+}
+
+::view-transition-old(site-nav) {
+  display: none;
+}
+
 ::view-transition-new(site-nav) {
   animation: none;
   mix-blend-mode: normal;

@@ -3,6 +3,25 @@
 const nav = document.querySelector<HTMLElement>('.nav');
 const blob = nav?.querySelector<HTMLElement>('.nav-blob');
 
+// 탭(링크)을 누르면 "알약이 벌어져 있었다"고 표시해 둔다. 다음 페이지가 같은 모양으로 시작한다(BaseLayout의 인라인 스크립트가 읽는다).
+// 새 문서에서는 마우스가 움직이기 전까지 :hover가 잡히지 않아, 표시가 없으면 알약이 작아졌다 다시 벌어진다.
+const KEY = 'nav-open';
+const root = document.documentElement;
+if (root.hasAttribute('data-nav-open')) {
+  // 첫 움직임에 해제한다. 마우스가 알약 위면 :hover 규칙이 같은 모양을 이어받고, 밖이면 평소대로 줄어든다
+  const release = () => root.removeAttribute('data-nav-open');
+  addEventListener('pointermove', release, { once: true });
+  setTimeout(release, 2500);
+}
+nav?.addEventListener('click', (e) => {
+  if (!(e.target as Element).closest('a')) return;
+  try {
+    if (nav.matches(':hover')) sessionStorage.setItem(KEY, '1');
+  } catch {
+    // 저장소를 못 쓰면 표시 없이 이동한다
+  }
+});
+
 if (nav && blob) {
   const links = Array.from(nav.querySelectorAll<HTMLElement>('.nav-link'));
   let isOpen = false; // 알약이 다 늘어난 상태

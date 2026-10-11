@@ -238,6 +238,8 @@ npm run preview      # 빌드 결과 미리보기
 
 ## 15. 알려진 사항
 
+- 탭 바 깜빡임 수정(2026-10-11): 탭을 누르면 새 문서가 마우스가 움직이기 전까지 :hover를 못 잡아 알약이 293px로 줄었다 다시 424px로 벌어졌다(재현·확인함). `nav.ts`가 클릭 때 `sessionStorage nav-open`을 남기고 BaseLayout 인라인 스크립트가 `<html data-nav-open>`을 붙여 같은 모양으로 시작하며, 첫 마우스 움직임에 해제한다(`nav.css`).
+
 - 2026-10-11 오작동 정리: 인트로 중 푸터 숨김 수정, Knowledge 전환은 시작 때 주소를 바꾸고 전환 중 뒤로·앞으로 가기는 끝난 뒤 처리, `404.astro` 추가, 외부 링크(`http`)는 `target=_blank rel=noopener noreferrer`. 노션 예시 행("(예시)")은 사용자 콘텐츠라 그대로 둔다.
 
 - `npm audit`가 high 3건을 보고한다: `http-cache-semantics`(astro의 의존성)의 max-stale 처리 취약점. 빌드 시점에만 쓰이고 정적 산출물에는 포함되지 않는다. `npm audit fix --force`는 astro 2.x로 **다운그레이드**하므로 쓰지 않는다. 패치된 버전이 나오면 Astro 업그레이드로 해결한다.

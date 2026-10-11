@@ -8,10 +8,30 @@ const blob = nav?.querySelector<HTMLElement>('.nav-blob');
 const KEY = 'nav-open';
 const root = document.documentElement;
 if (root.hasAttribute('data-nav-open')) {
-  // 첫 움직임에 해제한다. 마우스가 알약 위면 :hover 규칙이 같은 모양을 이어받고, 밖이면 평소대로 줄어든다
+  // 첫 마우스 움직임에서 포인터가 어디 있는지(좌표)로 정한다. :hover 상태를 기다리면 새 문서가 아직 호버를 계산하기 전이라
+  // 표시를 푸는 순간 알약이 줄었다가 다시 벌어진다.
+  //  - 알약 위: 표시를 둔 채 알약을 떠날 때 푼다 (그동안 :hover 규칙이 같은 모양을 유지한다)
+  //  - 알약 밖: 바로 푼다 (평소처럼 줄어든다)
   const release = () => root.removeAttribute('data-nav-open');
-  addEventListener('pointermove', release, { once: true });
-  setTimeout(release, 2500);
+  addEventListener(
+    'pointermove',
+    (e) => {
+      const r = nav?.getBoundingClientRect();
+      const inside = !!r && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if (inside) {
+        // 알약을 떠나는 순간 푼다. pointerleave는 새 문서에서 믿기 어려워(호버가 늦게 잡힌다) 좌표로 직접 본다
+        const watch = (ev: PointerEvent) => {
+          const b = nav!.getBoundingClientRect();
+          if (ev.clientX < b.left || ev.clientX > b.right || ev.clientY < b.top || ev.clientY > b.bottom) {
+            removeEventListener('pointermove', watch);
+            release();
+          }
+        };
+        addEventListener('pointermove', watch);
+      } else release();
+    },
+    { once: true },
+  );
 }
 nav?.addEventListener('click', (e) => {
   if (!(e.target as Element).closest('a')) return;

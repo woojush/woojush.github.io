@@ -1,0 +1,58 @@
+name: Sync Notion
+
+# 노션 Categories·Notes DB를 읽어 Knowledge 글을 만들고, 빌드가 통과하면 main에 커밋한 뒤 배포를 시작한다.
+# Actions 탭 → "Sync Notion" → Run workflow 로 실행한다. 필요한 비밀값: NOTION_TOKEN (Settings → Secrets → Actions)
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+# 동기화끼리 겹치지 않게 순서대로 처리
+concurrency:
+  group: notion-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      SITE_URL: https://${{ github.repository_owner }}.github.io
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Pull from Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/notion-sync.mjs
+
+      # 노션 글에 문제가 있으면 여기서 멈추고 main은 그대로 둔다 (잘못된 수식 등)
+      - name: Check and build
+        run: |
+          npm ci
+          npm run check
+          npm run build
+
+      - name: Commit and deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add -A src/content/knowledge src/data/topics.yaml public/images/knowledge public/labs
+          if git diff --cached --quiet; then
+            echo "바뀐 내용이 없습니다."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Knowledge: 노션 동기화"
+          git push origin HEAD:main
+          # GITHUB_TOKEN으로 push하면 deploy 워크플로가 자동으로 시작되지 않으므로 직접 시작한다
+          gh workflow run deploy.yml --ref main

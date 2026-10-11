@@ -170,3 +170,58 @@
   overflow: hidden;
   clip-path: inset(50%);
 }
+
+/* ───────── 노션에서 온 글의 원시 HTML: 콜아웃·토글·임베드 ─────────
+ * 노션 동기화(scripts/notion)가 .md에 이 HTML을 그대로 넣는다. 모양은 여기서만 정한다. */
+.prose .callout {
+  max-width: var(--measure);
+  margin: 0 0 var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border-left: 2px solid var(--text-muted);
+  border-radius: 0 var(--radius-s) var(--radius-s) 0;
+}
+
+.prose .callout[data-kind='stuck'] {
+  border-left-color: var(--accent);
+}
+
+.prose .callout > :last-child {
+  margin-bottom: 0;
+}
+
+.prose details {
+  max-width: var(--measure);
+  margin: 0 0 var(--space-5);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-s);
+}
+
+.prose summary {
+  cursor: pointer;
+  font-weight: var(--fw-strong);
+}
+
+.prose summary p {
+  display: inline;
+  margin: 0;
+}
+
+.prose details[open] > summary {
+  margin-bottom: var(--space-3);
+}
+
+.prose .embed {
+  max-width: 100%;
+  margin: 0 0 var(--space-5);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+}
+
+.prose .embed iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+}

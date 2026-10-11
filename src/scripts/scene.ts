@@ -137,15 +137,17 @@ const POST_FRAG = /* glsl */ `
   uniform float uTime;
   uniform float uLight;   // 1이면 밝은 테마(별이 어두운 점): 비네팅·그레인을 쓰지 않는다
   varying vec2 vUv;
-  // 격자 무늬가 생기지 않는 디더용 노이즈 (interleaved gradient noise)
+  // 사선·격자 무늬가 없는 노이즈 (Hoskins hash). interleaved gradient noise는 사선 줄무늬가 보여 쓰지 않는다
   float ign(vec2 p) {
-    return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715))));
+    vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
   }
   void main() {
     vec2 c = vUv - 0.5;
     float r2 = dot(c, c) * 4.0;          // 가운데 0 → 모서리 약 2
     float rr = sqrt(r2);
-    float edge = smoothstep(0.3, 1.1, rr);
+    float edge = smoothstep(0.6, 1.35, rr); // 번짐은 중심에서 더 멀리 떨어진 곳부터
     vec2 off = c * uCA * r2;
     // 가장자리일수록 퍼지는 원형 번짐: R·B는 반대로 어긋난 중심에서, G는 제자리에서 모은다
     float rad = uBlur * edge * edge;
@@ -168,7 +170,8 @@ const POST_FRAG = /* glsl */ `
     vec3 col = vec3(sr.r, sg.g * (1.0 + 0.3 * edge * (1.0 - uLight)), sb.b);
     // 어두운 테마: 별은 빛(더하기)이라 밝기가 곧 불투명도. 밝은 테마: 저장된 알파를 쓴다
     float a = mix(max(col.r, max(col.g, col.b)), max(sr.a, max(sg.a, sb.a)), uLight);
-    float v = uVig * smoothstep(0.25, 1.0, rr) * (1.0 - uLight);
+    float vr = smoothstep(0.0, 1.5, rr); // 0에서 기울기가 0이라 비네팅이 시작되는 경계선(등고선)이 생기지 않는다
+    float v = uVig * vr * vr * (1.0 - uLight);
     float n1 = ign(gl_FragCoord.xy + fract(uTime * 0.37) * 211.0) - 0.5;
     float n2 = ign(gl_FragCoord.yx * 1.31 + fract(uTime * 0.53) * 173.0) - 0.5;
     float g = n1 * uGrain * (0.35 + 0.65 * edge) * (1.0 - uLight);
@@ -177,7 +180,7 @@ const POST_FRAG = /* glsl */ `
     float outA = 1.0 - (1.0 - a) * (1.0 - v);
     outA = max(outA, max(col.r, max(col.g, col.b)) * (1.0 - uLight));
     // 비네팅이 만드는 단계(밴딩)가 등고선처럼 보이지 않게 어둠 쪽 알파에 미세한 디더를 섞는다
-    outA = clamp(outA + n1 * 0.06 * min(1.0, v * 10.0), 0.0, 1.0);
+    outA = clamp(outA + n1 * 0.11 * min(1.0, v * 10.0), 0.0, 1.0);
     gl_FragColor = vec4(col, outA);
   }
 `;

@@ -143,15 +143,21 @@ body:has([data-space]) .site-footer {
   color: var(--tag-count-hover-text);
 }
 
-/* 호버 때 아래에서 복제본이 올라와 원본에 겹쳐지며 사라진다 (lifestories.org: 호버 시 태그 텍스처가 한 번 더 겹쳐 올라온다) */
+/* 호버 때 아래에서 복제본이 천천히 올라와 원본 뒤에 겹쳐진다 (lifestories.org: 호버 시 태그가 한 번 더 겹쳐 보인다).
+ * 복제본은 원본 뒤에 있어 글자가 이중으로 보이지 않고, 올라와서는 원본 아래로 살짝 비치는 층으로 남는다. */
+.tag-item {
+  isolation: isolate;
+}
+
 .tag-ghost {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: -1;
   display: inline-flex;
   gap: 0.25rem;
   height: 2.125rem;
-  color: var(--tag-text);
+  color: transparent;
   font-size: 0.6875rem;
   font-weight: var(--fw-strong);
   letter-spacing: 0.21em;
@@ -162,21 +168,26 @@ body:has([data-space]) .site-footer {
   white-space: nowrap;
 }
 
+.tag-ghost .tag-name,
+.tag-ghost .tag-count {
+  filter: brightness(0.6);
+}
+
 .tag-item:hover .tag-ghost {
-  animation: tag-ghost-rise 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: tag-ghost-rise 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes tag-ghost-rise {
   0% {
     opacity: 0;
-    transform: translateY(1.25rem);
+    transform: translateY(1.5rem);
   }
-  30% {
-    opacity: 0.55;
+  35% {
+    opacity: 0.8;
   }
   100% {
-    opacity: 0;
-    transform: translateY(0);
+    opacity: 0.45;
+    transform: translateY(0.3125rem);
   }
 }
 

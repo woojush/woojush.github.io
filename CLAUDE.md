@@ -12,8 +12,9 @@
 - **탭 바 v4 구현됨** (2026-10-10, `tabbar-v4` 브랜치): 사용자 지시로 lifestories.org의 상단 알약을 그대로 따랐다. 평소에는 화면 위 가운데에 떠 있는 작은 알약(가운데 허브)이고, 마우스가 올라가면 스프링으로 늘어나며 글자가 모인다. 글자에 마우스를 올리면 알약 아래쪽에서 은은한 빛이 따라온다. **home은 메뉴에서 뺐고** 이름과 허브가 홈 링크다. 모양은 `src/styles/nav.css`, 값은 `tokens.css`의 탭 바 토큰, 동작은 `src/scripts/nav.ts`. 이 효과는 `docs/07` §3 c·`DESIGN.md`의 승인된 예외다.
 - **About 구현됨** (2026-10-10, `about-page` 브랜치): 구성은 Intro → Interests → Why this site → Path(Timeline) → Elsewhere. 문구는 사용자가 직접 쓴 것이다. Intro의 "Robot AI 엔지니어"는 사용자의 표현이며, 사이트 전체의 주제를 한 분야로 제한하지 않는 §1 원칙은 그대로다.
 - **메인 인트로 → 홈 화면 구현됨** (2026-10-10): 첫 방문에 문구가 점점 커지고 그 속도에 맞춰 별이 날아온다. 메인 문장이 나타나고 1.8초 뒤(3.8초) 작은 문장이 나타나며, 작은 문장이 다 나타나고 1.3초 뒤(6.0초) 4초 동안 블랙홀에 빨려 들어가듯(별은 선으로 늘어나 휘감김, 확대 300배) 폭발적으로 확대되어 어두운 배경 속으로 사라지면, **같은 페이지(`/`)에서** 프로필(사진·설명)·Now·Projects(active)·Recent가 나타난다. 이동은 없다. 인트로는 움직임 줄이기 설정일 때만 하지 않고, 홈에 올 때마다 한다(누르거나 Enter·Space·Esc로 건너뛴다). 세부는 `docs/07` "메인 인트로 → 홈 화면", 시간표는 `src/scripts/intro-timeline.ts`.
+- **Knowledge 구현됨** (2026-10-11): 목록은 topic 경로(`분야/세부분야`)에서 만든 2단계 트리(접힘, 최근 갱신, status 현황), 글 페이지는 breadcrumb·수식(KaTeX)·코드(Shiki 두 테마)·우측 목차·Related(역링크 자동)·이전/다음. 이를 위해 Phase 2·3의 일부(읽기 환경, 트리, Related)를 Knowledge 한정으로 앞당겼다(사용자 승인). Projects·Writing 상세는 아직 최소 틀이고 `/tags/`·Mermaid·검색은 하지 않았다. 지식 노트 샘플은 `sample-*`(전부 `draft: true`)이며 공개된 노트는 아직 없다. 구조는 `docs/01` §4.3, 작성법은 아래 §9.
 - GitHub·이메일·LinkedIn은 공개 확정, `site.ts`의 `links`에 추가했다(푸터와 About의 Elsewhere가 같이 쓴다).
-- 다음은 **하위 페이지별 디자인 설계** 단계이고, 그 뒤에 **Phase 2** (글 읽기 파이프라인)다. 사용자 승인 전에는 Phase 2로 넘어가지 않는다.
+- 다음은 **하위 페이지별 디자인 설계** 단계(Projects·Writing)이고, 그 뒤에 **Phase 2·3의 남은 부분**(Projects·Writing 상세에 읽기 환경·Related 적용, `/tags/`)이다. 읽기 환경(`ArticleLayout`·prose·KaTeX)과 트리·Related는 Knowledge에서 이미 만들어 두었으니 재사용한다. 사용자 승인 전에는 넘어가지 않는다.
 - 사용자는 대부분의 기능·디자인을 Claude가 맥락과 취향을 반영해 먼저 결정하고, 결과물을 보고 사용자가 판단하는 방식을 원한다. 질문은 꼭 필요한 것만 한다.
 - 진행 순서와 각 Phase의 완료 기준: `docs/06_implementation_plan.md`
 - 한 번에 **한 Phase만** 구현하고, 끝나면 완료 기준별 결과를 보고한 뒤 승인을 기다린다.
@@ -99,7 +100,8 @@ src/
 디자인 v2에서 추가됨: `docs/07`, `src/components/home/`(HomeHero 인트로, HomeProfile, HomeNow, HomeList), `src/scripts/scene.ts`(별 장면), `src/scripts/home-intro.ts`(시계·상태 전환), `src/scripts/intro-timeline.ts`(확대 곡선), `src/lib/{profile,format}.ts`.
 About에서 추가됨: `src/components/about/Timeline.astro`, `src/lib/content.ts`의 `getAbout`·`getTimeline`, about 스키마의 선택 필드 `lead`.
 Phase 1에서 추가됨: `src/components/layout/`(Header, Nav, Footer, ThemeToggle), `src/styles/{tokens,fonts,base}.css`, `src/scripts/{theme-init.js,theme-toggle.ts}`, `public/fonts/pretendard/`.
-이후에 추가될 것: `src/components/{content,home,about,mdx}/`, `src/styles/prose.css`, `src/lib/{topics,links,format}.ts`, `public/labs/`. 구조 명세는 `docs/05`.
+Knowledge에서 추가됨: `src/layouts/ArticleLayout.astro`, `src/components/{knowledge,content,mdx}/`(TopicTree·EntryRow / TableOfContents·Related·PrevNext / Callout·Figure·Embed), `src/styles/{prose,katex}.css`, `src/lib/{topics,links}.ts`, `src/lib/rehype-{heading-anchors,math-errors}.mjs`, `src/data/topics.yaml`, `public/fonts/katex/`.
+이후에 추가될 것: `public/labs/`, `/tags/`. 구조 명세는 `docs/05`.
 
 ## 6. Content model (요약. 기준은 `docs/02` + `src/content.config.ts`)
 
@@ -107,7 +109,7 @@ Phase 1에서 추가됨: `src/components/layout/`(Header, Nav, Footer, ThemeTogg
 
 | 컬렉션 | 추가 필드 |
 |--------|-----------|
-| knowledge | `topic`(필수, kebab 경로) `status`(필수: `seed` \| `growing` \| `evergreen`) |
+| knowledge | `topic`(필수, kebab 경로) `status`(필수: `seed` \| `growing` \| `evergreen`) `order`(선택, 같은 topic 안의 순서) |
 | projects | `summary`(필수) `status`(필수: `active`\|`paused`\|`done`\|`archived`) `period{start,end?}` `repo` `demo` `featured` |
 | writing | `kind`(필수: `technical`\|`essay`\|`career`\|`learning`\|`reflection`) |
 
@@ -140,9 +142,11 @@ Minimal · Technical · Editorial · Calm · Personal · Typography-driven · �
 
 ### 새 Knowledge 추가
 1. `src/content/knowledge/<slug>.md` 생성
-2. frontmatter 필수: `title`, `date`, `topic`, `status`
-3. 본문은 필요한 섹션만 H2로 쓴다 (Definition / Why / Intuition / Mathematical formulation / Derivation / Example / AI·Engineering relevance / My understanding / Related concepts / References). **쓰지 않는 섹션은 제목째로 지운다.**
-4. 새 분야는 그냥 `topic: <새분야>/…`로 쓰면 된다. 메뉴·코드 수정 불필요.
+2. frontmatter 필수: `title`, `date`, `topic`, `status`. 선택: `description`(목록의 한 줄 설명), `updated`, `tags`, `order`, `links`
+3. **topic**은 글 1편에 하나, `분야/세부분야`(예: `mathematics/linear-algebra`). 판별 질문: "이 개념을 어느 분과(교재의 어느 장)에서 배웠나?" 여러 분야에 걸치면 배운 곳에 두고 `links`·`tags`로 잇는다. 시기·프로젝트·군 복무로 나누지 않는다.
+4. 본문은 필요한 섹션만 H2로 쓴다. 기본 흐름: 왜 필요한가 → 핵심 아이디어 → 정의·성질 → 예시 → 막히는 지점 (`docs/02` §6.1). **쓰지 않는 섹션은 제목째로 지운다.**
+5. 수식은 `$…$`(인라인)·`$$…$$`(블록), 코드는 ``` 펜스(언어 이름 필수). 잘못된 TeX는 빌드가 멈춘다. 선행 개념은 `links`에 `rel: prerequisite`로 한 줄(그 글이 목록에서 앞에 오고 Related에 나타난다). 교재 순서대로 보이게 하고 싶으면 `order`.
+6. Callout·Figure·Embed는 `.mdx`에서만(상대 경로 import: `../../components/mdx/Callout.astro`). 새 분야는 그냥 `topic: <새분야>/…`로 쓰면 된다. 메뉴·코드 수정 불필요. 표시 이름·순서만 `src/data/topics.yaml`(선택).
 
 ### 새 Project 추가
 1. `src/content/projects/<slug>.md` 생성
@@ -213,6 +217,15 @@ npm run preview      # 빌드 결과 미리보기
 - **푸터 링크**: `site.ts`의 `links`가 비어 있으면 푸터는 저작권 줄만 그린다. 링크는 §4의 공개 확정 항목이 들어 있다. 그 밖의 외부 링크는 넣기 전에 사용자에게 확인한다.
 - **현재 메뉴 표시**: 정확히 그 페이지면 `aria-current="page"`, 그 섹션의 하위 글이면 `"true"`. 둘 다 굵기 600.
 
+## 13-2. Knowledge에서 확정한 구현 사실 (2026-10-11)
+
+- **Astro 7의 기본 Markdown 처리기는 Sätteri**라서 remark/rehype 플러그인이 안 먹는다. `astro.config.mjs`가 `@astrojs/markdown-remark`의 `unified()`를 `markdown.processor`로 쓴다(`@astrojs/mdx`도 이를 따른다). 새 플러그인은 `unified({ remarkPlugins, rehypePlugins })`에 넣는다.
+- **rehype 순서:** `rehype-heading-anchors` → `rehype-katex` → `rehype-math-errors`. 제목 id는 Astro가 사용자 플러그인 *뒤에* 붙이므로 앵커 플러그인이 id를 먼저 만든다(github-slugger와 같은 규칙, 한글 id 그대로). `rehype-katex`는 잘못된 TeX를 경고만 하고 빨간 글자로 렌더링하므로 `rehype-math-errors`가 빌드를 멈춘다.
+- **KaTeX:** `katex`·`remark-math`·`rehype-katex`(승인된 의존성). 글꼴은 `public/fonts/katex/`(woff2만), CSS는 `src/styles/katex.css`(dist의 katex.min.css에서 woff2 경로만 바꿔 만든 것 — katex를 올리면 다시 만든다). 글 페이지(ArticleLayout)에만 실린다.
+- **코드:** Shiki `vitesse-light`/`vitesse-dark`를 `defaultColor: false`로 내보내 CSS 변수(`--shiki-light/dark`)로 두고, `prose.css`가 `data-theme`에 맞는 쪽을 쓴다.
+- MDX에서 컴포넌트를 쓰면 빌드에 `use astro:head-inject` MODULE_LEVEL_DIRECTIVE 경고가 뜨지만 스타일은 정상적으로 들어간다(확인함). 무시한다.
+- 관계 검증(`lib/links.ts`): 없는 글을 가리키는 `links`, 선행(prerequisite) 순환은 빌드가 멈춘다. 캐시를 두지 않는다(dev에서 콘텐츠가 바뀌어도 맞게).
+
 ## 14. Phase 0에서 의도적으로 하지 않은 것
 
 디자인 토큰·다크 모드·기본 틀은 Phase 1에서 구현했다. Phase 0에서는 하지 않은 것: 페이지별 완성 디자인, 복잡한 navigation, backlink UI, 검색, 애니메이션, 인터랙티브 시각화, Project/Article UI, `topics.yaml`, `/tags/`, Home의 NOW 표시. 모두 `docs/06`의 해당 Phase에서 구현한다.
@@ -220,7 +233,7 @@ npm run preview      # 빌드 결과 미리보기
 ## 15. 알려진 사항
 
 - `npm audit`가 high 3건을 보고한다: `http-cache-semantics`(astro의 의존성)의 max-stale 처리 취약점. 빌드 시점에만 쓰이고 정적 산출물에는 포함되지 않는다. `npm audit fix --force`는 astro 2.x로 **다운그레이드**하므로 쓰지 않는다. 패치된 버전이 나오면 Astro 업그레이드로 해결한다.
-- 샘플 콘텐츠 3개(`sample-*.md`)는 전부 `draft: true`인 스키마 검증용 임시 자료다. 실제 글이 생기면 삭제한다.
+- 샘플 콘텐츠(`sample-*`: knowledge 5, project 1, writing 1)는 전부 `draft: true`인 검증용 임시 자료다. 실제 글이 생기면 삭제한다. 샘플의 `Embed`는 없는 `/labs/sample-projection/`을 가리킨다(draft라 배포되지 않는다).
 
 ## 16. 디자인 스킬 사용 규칙
 

@@ -50,6 +50,8 @@ const knowledge = defineCollection({
     topic: topicPath,
     // 색상 코드로 쓰지 않는다. 텍스트로만 표시한다.
     status: z.enum(['seed', 'growing', 'evergreen']),
+    // 같은 topic 안에서의 표시 순서(작을수록 앞). 없으면 선행 관계 → 날짜순. 교재 순서로 읽히게 하고 싶을 때만 쓴다.
+    order: z.number().optional(),
   }),
 });
 
@@ -113,4 +115,20 @@ const timeline = defineCollection({
   }),
 });
 
-export const collections = { knowledge, projects, writing, about, now, timeline };
+// Knowledge 목록의 소개 문구와 topic 표시 이름·순서. 등록하지 않은 topic도 동작한다(경로를 보기 좋게 바꿔 표시).
+const topics = defineCollection({
+  loader: glob({ pattern: 'topics.yaml', base: './src/data' }),
+  schema: z.object({
+    lead: z.string().optional(),
+    topics: z
+      .array(
+        z.object({
+          path: topicPath,
+          name: z.string(),
+        }),
+      )
+      .default([]),
+  }),
+});
+
+export const collections = { knowledge, projects, writing, about, now, timeline, topics };

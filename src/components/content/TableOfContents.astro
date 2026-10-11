@@ -1,0 +1,107 @@
+---
+// 글 안의 제목(h2·h3) 목차. 넓은 화면에서는 본문 오른쪽에 따라다니고, 좁은 화면에서는 본문 위의 접힌 목록이다.
+// 제목이 3개 미만이면 그리지 않는다.
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+interface Props {
+  headings: readonly Heading[];
+  /** inline: 좁은 화면에서 본문 위에 놓는 접힌 목록 / aside: 넓은 화면에서 본문 오른쪽에 따라다니는 목록 */
+  variant: 'inline' | 'aside';
+}
+
+const { variant } = Astro.props;
+const items = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  items.length >= 3 && (
+    variant === 'inline' ? (
+      <details class="toc toc-inline">
+        <summary>On this page</summary>
+        <ol>
+          {items.map((h) => (
+            <li class:list={{ sub: h.depth === 3 }}>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ol>
+      </details>
+    ) : (
+      <nav class="toc toc-aside" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ol>
+          {items.map((h) => (
+            <li class:list={{ sub: h.depth === 3 }}>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )
+  )
+}
+
+<style>
+  .toc ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .toc a {
+    display: block;
+    padding-block: var(--space-1);
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+    text-decoration: none;
+  }
+
+  .toc a:hover {
+    color: var(--text);
+  }
+
+  .toc li.sub a {
+    padding-left: var(--space-3);
+  }
+
+  /* 좁은 화면: 본문 위의 접힌 목록 */
+  .toc-inline {
+    margin-bottom: var(--space-5);
+    padding-block: var(--space-2);
+    border-block: 1px solid var(--rule);
+  }
+
+  .toc-inline summary {
+    min-height: var(--tap);
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    cursor: pointer;
+  }
+
+  /* 넓은 화면: 본문 오른쪽 */
+  @media (min-width: 960px) {
+    .toc-inline {
+      display: none;
+    }
+
+    .toc-aside {
+      position: sticky;
+      top: var(--space-7);
+      max-height: calc(100dvh - var(--space-8));
+      overflow-y: auto;
+    }
+
+    .toc-title {
+      margin: 0 0 var(--space-2);
+      color: var(--text-muted);
+      font-size: var(--fs-s);
+      font-weight: var(--fw-strong);
+    }
+  }
+</style>

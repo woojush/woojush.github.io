@@ -1,0 +1,33 @@
+---
+// MDX 전용. public/labs/<slug>/index.html 에 둔 독립 페이지(시각화·실험)를 글 안에 iframe으로 넣는다 (CLAUDE.md §10의 1단계).
+// sandbox로 격리하고(스크립트만 허용), 화면에 가까워질 때 불러온다. title은 필수다(스크린 리더용).
+interface Props {
+  /** 예: /labs/projection/ */
+  src: string;
+  title: string;
+  height?: number;
+}
+
+const { src, title, height = 420 } = Astro.props;
+---
+
+<div class="embed">
+  <iframe src={src} title={title} loading="lazy" sandbox="allow-scripts" style={`height:${height}px`}></iframe>
+</div>
+
+<style>
+  .embed {
+    max-width: 100%;
+    margin: 0 0 var(--space-5);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-s);
+    overflow: hidden;
+  }
+
+  iframe {
+    display: block;
+    width: 100%;
+    border: 0;
+    background: var(--surface);
+  }
+</style>

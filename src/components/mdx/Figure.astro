@@ -1,0 +1,35 @@
+---
+// MDX 전용. 이미지·도표 + 캡션. 이미지는 public/ 아래 경로를 쓴다. alt는 필수다(그림이 전하는 내용을 말로).
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+const { src, alt, caption } = Astro.props;
+---
+
+<figure>
+  <img src={src} alt={alt} loading="lazy" decoding="async" />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  figure {
+    max-width: 100%;
+    margin: 0 0 var(--space-5);
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  figcaption {
+    margin-top: var(--space-2);
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+</style>

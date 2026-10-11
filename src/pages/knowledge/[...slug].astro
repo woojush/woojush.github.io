@@ -1,19 +1,107 @@
 ---
+// 지식 노트 한 편. 위: topic 경로·제목·상태/갱신일/태그. 가운데: 본문 + 오른쪽 목차. 아래: Related(선행·이어지는 개념·연결된 프로젝트와 글) + 같은 topic의 이전/다음.
+// URL은 파일명(entry.id)에서만 만들어진다. topic 등 metadata는 URL에 쓰지 않는다 (CLAUDE.md §3-2).
 import { render } from 'astro:content';
-import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getEntries } from '@/lib/content';
+import ArticleLayout from '@/layouts/ArticleLayout.astro';
+import Related from '@/components/content/Related.astro';
+import PrevNext from '@/components/content/PrevNext.astro';
+import { getEntries, getTopicsConfig } from '@/lib/content';
+import { getRelations, validateLinks } from '@/lib/links';
+import { neighborsInTopic, topicCrumbs } from '@/lib/topics';
+import { formatDate } from '@/lib/format';
 
-// URL은 파일명(entry.id)에서만 만들어진다. topic 등 metadata는 URL에 쓰지 않는다.
 export async function getStaticPaths() {
   const entries = await getEntries('knowledge');
   return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
 }
 
+await validateLinks();
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
+const config = await getTopicsConfig();
+const all = await getEntries('knowledge');
+const crumbs = topicCrumbs(entry.data.topic, config.topics);
+const groups = await getRelations(entry.id);
+const { prev, next } = neighborsInTopic(all, entry);
+const when = entry.data.updated ?? entry.data.date;
+const toItem = (n: (typeof all)[number] | undefined) => (n ? { href: `/knowledge/${n.id}/`, title: n.data.title } : undefined);
 ---
 
-<BaseLayout title={entry.data.title} description={entry.data.description} lang={entry.data.lang}>
-  <h1>{entry.data.title}</h1>
+<ArticleLayout title={entry.data.title} description={entry.data.description} lang={entry.data.lang} headings={headings}>
+  <header slot="header" class="note-head">
+    <nav class="crumbs" aria-label="Topic">
+      <a href="/knowledge/">Knowledge</a>
+      {
+        crumbs.map((c) => (
+          <>
+            <span aria-hidden="true">/</span>
+            <a href={`/knowledge/#${c.anchor}`}>{c.name}</a>
+          </>
+        ))
+      }
+    </nav>
+    <h1>{entry.data.title}</h1>
+    {entry.data.description && <p class="desc">{entry.data.description}</p>}
+    <p class="meta">
+      <span>{entry.data.status}</span>
+      <span>
+        {entry.data.updated ? 'updated ' : ''}<time datetime={when.toISOString().slice(0, 10)}>{formatDate(when)}</time>
+      </span>
+      {entry.data.tags.length > 0 && <span>{entry.data.tags.map((t) => `#${t}`).join(' ')}</span>}
+    </p>
+  </header>
+
   <Content />
-</BaseLayout>
+
+  <Fragment slot="footer">
+    <Related groups={groups} />
+    <PrevNext prev={toItem(prev)} next={toItem(next)} />
+  </Fragment>
+</ArticleLayout>
+
+<style>
+  .note-head {
+    margin-bottom: var(--space-6);
+  }
+
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-2);
+    margin-bottom: var(--space-3);
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  .crumbs a {
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  .crumbs a:hover {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  h1 {
+    margin-bottom: var(--space-3);
+  }
+
+  .desc {
+    margin-bottom: var(--space-3);
+    font-size: var(--fs-m);
+    line-height: var(--lh-m);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-4);
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+</style>

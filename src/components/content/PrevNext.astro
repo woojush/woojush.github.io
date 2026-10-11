@@ -1,0 +1,79 @@
+---
+// 같은 topic 안의 이전·다음 글. 둘 다 없으면 그리지 않는다.
+interface Item {
+  href: string;
+  title: string;
+}
+interface Props {
+  prev?: Item;
+  next?: Item;
+}
+
+const { prev, next } = Astro.props;
+---
+
+{
+  (prev || next) && (
+    <nav class="prev-next" aria-label="Same topic">
+      {prev ? (
+        <a class="prev" href={prev.href} rel="prev">
+          <span class="dir">Previous</span>
+          <span class="title">{prev.title}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+      {next && (
+        <a class="next" href={next.href} rel="next">
+          <span class="dir">Next</span>
+          <span class="title">{next.title}</span>
+        </a>
+      )}
+    </nav>
+  )
+}
+
+<style>
+  .prev-next {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-top: var(--space-7);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rule);
+  }
+
+  a {
+    display: block;
+    min-height: var(--tap);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .next {
+    text-align: right;
+  }
+
+  .dir {
+    display: block;
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  a:hover .title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  @media (max-width: 480px) {
+    .prev-next {
+      grid-template-columns: 1fr;
+    }
+
+    .next {
+      text-align: left;
+    }
+  }
+</style>

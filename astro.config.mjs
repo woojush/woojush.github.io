@@ -1,6 +1,11 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import { unified } from '@astrojs/markdown-remark';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeHeadingAnchors from './src/lib/rehype-heading-anchors.mjs';
+import rehypeMathErrors from './src/lib/rehype-math-errors.mjs';
 
 // 배포 구조 (docs/03_technical_stack.md 6절)
 // - 기준: `<username>.github.io` 저장소 → 루트 경로(base: '/')
@@ -13,4 +18,14 @@ export default defineConfig({
   // GitHub Pages는 /about/ → about/index.html 로 서빙한다. 모든 내부 링크는 trailing slash로 통일.
   trailingSlash: 'always',
   integrations: [mdx()],
+  markdown: {
+    // 수식: $…$ 인라인, $$…$$ 블록. 잘못된 TeX는 빨간 글자로 배포되지 않도록 빌드를 멈춘다(rehype-math-errors).
+    // Astro 7의 기본 처리기는 Sätteri라서, remark/rehype 플러그인은 unified 처리기(@astrojs/markdown-remark)로 돌린다.
+    processor: unified({
+      remarkPlugins: [remarkMath],
+      rehypePlugins: [rehypeHeadingAnchors, [rehypeKatex, { strict: 'ignore' }], rehypeMathErrors],
+    }),
+    // 코드: 두 테마의 색을 변수로 같이 내보내고, prose.css가 data-theme에 맞는 쪽을 쓴다.
+    shikiConfig: { themes: { light: 'vitesse-light', dark: 'vitesse-dark' }, defaultColor: false },
+  },
 });

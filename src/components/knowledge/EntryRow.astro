@@ -1,0 +1,78 @@
+---
+// 지식 노트 한 줄: 제목(+ 한 줄 설명) | 상태 | 날짜. 카드가 아니라 행이다. 상태는 색이 아니라 글자로만 표시한다.
+import { formatDate } from '@/lib/format';
+
+interface Props {
+  href: string;
+  title: string;
+  status: 'seed' | 'growing' | 'evergreen';
+  date: Date;
+  description?: string;
+}
+
+const { href, title, status, date, description } = Astro.props;
+---
+
+<li class="row">
+  <div class="main">
+    <a href={href}>{title}</a>
+    {description && <p class="desc">{description}</p>}
+  </div>
+  <span class="status">{status}</span>
+  <time datetime={date.toISOString().slice(0, 10)}>{formatDate(date)}</time>
+</li>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 5.5rem 6.5rem;
+    gap: var(--space-4);
+    align-items: baseline;
+    padding-block: var(--space-2);
+    border-top: 1px solid var(--rule);
+  }
+
+  a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .desc {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  .status,
+  time {
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-s);
+  }
+
+  time {
+    text-align: right;
+  }
+
+  @media (max-width: 480px) {
+    .row {
+      grid-template-columns: 1fr auto;
+      gap: 0 var(--space-3);
+    }
+
+    .main {
+      grid-column: 1 / -1;
+    }
+
+    time {
+      text-align: left;
+    }
+  }
+</style>

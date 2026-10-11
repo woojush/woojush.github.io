@@ -55,6 +55,7 @@ src/data/
 |------|:---:|------|------|
 | `topic` | ✔ | string (슬래시 경로) | 지식 트리 위치. 예: `mathematics/linear-algebra` |
 | `status` | ✔ | `seed` \| `growing` \| `evergreen` | 성숙도. seed = 메모 수준, growing = 작성 중, evergreen = 한동안 안 고쳐도 되는 상태 |
+| `order` | | number | 같은 topic 안의 표시 순서(작을수록 앞). 없으면 선행(prerequisite) 관계 → 날짜 오래된 순. 교재 순서로 읽히게 하고 싶을 때만 쓴다 (2026-10-11) |
 
 ```yaml
 ---
@@ -215,8 +216,11 @@ mathematics/linear-algebra:
 | Related concepts | 자동 Related와 별개로 본문에서 설명이 필요할 때 | |
 | References | 출처 | |
 
+**본인 노트 형식 매핑 (2026-10-11):** 위 목록은 아래 흐름으로 쓰는 것을 기본으로 한다 — *왜 필요한가*(Why) → *핵심 아이디어*(Intuition) → *정의·성질*(Definition, Mathematical formulation, Derivation) → *예시*(Example) → *막히는 지점*(`<Callout kind="stuck">`, MDX). 개념마다 같은 틀을 쓰면 나중에 다시 펼쳐 볼 때 찾기 쉽다.
+
 관례:
 
+- **topic 정하기:** 글 1편에 topic 하나, `분야/세부분야` 2단계. 분야는 학문 분과(mathematics, computer-science, machine-learning, robotics, neuroscience…), 세부분야는 교재 목차·분과 단위(linear-algebra, probability…). 시기·프로젝트·군 복무 같은 기준은 쓰지 않는다. 판별 질문: "이 개념을 어느 분과(교재의 어느 장)에서 배웠나?" 여러 분야에 걸치면 배운 곳 한 군데에 두고 다른 분야와는 `links`·`tags`로 잇는다.
 - **쓰지 않는 섹션은 제목째로 지운다.** 빈 섹션 제목을 남기지 않는다. seed 단계의 글은 Definition과 My understanding 두 개뿐이어도 정상이다.
 - 섹션 제목은 H2(`##`)만 쓴다. 우측 목차(TOC)는 H2·H3로 만들어지므로 제목 이름이 곧 목차 이름이 된다.
 

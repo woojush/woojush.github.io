@@ -3,6 +3,8 @@ title: Sample essay
 kind: essay
 date: 2026-10-04
 tags: [sample]
+links:
+  - { type: knowledge, slug: sample-rank-nullity, rel: explains }
 draft: true
 ---
 

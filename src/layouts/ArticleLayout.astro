@@ -1,0 +1,57 @@
+---
+// 읽는 글(knowledge 우선)의 틀: 제목 영역(header 슬롯) → 본문(.prose) + 오른쪽 목차 → 하단(footer 슬롯).
+// 수식·코드·표 같은 본문 스타일은 prose.css, 수식 글꼴은 katex.css. 이 레이아웃을 쓰는 페이지에만 실린다.
+import '@/styles/prose.css';
+import '@/styles/katex.css';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import TableOfContents from '@/components/content/TableOfContents.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: string;
+  headings?: readonly { depth: number; slug: string; text: string }[];
+}
+
+const { title, description, lang, headings = [] } = Astro.props;
+const hasToc = headings.filter((h) => h.depth === 2 || h.depth === 3).length >= 3;
+---
+
+<BaseLayout title={title} description={description} lang={lang}>
+  <article class="note">
+    <slot name="header" />
+    <div class:list={['note-grid', { 'has-toc': hasToc }]}>
+      <div class="note-main">
+        <TableOfContents headings={headings} variant="inline" />
+        <div class="prose">
+          <slot />
+        </div>
+      </div>
+      <div class="note-side">
+        <TableOfContents headings={headings} variant="aside" />
+      </div>
+    </div>
+    <slot name="footer" />
+  </article>
+</BaseLayout>
+
+<style>
+  .note-side {
+    display: none;
+  }
+
+  /* 넓은 화면: 본문(680px) + 오른쪽 목차. 목차는 TableOfContents가 스스로 보였다 숨는다 */
+  @media (min-width: 960px) {
+    .note-grid.has-toc {
+      display: grid;
+      grid-template-columns: minmax(0, var(--measure)) 11rem;
+      gap: var(--space-5);
+      align-items: start;
+    }
+
+    .note-grid.has-toc .note-side {
+      display: block;
+      align-self: stretch;
+    }
+  }
+</style>

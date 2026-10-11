@@ -1,0 +1,43 @@
+---
+// MDX 전용. 본문 흐름에서 한 번 멈춰 읽을 대목: note(기본) / intuition(직관) / stuck(막힐 가능성이 높은 지점).
+// 색이 아니라 라벨과 왼쪽 선으로 구분한다.
+interface Props {
+  kind?: 'note' | 'intuition' | 'stuck';
+  title?: string;
+}
+
+const LABELS = { note: 'Note', intuition: 'Intuition', stuck: 'Where it gets hard' } as const;
+const { kind = 'note', title } = Astro.props;
+---
+
+<div class="callout" role="note" data-kind={kind}>
+  <p class="label">{title ?? LABELS[kind]}</p>
+  <div class="body"><slot /></div>
+</div>
+
+<style>
+  .callout {
+    max-width: var(--measure);
+    margin: 0 0 var(--space-5);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface);
+    border-left: 2px solid var(--text-muted);
+    border-radius: 0 var(--radius-s) var(--radius-s) 0;
+  }
+
+  .callout[data-kind='stuck'] {
+    border-left-color: var(--accent);
+  }
+
+  .label {
+    margin: 0 0 var(--space-1);
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    font-weight: var(--fw-strong);
+    line-height: var(--lh-s);
+  }
+
+  .body > :global(:last-child) {
+    margin-bottom: 0;
+  }
+</style>

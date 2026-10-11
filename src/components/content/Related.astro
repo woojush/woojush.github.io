@@ -1,0 +1,100 @@
+---
+// 글 하단의 관계: 선행·이어지는 개념, 연결된 프로젝트·글. 비어 있으면 그리지 않는다.
+// 직접 선언한 것과 다른 글이 가리킨 것(역링크)은 lib/links.ts가 이미 합쳐서 준다.
+import type { RelationGroup } from '@/lib/links';
+
+interface Props {
+  groups: readonly RelationGroup[];
+}
+
+const { groups } = Astro.props;
+---
+
+{
+  groups.length > 0 && (
+    <section class="related" aria-labelledby="related">
+      <h2 id="related">Related</h2>
+      <dl>
+        {groups.map((group) => (
+          <div class="group">
+            <dt>{group.label}</dt>
+            <dd>
+              <ul>
+                {group.items.map((item) => (
+                  <li>
+                    <a href={item.href}>{item.title}</a>
+                    {item.type !== 'knowledge' && <span class="kind">{item.type}</span>}
+                  </li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  )
+}
+
+<style>
+  .related {
+    margin-top: var(--space-8);
+  }
+
+  h2 {
+    margin-top: 0;
+    font-size: var(--fs-l);
+    line-height: var(--lh-l);
+  }
+
+  dl {
+    margin: 0;
+  }
+
+  .group {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: var(--space-4);
+    padding-block: var(--space-2);
+    border-top: 1px solid var(--rule);
+  }
+
+  dt {
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+    line-height: var(--lh-base);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  li a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .kind {
+    margin-left: var(--space-2);
+    color: var(--text-muted);
+    font-size: var(--fs-s);
+  }
+
+  @media (max-width: 480px) {
+    .group {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+</style>

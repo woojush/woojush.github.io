@@ -1,0 +1,172 @@
+/*
+ * prose.css — 글 본문(마크다운/MDX 렌더 결과)의 타이포그래피. .prose 안에서만 적용된다.
+ * 색·크기·간격은 tokens.css의 토큰만 쓴다. 본문 폭 680px는 base.css의 main 규칙이 맡는다.
+ */
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose :where(h2, h3, h4) {
+  scroll-margin-top: var(--space-6);
+}
+
+/* 제목 끝 앵커: 마우스를 올리거나 키보드로 포커스하면 보인다. 터치에서는 늘 옅게 보인다 */
+.prose .anchor {
+  margin-left: 0.4em;
+  color: var(--text-muted);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity var(--duration) var(--ease);
+}
+
+.prose .anchor::before {
+  content: '#';
+}
+
+.prose :where(h2, h3, h4):hover .anchor,
+.prose .anchor:focus-visible {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .prose .anchor {
+    opacity: 0.5;
+  }
+}
+
+.prose :where(ul, ol) {
+  padding-left: 1.4em;
+}
+
+.prose li {
+  margin-bottom: var(--space-1);
+}
+
+.prose li > :where(ul, ol) {
+  margin-top: var(--space-1);
+  margin-bottom: 0;
+}
+
+.prose strong {
+  font-weight: var(--fw-strong);
+}
+
+.prose blockquote {
+  max-width: var(--measure);
+  margin: 0 0 var(--space-4);
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--rule);
+  color: var(--text-muted);
+}
+
+.prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.prose hr {
+  margin: var(--space-6) 0;
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+
+/* ───────── 코드 ───────── */
+.prose :not(pre) > code {
+  padding: 0.1em 0.35em;
+  background: var(--code-bg);
+  border-radius: var(--radius-s);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.prose pre {
+  max-width: 100%;
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4);
+  overflow-x: auto;
+  background: var(--code-bg) !important; /* Shiki가 넣는 배경 대신 토큰을 쓴다 */
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-s);
+  font-family: var(--font-mono);
+  font-size: var(--fs-s);
+  line-height: 1.6;
+  word-break: normal;
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+
+/* Shiki는 두 테마의 색을 변수로 내보낸다. 어두운 테마가 기본이다 */
+.prose pre span {
+  color: var(--shiki-dark);
+  font-style: var(--shiki-dark-font-style);
+  font-weight: var(--shiki-dark-font-weight);
+}
+
+:root[data-theme='light'] .prose pre span {
+  color: var(--shiki-light);
+  font-style: var(--shiki-light-font-style);
+  font-weight: var(--shiki-light-font-weight);
+}
+
+/* ───────── 표 ───────── */
+.prose table {
+  display: block; /* 좁은 화면에서 표만 옆으로 스크롤되고 페이지는 밀리지 않는다 */
+  max-width: 100%;
+  margin: 0 0 var(--space-5);
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: var(--fs-s);
+  line-height: var(--lh-s);
+}
+
+.prose :where(th, td) {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  font-weight: var(--fw-strong);
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ───────── 수식 ─────────
+ * 블록 수식이 680px보다 길면 그 수식만 옆으로 스크롤된다.
+ */
+.prose .katex-display {
+  margin: var(--space-4) 0;
+  padding-block: var(--space-1);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.prose .katex {
+  font-size: 1.06em;
+}
+
+/* ───────── 각주 ───────── */
+.prose .footnotes {
+  margin-top: var(--space-7);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--rule);
+  color: var(--text-muted);
+  font-size: var(--fs-s);
+  line-height: var(--lh-s);
+}
+
+.prose .footnotes h2 {
+  /* remark가 붙이는 "Footnotes" 제목은 숨긴다 (구분선이 대신한다) */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

@@ -28,6 +28,12 @@ export async function getTimeline() {
   return entry.data.entries;
 }
 
+// Knowledge 목록의 소개 문구와 topic 표시 이름·순서. 파일이 없어도 동작한다.
+export async function getTopicsConfig() {
+  const entry = await getEntry('topics', 'topics');
+  return entry?.data ?? { lead: undefined, topics: [] };
+}
+
 export async function getNow() {
   const entry = await getEntry('now', 'now');
   if (!entry) throw new Error('src/data/now.yaml 이 없다.');

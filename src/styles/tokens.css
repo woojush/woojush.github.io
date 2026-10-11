@@ -131,3 +131,28 @@
   --glow-green: rgba(50, 98, 84, 0.6);
   --glow-blue: rgba(179, 18, 0, 0.7);
 }
+
+/* ───────── Writing 책장 (2026-10-11 사용자 승인 예외) ─────────
+ * 실제 책장처럼 보이도록 이 블록의 색과 그림자·그라디언트를 Writing 책장(components/writing/Bookcase.astro) 안에서만 쓴다.
+ * 다른 화면에서는 쓰지 않는다 (docs/07 "Writing: 책장").
+ */
+:root {
+  --wood-dark: #2b1b10; /* 널빤지 앞면 아래, 프레임 그늘 */
+  --wood-mid: #4b2f1b; /* 프레임, 널빤지 앞면 */
+  --wood-light: #6e4a2c; /* 널빤지 윗면(빛을 받는 면), 프레임 모서리 */
+  --case-back: #15100c; /* 책장 안쪽 뒷판 */
+  --brass: #b58d49; /* 명패 */
+  --brass-dark: #7d5f2b;
+  --brass-ink: #2e2210; /* 명패에 새긴 글자 */
+  --book-gold: #cdae6a; /* 책등 금박 띠·제목 */
+  --book-oxblood: #6a2b2a;
+  --book-navy: #25344f;
+  --book-forest: #2f4a3a;
+  --book-ochre: #8a6a2c;
+  --book-slate: #4a5666;
+  --book-plum: #4b3450;
+  --book-umber: #5a4130;
+  --book-teal: #2a5656;
+  --book-cream: #cbbf9f;
+  --book-cream-ink: #3a2f1c; /* 크림색 책등 위의 제목 */
+}

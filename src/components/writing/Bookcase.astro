@@ -16,21 +16,22 @@ const { shelves } = Astro.props;
     <div class="case">
       {shelves.map((shelf) => (
         <section class="tier" id={shelf.id} aria-labelledby={`${shelf.id}-label`} style={`--row-h:${shelf.rowH}rem`}>
-          <header class="tier-head">
-            <h2 id={`${shelf.id}-label`}>
-              <span class="name">{shelf.label}</span>
-              <span class="count">{shelf.books.length}</span>
-            </h2>
+          <h2 id={`${shelf.id}-label`} class="plate">
+            <span class="screw" aria-hidden="true" />
+            <span class="name">{shelf.label}</span>
             <span class="en">{shelf.en}</span>
-          </header>
+            <span class="count">{shelf.books.length}</span>
+            <span class="screw" aria-hidden="true" />
+          </h2>
           <ul class="row">
             {shelf.books.map((book) => (
-              <li>
+              <li style={book.tilt ? `margin-inline:${Math.abs(book.tilt) * 0.12}rem` : undefined}>
                 <a
                   class="spine"
                   href={book.href}
+                  data-hue={book.hue}
                   aria-label={`${book.title}, ${book.when}`}
-                  style={`--w:${book.width}rem;--h:${book.height}rem;--cols:${book.cols};--spine:var(--tag-${book.hue})`}
+                  style={`--w:${book.width}rem;--h:${book.height}rem;--cols:${book.cols};--c:var(--book-${book.hue});--tilt:${book.tilt}deg`}
                 >
                   <span class="spine-title">{book.title}</span>
                 </a>
@@ -41,6 +42,7 @@ const { shelves } = Astro.props;
                 </span>
               </li>
             ))}
+            <li class="end" aria-hidden="true" />
           </ul>
         </section>
       ))}
@@ -49,77 +51,45 @@ const { shelves } = Astro.props;
 }
 
 <style>
-  /* 책장 본체: 한 단계 올라온 면 + 월넛 테두리(윗널·옆널). 아랫널은 마지막 층의 널빤지가 맡는다 */
+  /* 진짜 책장: 나무 틀(세로 결) 안에 어두운 뒷판, 층마다 널빤지, 널빤지 앞면에 황동 명패.
+     이 파일의 그림자·그라디언트는 Writing 책장 한정 승인 예외다(docs/07). 색은 tokens.css의 --wood-*, --brass*, --book-* */
   .case {
-    --board-h: 0.5rem;
-    background: var(--surface);
-    border: var(--board-h) solid var(--tag-walnut);
-    border-bottom: 0;
+    --board-h: 1.5rem;
+    padding: 1rem 1rem 0;
+    background-color: var(--wood-mid);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.5' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23f)'/%3E%3C/svg%3E"),
+      linear-gradient(90deg, var(--wood-dark), var(--wood-mid) 6%, var(--wood-mid) 94%, var(--wood-dark));
+    border-radius: 4px 4px 0 0;
+    box-shadow: 0 1.5rem 2rem -1rem rgb(0 0 0 / 0.6);
   }
 
   .tier {
-    position: relative; /* 책등을 가리키는 .peek이 이 층의 오른쪽 위에 앉는다 */
-    padding-top: var(--space-4);
+    position: relative;
+    background: var(--case-back);
+    box-shadow: inset 0 0.8rem 1rem -0.4rem rgb(0 0 0 / 0.85), inset 0.6rem 0 0.8rem -0.4rem rgb(0 0 0 / 0.6), inset -0.6rem 0 0.8rem -0.4rem rgb(0 0 0 / 0.6);
   }
 
-  /* 층 라벨: Knowledge 태그와 같은 말씨 — 이름 칸(월넛)과 글 수 칸이 4px 떨어져 있다 */
-  .tier-head {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-3);
-    padding-inline: var(--space-4);
-    margin-bottom: var(--space-4);
-  }
-
-  h2 {
-    display: flex;
-    gap: var(--space-1);
-    margin: 0;
-    font-size: var(--fs-s);
-    line-height: var(--lh-s);
-  }
-
-  .name,
-  .count {
-    padding: 0.15rem var(--space-3);
-    border-radius: 3px;
-    color: var(--tag-text);
-  }
-
-  .name {
-    background: var(--tag-walnut);
-    font-weight: var(--fw-strong);
-  }
-
-  .count {
-    background: var(--tag-count-bg);
-    min-width: 2.25rem;
-    text-align: center;
-  }
-
-  .en {
-    color: var(--text-muted);
-    font-size: var(--fs-s);
-    line-height: var(--lh-s);
-  }
-
-  /* 한 층: 책등이 바닥(널빤지)에 서 있고, 넘치면 다음 줄에 같은 널빤지가 한 장 더 깔린다.
-     널빤지는 단색 띠다(그라디언트 효과가 아니라 줄마다 반복하려고 쓴 하드 스톱). */
+  /* 한 층: 책이 널빤지 위에 서 있고, 넘치면 다음 줄에 널빤지가 한 장 더 깔린다.
+     널빤지 = 윗면(밝음, 얇음) + 앞면(어두움) + 가로 결. 줄마다 반복하려고 하드 스톱 타일로 그린다 */
   .row {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    column-gap: 0.3rem;
-    max-width: none; /* main의 ul 폭 제한(680px)을 풀어 널빤지가 책장 끝까지 간다 */
+    max-width: none;
     margin: 0;
-    padding: 0 var(--space-4);
+    padding: 0 1.2rem;
     list-style: none;
-    background: linear-gradient(
-        to bottom,
-        transparent calc(100% - var(--board-h)),
-        var(--tag-walnut) calc(100% - var(--board-h))
-      )
-      0 0 / 100% calc(var(--row-h, 13rem) + var(--board-h)) repeat-y;
+    background:
+      linear-gradient(
+          to bottom,
+          transparent calc(100% - var(--board-h)),
+          var(--wood-light) calc(100% - var(--board-h)),
+          var(--wood-light) calc(100% - var(--board-h) + 0.3rem),
+          var(--wood-mid) calc(100% - var(--board-h) + 0.3rem),
+          var(--wood-dark) 100%
+        )
+        0 0 / 100% calc(var(--row-h, 13rem) + var(--board-h)) repeat-y;
   }
 
   .row > li {
@@ -129,6 +99,53 @@ const { shelves } = Astro.props;
     margin: 0 0 var(--board-h);
   }
 
+  /* 황동 명패: 첫 널빤지 앞면 왼쪽. 나사 두 개, 새긴 글자 */
+  .plate {
+    position: absolute;
+    z-index: 2;
+    top: calc(var(--row-h) + var(--board-h) / 2 + 0.15rem);
+    left: 1.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.15rem 0.5rem;
+    transform: translateY(-50%);
+    background: linear-gradient(to bottom, #d3ad66, var(--brass) 45%, var(--brass-dark));
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.35);
+    color: var(--brass-ink);
+    font-size: 0.78rem;
+    font-weight: var(--fw-strong);
+    line-height: 1.2rem;
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 0 rgb(255 255 255 / 0.3);
+    white-space: nowrap;
+  }
+
+  .plate .en {
+    font-weight: 400;
+    opacity: 0.8;
+  }
+
+  .plate .count {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .plate .count::before {
+    content: '·';
+    margin-right: 0.5rem;
+  }
+
+  .screw {
+    width: 0.3rem;
+    height: 0.3rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #e9d29b, var(--brass-dark));
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35);
+  }
+
+  /* 책등: 천 표지 색 + 원통 음영 + 위아래 금박 띠 + 세로 금박 제목 */
   .spine {
     position: relative;
     display: flex;
@@ -136,34 +153,47 @@ const { shelves } = Astro.props;
     justify-content: center;
     width: var(--w);
     height: var(--h);
-    background: var(--spine);
-    border-radius: 3px 3px 0 0;
-    color: var(--tag-text);
+    background:
+      linear-gradient(90deg, rgb(0 0 0 / 0.45), rgb(255 255 255 / 0.1) 16%, transparent 42%, rgb(0 0 0 / 0.18) 78%, rgb(0 0 0 / 0.5)),
+      var(--c);
+    border-radius: 2px 2px 0 0;
+    box-shadow: 1px 0 0 rgb(0 0 0 / 0.5), -1px 0 0 rgb(0 0 0 / 0.5), 0.15rem 0 0.4rem rgb(0 0 0 / 0.55);
+    color: var(--book-gold);
     text-decoration: none;
-    transform-origin: bottom;
+    transform: rotate(var(--tilt, 0deg));
+    transform-origin: bottom center;
     transition:
       transform var(--duration) var(--ease-out),
-      filter var(--duration) var(--ease);
+      box-shadow var(--duration) var(--ease);
   }
 
-  /* 책등의 제본 띠 두 줄 (위·아래) */
+  .spine[data-hue='cream'] {
+    color: var(--book-cream-ink);
+  }
+
   .spine::before,
   .spine::after {
     content: '';
     position: absolute;
     inset-inline: 0;
-    border-top: 1px solid color-mix(in srgb, var(--tag-text) 26%, transparent);
+    height: 0.2rem;
+    border-block: 1px solid var(--book-gold);
+    opacity: 0.75;
+  }
+
+  .spine[data-hue='cream']::before,
+  .spine[data-hue='cream']::after {
+    border-color: var(--book-cream-ink);
   }
 
   .spine::before {
-    top: 0.7rem;
+    top: 0.6rem;
   }
 
   .spine::after {
-    bottom: 0.7rem;
+    bottom: 0.6rem;
   }
 
-  /* 제목은 세로쓰기. 길면 줄(칸)이 늘어나고, 칸 수를 넘으면 잘린다 */
   .spine-title {
     writing-mode: vertical-rl;
     height: calc(var(--h) - 2.5rem);
@@ -173,16 +203,26 @@ const { shelves } = Astro.props;
     line-height: 1.35rem;
     letter-spacing: 0.04em;
     word-break: break-all;
-    text-align: start;
+    text-shadow: 0 -1px 0 rgb(0 0 0 / 0.35);
+  }
+
+  /* 책 받침대: 줄 끝에 놓인 황동 ㄴ자 */
+  .row > .end {
+    width: 0.5rem;
+    height: 4.5rem;
+    margin-left: 0.4rem;
+    background: linear-gradient(90deg, var(--brass), var(--brass-dark));
+    border-radius: 1px 1px 0 0;
+    box-shadow: 0.1rem 0 0.3rem rgb(0 0 0 / 0.5);
   }
 
   .spine:hover,
   .spine:focus-visible {
-    transform: translateY(-0.5rem);
-    filter: brightness(1.18);
+    z-index: 1;
+    transform: translateY(-0.45rem) rotate(0deg);
+    box-shadow: 1px 0 0 rgb(0 0 0 / 0.5), -1px 0 0 rgb(0 0 0 / 0.5), 0.3rem 0.4rem 0.8rem rgb(0 0 0 / 0.65);
   }
 
-  /* 층 오른쪽 위에 뜨는 미리보기. 마우스가 없는 화면에서는 쓰지 않는다 */
   .peek {
     display: none;
   }
@@ -190,14 +230,19 @@ const { shelves } = Astro.props;
   @media (hover: hover) and (min-width: 641px) {
     .peek {
       position: absolute;
-      top: var(--space-4);
-      right: var(--space-4);
+      z-index: 3;
+      top: 0.6rem;
+      right: 1.2rem;
       display: flex;
       align-items: baseline;
       gap: var(--space-3);
-      max-width: calc(100% - 15rem);
+      width: max-content;
+      max-width: 34rem;
+      padding: 0.3rem 0.7rem;
       overflow: hidden;
-      color: var(--text-muted);
+      background: rgb(0 0 0 / 0.7);
+      border-radius: 3px;
+      color: var(--book-cream);
       font-size: var(--fs-s);
       line-height: var(--lh-s);
       white-space: nowrap;
@@ -208,15 +253,15 @@ const { shelves } = Astro.props;
 
     .peek strong {
       flex: none;
-      max-width: 18rem;
+      max-width: 16rem;
       overflow: hidden;
-      color: var(--text);
       font-weight: var(--fw-strong);
       text-overflow: ellipsis;
     }
 
     .peek-desc {
       overflow: hidden;
+      opacity: 0.75;
       text-overflow: ellipsis;
     }
 
@@ -227,9 +272,20 @@ const { shelves } = Astro.props;
   }
 
   @media (max-width: 640px) {
-    .tier-head,
+    .case {
+      padding: 0.6rem 0.6rem 0;
+    }
+
     .row {
-      padding-inline: var(--space-3);
+      padding-inline: 0.6rem;
+    }
+
+    .plate {
+      left: 0.8rem;
+    }
+
+    .plate .en {
+      display: none;
     }
   }
 </style>

@@ -5,7 +5,7 @@ import { formatDate } from '@/lib/format';
 
 export type Piece = CollectionEntry<'writing'>;
 export type Kind = Piece['data']['kind'];
-export type SpineHue = 'moss' | 'slate' | 'plum' | 'stone' | 'sand' | 'clay';
+export type SpineHue = 'oxblood' | 'navy' | 'forest' | 'ochre' | 'slate' | 'plum' | 'umber' | 'cream' | 'teal';
 
 /** 위에서 아래로 놓이는 층. label은 노션 Form과 같은 한글 이름, en은 작은 부제 */
 export const SHELVES: readonly { kind: Kind; label: string; en: string }[] = [
@@ -31,6 +31,8 @@ export interface Book {
   /** 제목이 들어가는 줄(세로쓰기 칸) 수 */
   cols: number;
   hue: SpineHue;
+  /** 옆 책에 기대어 기울어진 정도(deg). 대부분 0 */
+  tilt: number;
 }
 
 export interface Shelf {
@@ -50,8 +52,8 @@ function hash(s: string): number {
   return h >>> 0;
 }
 
-// 색은 이미 있는 태그 색(tokens.css --tag-*)만 쓴다. 층 널빤지가 walnut이라 책등에서는 뺐다
-const HUES: readonly SpineHue[] = ['moss', 'slate', 'plum', 'stone', 'sand', 'slate', 'moss', 'clay', 'stone', 'plum'];
+// 책 천·가죽 색(tokens.css --book-*). 크림은 드물게 섞는다
+const HUES: readonly SpineHue[] = ['oxblood', 'navy', 'forest', 'umber', 'slate', 'ochre', 'plum', 'teal', 'oxblood', 'navy', 'forest', 'cream', 'umber', 'slate'];
 
 const LINE_REM = 0.95; // 세로쓰기에서 글자 한 자가 차지하는 길이
 const COL_REM = 1.35; // 제목 한 줄(칸)의 너비
@@ -76,6 +78,8 @@ export function bookOf(entry: Piece): Book {
     height: Math.round(height * 100) / 100,
     cols,
     hue: HUES[h % HUES.length],
+    // 일곱 권에 한 권쯤 기대어 있다
+    tilt: (h >> 11) % 7 === 0 ? ((h >> 14) % 2 ? 1 : -1) * (3 + ((h >> 16) % 3)) : 0,
   };
 }
 

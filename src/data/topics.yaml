@@ -2,13 +2,13 @@
 # lead만 손으로 쓴다(동기화가 유지한다).
 lead: 배운 것을 개념 단위로 쌓는 곳. 덜 익은 노트도 그대로 올리고, 이해가 깊어지면 고쳐 씁니다.
 topics:
-  - { path: ai, name: "AI", color: walnut, description: "인공지능과 로보틱스를 공부하며 쌓는 개념" }
-  - { path: ai/mathematics, name: "Mathematics", description: "Mathematics for Machine Learning을 따라 정리한 수학 기초" }
+  - { path: ai, name: "AI", color: walnut }
+  - { path: ai/mathematics, name: "Mathematics" }
   - { path: ai/mathematics/linear-algebra, name: "2. Linear Algebra" }
   - { path: ai/mathematics/analytic-geometry, name: "3. Analytic Geometry" }
-  - { path: art, name: "Art", color: clay, description: "그림과 미술을 공부하며 쌓는 개념" }
+  - { path: art, name: "Art", color: clay }
   - { path: art/drawing, name: "Drawing" }
-  - { path: english, name: "English", color: slate, description: "영어 공부 기록" }
+  - { path: english, name: "English", color: slate }
   - { path: english/vocabulary, name: "Vocabulary" }
-  - { path: philosophy, name: "Philosophy", color: plum, description: "철학 읽기와 개념 정리" }
+  - { path: philosophy, name: "Philosophy", color: plum }
   - { path: philosophy/ethics, name: "Ethics" }

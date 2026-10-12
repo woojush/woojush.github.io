@@ -28,169 +28,60 @@ body:has([data-wspace]) .site-footer {
   -webkit-user-select: none;
 }
 
-/* ───────── 입구: 태양계 ───────── */
-.wsky {
+/* ───────── 입구: 3D 태양계 ───────── */
+.wsky,
+.wgl {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-.sys {
-  --S: min(100vw, 100svh);
-  position: absolute;
-  left: 50%;
-  top: 53%;
-  width: 0;
-  height: 0;
+.wgl {
+  opacity: 0;
+  transition: opacity 1.2s ease;
 }
 
-.sun {
-  position: absolute;
-  width: calc(var(--S) * 0.1);
-  height: calc(var(--S) * 0.1);
-  left: calc(var(--S) * -0.05);
-  top: calc(var(--S) * -0.05);
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 38%, #fff4de 0%, #f3c98a 28%, var(--accent) 58%, #b9722e 100%);
-  box-shadow:
-    0 0 calc(var(--S) * 0.04) rgba(224, 169, 109, 0.55),
-    0 0 calc(var(--S) * 0.16) rgba(224, 169, 109, 0.22);
+.wsystem.is-ready .wgl {
+  opacity: 1;
 }
 
-.orbit {
-  position: absolute;
-  width: calc(var(--S) * var(--o) / 100);
-  height: calc(var(--S) * var(--o) / 100);
-  left: calc(var(--S) * var(--o) / -200);
-  top: calc(var(--S) * var(--o) / -200);
-  border: 1px solid rgba(235, 231, 223, 0.1);
-  border-radius: 50%;
-  pointer-events: none;
-  transform: rotate(var(--ph));
-  animation: orbit-spin var(--period) linear infinite, orbit-in 1.4s calc(var(--i) * 0.18s) both ease-out;
+/* 누르면 장면이 어두워지며 다가간다 */
+.wsystem.is-leaving .wgl {
+  transition: opacity 0.9s ease 0.35s;
+  opacity: 0;
 }
 
-@keyframes orbit-spin {
-  to {
-    transform: rotate(calc(var(--ph) + 360deg));
-  }
+.wplanets ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-@keyframes orbit-in {
-  from {
-    opacity: 0;
-  }
-}
-
-/* 모든 행성이 멈춰야 누르기 쉽다 */
-.sys:has(.pl:hover, .pl:focus-visible) .orbit,
-.sys:has(.pl:hover, .pl:focus-visible) .pl {
-  animation-play-state: paused;
-}
-
+/* 3D 천체 위에 겹쳐 따라다니는 링크. 위치(transform)와 크기(--d)는 writing-system.ts가 매 프레임 넣는다 */
 .pl {
   position: absolute;
-  left: 50%;
+  left: 0;
   top: 0;
-  width: 0;
-  height: 0;
-  pointer-events: auto;
+  z-index: 2;
+  width: var(--d, 44px);
+  height: var(--d, 44px);
+  margin: calc(var(--d, 44px) / -2) 0 0 calc(var(--d, 44px) / -2);
+  border-radius: 50%;
   color: var(--text);
   text-decoration: none;
-  /* 궤도가 돌아도 글자는 똑바로 */
-  transform: rotate(calc(var(--ph) * -1));
-  animation: pl-counter var(--period) linear infinite;
-}
-
-@keyframes pl-counter {
-  to {
-    transform: rotate(calc(var(--ph) * -1 - 360deg));
-  }
-}
-
-/* 누르는 영역은 행성보다 넉넉하게 */
-.pl::before {
-  content: '';
-  position: absolute;
-  width: max(44px, calc(var(--S) * 0.1));
-  height: max(44px, calc(var(--S) * 0.1));
-  left: calc(max(44px, var(--S) * 0.1) / -2);
-  top: calc(max(44px, var(--S) * 0.1) / -2);
-  border-radius: 50%;
-}
-
-.pl-body {
-  --d: calc(var(--S) * 0.05);
-  position: absolute;
-  width: var(--d);
-  height: var(--d);
-  left: calc(var(--d) / -2);
-  top: calc(var(--d) / -2);
-  border-radius: 50%;
-  background: radial-gradient(circle at 32% 30%, hsl(var(--h) var(--s) calc(var(--l) + 26%)), hsl(var(--h) var(--s) var(--l)) 55%, hsl(var(--h) var(--s) calc(var(--l) - 20%)) 100%);
-  box-shadow: inset calc(var(--d) * -0.16) calc(var(--d) * -0.12) calc(var(--d) * 0.3) rgba(0, 0, 0, 0.45);
-  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
-.pl:hover .pl-body,
-.pl:focus-visible .pl-body {
-  transform: scale(1.14);
+  will-change: transform;
 }
 
 .pl:focus-visible {
-  outline: none;
-}
-
-.pl:focus-visible .pl-body {
   outline: 2px solid var(--accent);
-  outline-offset: 4px;
-}
-
-/* 수성: 작고 매끈한 회청색 */
-.pl[data-body='Mercury'] .pl-body {
-  --d: calc(var(--S) * 0.036);
-}
-
-/* 목성: 가장 크고 가로 띠 */
-.pl[data-body='Jupiter'] .pl-body {
-  --d: calc(var(--S) * 0.085);
-  background:
-    repeating-linear-gradient(to bottom, transparent 0 8%, rgba(0, 0, 0, 0.16) 8% 13%, rgba(255, 235, 210, 0.1) 13% 19%, transparent 19% 27%),
-    radial-gradient(circle at 32% 30%, hsl(var(--h) var(--s) calc(var(--l) + 24%)), hsl(var(--h) var(--s) var(--l)) 55%, hsl(var(--h) var(--s) calc(var(--l) - 20%)) 100%);
-}
-
-/* 토성: 고리 */
-.pl[data-body='Saturn'] .pl-body {
-  --d: calc(var(--S) * 0.06);
-}
-
-.pl[data-body='Saturn'] .pl-body::after {
-  content: '';
-  position: absolute;
-  width: 230%;
-  height: 58%;
-  left: -65%;
-  top: 21%;
-  border-radius: 50%;
-  border: max(2px, calc(var(--S) * 0.005)) solid hsl(var(--h) calc(var(--s) + 6%) calc(var(--l) + 30%) / 0.75);
-  transform: rotate(-20deg);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
-}
-
-/* 달: 작고 옅은 회보라, 얕은 분화구 */
-.pl[data-body='Moon'] .pl-body {
-  --d: calc(var(--S) * 0.032);
-  background:
-    radial-gradient(circle at 62% 66%, rgba(0, 0, 0, 0.18) 0 12%, transparent 13%),
-    radial-gradient(circle at 36% 42%, rgba(0, 0, 0, 0.14) 0 16%, transparent 17%),
-    radial-gradient(circle at 32% 30%, hsl(var(--h) var(--s) calc(var(--l) + 32%)), hsl(var(--h) var(--s) calc(var(--l) + 8%)) 58%, hsl(var(--h) var(--s) calc(var(--l) - 14%)) 100%);
+  outline-offset: 3px;
 }
 
 .pl-label {
   position: absolute;
-  left: 0;
-  top: calc(var(--S) * 0.03 + 10px);
+  left: 50%;
+  top: calc(100% + 2px);
   transform: translateX(-50%);
   display: grid;
   justify-items: center;
@@ -198,14 +89,14 @@ body:has([data-wspace]) .site-footer {
   white-space: nowrap;
   text-align: center;
   pointer-events: none;
+  opacity: 0.88;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
 }
 
-.pl[data-body='Jupiter'] .pl-label {
-  top: calc(var(--S) * 0.047 + 10px);
-}
-
-.pl[data-body='Saturn'] .pl-label {
-  top: calc(var(--S) * 0.045 + 12px);
+.pl[data-hot] .pl-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(2px) scale(1.08);
 }
 
 .pl-name {
@@ -218,6 +109,39 @@ body:has([data-wspace]) .site-footer {
   font-size: 0.75rem;
   color: var(--text-muted);
   letter-spacing: 0.04em;
+}
+
+@media (max-width: 640px) {
+  .pl-meta {
+    font-size: 0.68rem;
+  }
+}
+
+/* WebGL을 못 쓸 때: 가운데에 줄지어 선 평범한 링크 */
+.wsystem.no-gl .wgl {
+  display: none;
+}
+
+.wsystem.no-gl .wplanets ul {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-7);
+}
+
+.wsystem.no-gl .pl {
+  position: relative;
+  margin: 0;
+  width: auto;
+  height: auto;
+  transform: none !important;
+}
+
+.wsystem.no-gl .pl-label {
+  position: static;
+  transform: none;
 }
 
 /* ───────── 행성 화면: 표지 호 ───────── */
@@ -538,16 +462,8 @@ body:has([data-wspace]) .site-footer {
 
 /* 행성 사이를 오갈 때: 카드가 옆으로 쓸려 나가고 반대쪽에서 들어온다(writing-arc.ts). 움직임 줄이기에서는 끈다 */
 @media (prefers-reduced-motion: reduce) {
-  .orbit,
-  .pl,
   .wheel {
     animation: none !important;
-  }
-  .orbit {
-    transform: rotate(var(--ph));
-  }
-  .pl {
-    transform: rotate(calc(var(--ph) * -1));
   }
 }
 

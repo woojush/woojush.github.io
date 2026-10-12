@@ -16,17 +16,13 @@ export interface WritingForm {
   spread: number;
   sat: number;
   light: number;
-  /** 입구 화면: 궤도 지름(화면 짧은 변 대비 %), 한 바퀴 시간(초), 시작 각도(도) */
-  orbit: number;
-  period: number;
-  phase: number;
 }
 
 export const forms: readonly WritingForm[] = [
-  { id: 'poem', label: '시', en: 'Poem', body: 'Mercury', hue: 200, spread: 12, sat: 28, light: 34, orbit: 30, period: 70, phase: 200 },
-  { id: 'prose', label: '산문', en: 'Prose', body: 'Jupiter', hue: 16, spread: 12, sat: 44, light: 38, orbit: 48, period: 110, phase: 40 },
-  { id: 'essay', label: '에세이', en: 'Essay', body: 'Saturn', hue: 44, spread: 10, sat: 40, light: 30, orbit: 66, period: 160, phase: 300 },
-  { id: 'bookmark', label: '책갈피', en: 'Bookmark', body: 'Moon', hue: 255, spread: 14, sat: 22, light: 38, orbit: 84, period: 220, phase: 120 },
+  { id: 'poem', label: '시', en: 'Poem', body: 'Mercury', hue: 200, spread: 12, sat: 28, light: 34 },
+  { id: 'prose', label: '산문', en: 'Prose', body: 'Jupiter', hue: 16, spread: 12, sat: 44, light: 38 },
+  { id: 'essay', label: '에세이', en: 'Essay', body: 'Saturn', hue: 44, spread: 10, sat: 40, light: 30 },
+  { id: 'bookmark', label: '책갈피', en: 'Bookmark', body: 'Moon', hue: 255, spread: 14, sat: 22, light: 38 },
 ];
 
 export const formIds = forms.map((f) => f.id);

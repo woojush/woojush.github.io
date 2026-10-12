@@ -81,9 +81,12 @@ if (section && wheel) {
   };
 
   let lastT = 0;
+  const bornAt = performance.now();
   const tick = (t: number) => {
     const dt = Math.min(0.05, (t - lastT) / 1000 || 0.016);
     lastT = t;
+    // 프레임이 느린 기기에서도 들어오는 움직임은 실제 시간으로 3초 안에 끝낸다(dt를 잘라 쓰므로 느리면 끝없이 늘어지는 것을 막는다)
+    if (!dragging && t - bornAt > 3000 && Math.abs(target - pos) > 0.0015 && Math.abs(target - pos) < 1) pos = target;
     if (!dragging) {
       const k = 1 - Math.exp(-dt * rate);
       pos += (target - pos) * k;

@@ -1,0 +1,39 @@
+---
+// WRITING 입구: 별 위에 태양계. 글의 형식 4종이 행성 4개(시=수성, 산문=목성, 에세이=토성, 책갈피=달)이고, 누르면 그 행성의 표지 호 화면(/writing/<form>/)으로 간다.
+// 행성은 느리게 공전한다(마우스를 올리면 모두 멈춘다). 링크 목록이라 스크립트 없이도 쓸 수 있고, 움직임 줄이기에서는 가만히 있다.
+// 사용자 지시(2026-10-12): 이름 '우주'에서 착안한 태양계. 책장 안은 폐기. 형식·색은 data/writing-forms.ts.
+import '@/styles/writing.css';
+import { forms } from '@/data/writing-forms';
+
+interface Props {
+  counts: Record<string, number>;
+}
+const { counts } = Astro.props;
+---
+
+<section class="wspace wsystem" data-wspace="system" aria-label="Writing">
+  <canvas class="wsky" data-wsky aria-hidden="true"></canvas>
+  <h1 class="sr-only">Writing</h1>
+  <div class="sys">
+    <div class="sun" aria-hidden="true"></div>
+    {
+      forms.map((f, i) => (
+        <div class="orbit" style={`--o:${f.orbit};--period:${f.period}s;--ph:${f.phase}deg;--i:${i}`} aria-hidden="false">
+          <a class="pl" data-body={f.body} href={`/writing/${f.id}/`} style={`--h:${f.hue};--s:${f.sat}%;--l:${f.light}%`}>
+            <span class="pl-body" aria-hidden="true"></span>
+            <span class="pl-label">
+              <span class="pl-name">{f.label}</span>
+              <span class="pl-meta">
+                {f.en} · {counts[f.id] ?? 0}
+              </span>
+            </span>
+          </a>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  import '@/scripts/writing-system';
+</script>

@@ -78,7 +78,8 @@ const writing = defineCollection({
   loader: glob({ pattern: contentPattern, base: './src/content/writing' }),
   schema: z.object({
     ...common,
-    kind: z.enum(['technical', 'essay', 'career', 'learning', 'reflection']),
+    // 글의 형식 4종(2026-10-11 사용자 결정, 블로그 글을 보고 도출): 시 / 산문 / 에세이 / 책갈피. 값·행성 대응은 src/data/writing-forms.ts
+    form: z.enum(['poem', 'prose', 'essay', 'bookmark']),
   }),
 });
 

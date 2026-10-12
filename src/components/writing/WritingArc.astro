@@ -1,0 +1,83 @@
+---
+// 한 행성(= 글 형식)의 화면: 그 행성 궤도의 한 조각 위에 표지 카드들이 부채꼴로 놓이고, 끌거나 휠·방향키로 돌린다(Form Follows Function의 회전 메뉴를 오마주, 어두운 우주 분위기로 변형).
+// 가운데 카드만 똑바로 서 있고 누르면 글로 간다. 양옆 행성으로 바로 넘어가는 이전/다음 링크와 4개 점이 아래에 있다.
+// 마크업은 평범한 링크 목록이다(스크립트가 없으면 카드가 목록처럼 쌓인다). 동작은 src/scripts/writing-arc.ts.
+import '@/styles/writing.css';
+import { forms, type WritingForm } from '@/data/writing-forms';
+import type { Card } from '@/lib/writing';
+
+interface Props {
+  form: WritingForm;
+  cards: Card[];
+}
+const { form, cards } = Astro.props;
+const idx = forms.findIndex((f) => f.id === form.id);
+const prev = forms[(idx + forms.length - 1) % forms.length];
+const next = forms[(idx + 1) % forms.length];
+---
+
+<section
+  class="wspace warc"
+  data-wspace="arc"
+  data-count={cards.length}
+  aria-label={`${form.label} — ${form.en}`}
+  style={`--h:${form.hue};--s:${form.sat}%;--l:${form.light}%`}
+>
+  <div class="wbg" aria-hidden="true"></div>
+  <div class="wring" aria-hidden="true" data-ring></div>
+  <header class="warc-head">
+    <a class="warc-back" href="/writing/">← Solar system</a>
+    <h1 class="warc-title">{form.label}</h1>
+    <p class="warc-sub">{form.en} · {form.body}</p>
+  </header>
+  {
+    cards.length > 0 ? (
+      <div class="wheel" data-wheel role="region" aria-label={`${form.label} 목록 (좌우 방향키로 넘김)`}>
+        <ol class="cards">
+          {cards.map((c, i) => (
+            <li class="wcard" data-i={i} style={`--c:${c.color}`}>
+              <a class="wcard-link" href={c.href}>
+                <span class="wc-title">{c.title}</span>
+                <span class="wc-no" aria-hidden="true">{c.no}</span>
+                <span class="wc-meta">
+                  {form.label}
+                  <br />
+                  {c.date}
+                </span>
+              </a>
+              <span class="wc-label" aria-hidden="true">
+                <b>{c.title}</b>
+                <i>{c.date}</i>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    ) : (
+      <p class="warc-empty">아직 이 형식의 글이 없습니다.</p>
+    )
+  }
+  <nav class="pnav" aria-label="행성 이동">
+    <a class="pnav-side pnav-prev" href={`/writing/${prev.id}/`} data-dir="prev" rel="prev">
+      <span class="pnav-arrow" aria-hidden="true">‹</span>
+      <span>{prev.label}<small>{prev.en}</small></span>
+    </a>
+    <ul class="pnav-dots">
+      {
+        forms.map((f) => (
+          <li>
+            <a href={`/writing/${f.id}/`} aria-label={`${f.label} (${f.en})`} aria-current={f.id === form.id ? 'page' : undefined} data-dir={forms.indexOf(f) > idx ? 'next' : 'prev'} style={`--h:${f.hue};--s:${f.sat}%;--l:${f.light}%`}></a>
+          </li>
+        ))
+      }
+    </ul>
+    <a class="pnav-side pnav-next" href={`/writing/${next.id}/`} data-dir="next" rel="next">
+      <span>{next.label}<small>{next.en}</small></span>
+      <span class="pnav-arrow" aria-hidden="true">›</span>
+    </a>
+  </nav>
+</section>
+
+<script>
+  import '@/scripts/writing-arc';
+</script>

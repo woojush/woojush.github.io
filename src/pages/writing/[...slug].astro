@@ -2,10 +2,13 @@
 import { render } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getEntries } from '@/lib/content';
+import { formIds } from '@/data/writing-forms';
 
 // URL은 파일명(entry.id)에서만 만들어진다. topic 등 metadata는 URL에 쓰지 않는다.
 export async function getStaticPaths() {
   const entries = await getEntries('writing');
+  const clash = entries.find((e) => (formIds as string[]).includes(e.id));
+  if (clash) throw new Error(`글 파일명 '${clash.id}'이(가) 형식 화면 주소(/writing/${clash.id}/)와 겹친다. 파일명을 바꾼다.`);
   return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
 }
 

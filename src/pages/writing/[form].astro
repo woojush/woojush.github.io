@@ -1,0 +1,22 @@
+---
+// 한 행성(= 글 형식)의 표지 호 화면. 주소는 /writing/<form>/ (poem, prose, essay, bookmark).
+// 개별 글은 /writing/<파일명>/ 이므로 파일명이 형식 이름과 같으면 부딪힌다 → [...slug].astro가 빌드를 멈춘다.
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import WritingArc from '@/components/writing/WritingArc.astro';
+import { getEntries } from '@/lib/content';
+import { cardsOf } from '@/lib/writing';
+import { forms } from '@/data/writing-forms';
+
+export async function getStaticPaths() {
+  return forms.map((form) => ({ params: { form: form.id }, props: { form } }));
+}
+
+const { form } = Astro.props;
+const cards = cardsOf(await getEntries('writing'), form);
+---
+
+<BaseLayout title={`${form.label} · Writing`} description={`${form.label}(${form.en}) 형식의 글`}>
+  {/* 스크립트가 켜지기 전부터 카드 배치 스타일을 쓰도록 첫 페인트 전에 표시한다 */}
+  <script is:inline slot="head">document.documentElement.classList.add('js-arc');</script>
+  <WritingArc form={form} cards={cards} />
+</BaseLayout>

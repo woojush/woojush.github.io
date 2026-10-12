@@ -1,19 +1,13 @@
 ---
+// WRITING 입구: 별 위의 태양계. 글의 형식 4종이 행성이고(data/writing-forms.ts), 행성을 누르면 그 형식의 표지 호 화면으로 간다.
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import SolarSystem from '@/components/writing/SolarSystem.astro';
 import { getEntries } from '@/lib/content';
+import { countsOf } from '@/lib/writing';
 
 const entries = await getEntries('writing');
 ---
 
-<BaseLayout title="Writing">
-  <h1>Writing</h1>
-  {entries.length > 0 && (
-    <ul>
-      {entries.map((entry) => (
-        <li>
-          <a href={`/writing/${entry.id}/`}>{entry.data.title}</a>
-        </li>
-      ))}
-    </ul>
-  )}
+<BaseLayout title="Writing" description="시, 산문, 에세이, 책갈피 — 글의 형식마다 하나의 행성">
+  <SolarSystem counts={countsOf(entries)} />
 </BaseLayout>

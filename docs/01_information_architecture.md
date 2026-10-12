@@ -165,8 +165,7 @@ Related                                 ← links 선언 + 자동 backlink
 
 ### 4.5 WRITING
 
-- **목록**: 최신순, 제목 + 날짜 + `kind`(technical / essay / career / learning / reflection) 텍스트.
-- MVP에서는 kind 필터 페이지를 만들지 않는다. 글이 20~30편을 넘어 목록에서 찾기 어려워질 때 추가한다.
+- **구성(2026-10-12 변경)**: 입구는 별 위의 태양계, 글 형식 4종(`form`: poem 시 / prose 산문 / essay 에세이 / bookmark 책갈피)이 행성(수성·목성·토성·달)이다. 행성 화면(`/writing/<form>/`)은 표지 카드가 궤도 위에 부채꼴로 놓인 회전 호이며, 행성끼리 바로 넘어간다. 예전의 최신순 목록·`kind` 값(technical/essay/career/learning/reflection)과 책장 안은 폐기했다.
 - Knowledge와의 구분: **Knowledge는 "배운 것(What I learned)", Writing은 "내 생각(What I think)"**. 헷갈릴 때의 판별 질문은 *"이 글은 틀릴 수 있는 의견을 담고 있는가?"* 담고 있으면 Writing.
 
 ---
@@ -179,8 +178,8 @@ Related                                 ← links 선언 + 자동 backlink
 |------|---------|--------------------|----------------------|
 | Learn | 공부 | **Knowledge** 문서 | (출발점) |
 | Build | 만들기 | **Project** case study | 프로젝트 frontmatter의 `links`에 출발점 knowledge를 적음 |
-| Explain | 설명하기 | **Writing** (kind: technical) | 글 frontmatter의 `links`에 대상을 적음 |
-| Reflect | 돌아보기 | **Writing** (kind: reflection) + NOW의 *Thinking* | 필요하면 `links`, 아니면 독립 |
+| Explain | 설명하기 | **Writing** (form: essay) | 글 frontmatter의 `links`에 대상을 적음 |
+| Reflect | 돌아보기 | **Writing** (form: essay·prose) + NOW의 *Thinking* | 필요하면 `links`, 아니면 독립 |
 
 ### 구체적 예: Projection 하나가 세 군데로 퍼지는 과정
 
@@ -214,7 +213,7 @@ Related                                 ← links 선언 + 자동 backlink
 1. 기존 세 type(Knowledge / Project / Writing)에 담기지 않는 콘텐츠가 **10개 이상** 실제로 쌓였고,
 2. 방문자(미래의 나 포함)가 기존 메뉴에서 그것을 **찾기 어렵다**고 느낄 때.
 
-예: 읽은 책 기록이 쌓이면 먼저 Writing의 `kind: learning`이나 tag로 시작해 보고, 위 조건을 넘으면 그때 type을 추가한다.
+예: 읽은 책 기록이 쌓이면 먼저 Writing의 `form: bookmark`나 tag로 시작해 보고, 위 조건을 넘으면 그때 type을 추가한다.
 
 **새 분야가 생길 때(예: Robotics)**: 메뉴 변경 없음. `topic: robotics/...` 문서를 쓰기 시작하면 Knowledge 트리에 자동으로 나타난다. 필요하면 `topics.yaml`에 표시 이름과 순서만 추가.
 

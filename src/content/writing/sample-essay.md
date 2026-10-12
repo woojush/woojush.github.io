@@ -1,6 +1,6 @@
 ---
 title: Sample essay
-kind: essay
+form: essay
 date: 2026-10-04
 tags: [sample]
 draft: true

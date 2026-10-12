@@ -7,9 +7,21 @@ const stripId = (id) => id.replaceAll('-', '');
 const esc = (s) => s.replace(/[\\*_~`[\]<>{}$|]/g, (c) => (c === '<' ? '&lt;' : c === '>' ? '&gt;' : `\\${c}`));
 
 export function richText(items, ctx, { plain = false } = {}) {
-  return items
+  // 수식이 바로 이어지면($\pi^2$$=\pi$) $$로 읽혀 깨지므로 하나의 수식으로 합친다
+  const merged = [];
+  for (const t of items) {
+    const last = merged[merged.length - 1];
+    if (t.type === 'equation' && last?.type === 'equation') merged[merged.length - 1] = { ...last, equation: { expression: last.equation.expression + t.equation.expression } };
+    else merged.push(t);
+  }
+  return merged
     .map((t) => {
-      if (t.type === 'equation') return plain ? t.equation.expression : `$${t.equation.expression.trim()}$`;
+      if (t.type === 'equation') {
+        if (plain) return t.equation.expression;
+        const e = t.equation.expression.trim();
+        // 식 안에 $가 있으면(예: \fbox{$x$}) $...$로는 끝을 잘못 잡아 글 전체가 비어 버린다. 같은 개수로 여닫는 $$ ... $$는 안의 $를 글자로 둔다.
+        return e.includes('$') ? `$$ ${e} $$` : `$${e}$`;
+      }
       let text = t.plain_text;
       if (plain) return text;
       const a = t.annotations ?? {};
@@ -25,6 +37,9 @@ export function richText(items, ctx, { plain = false } = {}) {
     })
     .join('');
 }
+
+// 줄 맨 앞의 "3. "·"- "·"# "가 목록·제목으로 읽히지 않게 막는다 (토글 제목을 별도 문단으로 쓰기 때문)
+const summaryText = (s) => s.replace(/^(\d+)([.)])(\s)/, '$1\\$2$3').replace(/^([-+*#>])/, '\\$1');
 
 const indent = (lines, pad) => lines.map((l) => (l ? pad + l : l));
 
@@ -77,7 +92,8 @@ function renderBlock(b, ctx) {
       return [mark + richText(d.rich_text, ctx), ...indent(kids, ' '.repeat(mark.length))];
     }
     case 'toggle': {
-      return ['<details>', '', `<summary>${richText(d.rich_text, ctx)}</summary>`, '', ...renderChildren(b.children, ctx), '', '</details>'];
+      // <summary> 한 줄에 쓰면 원시 HTML이라 안의 $수식$·\\이스케이프가 처리되지 않는다. 빈 줄로 떼어 Markdown으로 읽히게 한다(prose.css의 `summary p`가 한 줄로 보이게 함)
+      return ['<details>', '', '<summary>', '', summaryText(richText(d.rich_text, ctx)), '', '</summary>', '', ...renderChildren(b.children, ctx), '', '</details>'];
     }
     case 'quote':
       return [richText(d.rich_text, ctx), ...(b.children ? ['', ...renderChildren(b.children, ctx)] : [])].flatMap((l) => (l === '' ? ['>'] : [`> ${l}`]));

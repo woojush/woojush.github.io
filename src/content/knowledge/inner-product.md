@@ -13,7 +13,11 @@ $<x,y>=x^Ty$ 즉, $\text{Dot Product}$는 $\text{Inner Product}$의 구체적인
 
 <details>
 
-<summary><strong>왜 필요한가 </strong></summary>
+<summary>
+
+<strong>왜 필요한가 </strong>
+
+</summary>
 
 > 두 벡터 간의 관계를 알아내기 위해 → projection이 있지 않은가?
 → <strong>Projection의 결과:</strong> 그림자 자체인 <strong>벡터(Vector)  /   Inner Product의 결과:</strong> 중복된 양을 나타내는 <strong>실수(Scalar)</strong>
@@ -55,11 +59,19 @@ $<x,y>=x^Ty$ 즉, $\text{Dot Product}$는 $\text{Inner Product}$의 구체적인
 
 <details>
 
-<summary><strong>배경지식</strong></summary>
+<summary>
+
+<strong>배경지식</strong>
+
+</summary>
 
 <details>
 
-<summary><strong>① Vector Space</strong></summary>
+<summary>
+
+<strong>① Vector Space</strong>
+
+</summary>
 
 > <strong>Vector Space = 벡터들을 모아놓고, 벡터끼리 더하거나 스칼라를 곱할 수 있도록 연산이 정의되어 있으며, 그 연산들이 정해진 규칙을 만족하는 구조</strong>
 
@@ -78,7 +90,11 @@ $<x,y>=x^Ty$ 즉, $\text{Dot Product}$는 $\text{Inner Product}$의 구체적인
 
 <details>
 
-<summary><strong>② Bilinear mapping</strong></summary>
+<summary>
+
+<strong>② Bilinear mapping</strong>
+
+</summary>
 
 > <strong>두 개의 벡터를 입력받으며, 한쪽 입력을 고정하면 다른 쪽 입력에 대해 선형이고, 반대로 다른 쪽을 고정해도 선형인 함수</strong>
 
@@ -101,7 +117,11 @@ Dot Product `xᵀy`에서 y를 고정하면 x에 대한 Linear Mapping이 된다
 
 <details>
 
-<summary><strong>③ 왜 Inner Product에 Bilinear가 들어가는가</strong></summary>
+<summary>
+
+<strong>③ 왜 Inner Product에 Bilinear가 들어가는가</strong>
+
+</summary>
 
 >
 >
@@ -113,7 +133,11 @@ Bilinearity는 이러한 선형결합 구조가 Inner Product의 계산에서도
 
 <details>
 
-<summary><u><strong>핵심 정리</strong></u></summary>
+<summary>
+
+<u><strong>핵심 정리</strong></u>
+
+</summary>
 
 <div class="callout" role="note" data-kind="intuition">
 
@@ -143,14 +167,22 @@ Bilinearity는 이러한 선형결합 구조가 Inner Product의 계산에서도
 
 <details>
 
-<summary>$\text{Inner Product}$<strong>의 세가지 조건</strong></summary>
+<summary>
+
+$\text{Inner Product}$<strong>의 세가지 조건</strong>
+
+</summary>
 
 > $\text{Inner Product}$는 단순히 “두 벡터를 넣어서 숫자를 뱉는 함수”가 아니다.
 그 숫자가 길이·각도·직교를 정의하는 데 사용할 수 있으려면 특정 조건을 만족해야 한다.
 
 <details>
 
-<summary><strong>① Bilinear - 선형성</strong></summary>
+<summary>
+
+<strong>① Bilinear - 선형성</strong>
+
+</summary>
 
 > $\begin{cases}<ax+by,z>=a<x,z>+b<y,z>\\<x,ay+bz>=a<x,y>+b<x,z>\end{cases}$     <strong>“벡터의 선형적인 구조를 Inner Product에서도 그대로 유지하자”</strong>
 
@@ -158,7 +190,11 @@ Bilinearity는 이러한 선형결합 구조가 Inner Product의 계산에서도
 
 <details>
 
-<summary><strong>② Symmetric - 대칭성</strong></summary>
+<summary>
+
+<strong>② Symmetric - 대칭성</strong>
+
+</summary>
 
 > $<x,y> = <y,x>$   <strong>“두 벡터 사이의 관계를 하나의 대칭적인 값으로 측정하고 싶다.”</strong>
 
@@ -166,13 +202,21 @@ Bilinearity는 이러한 선형결합 구조가 Inner Product의 계산에서도
 
 <details>
 
-<summary><strong>③ Positive Definite - 양의 정부호</strong></summary>
+<summary>
+
+<strong>③ Positive Definite - 양의 정부호</strong>
+
+</summary>
 
 > $⟨x,x⟩≥0,⟨x,x⟩=0⟺x=0​$
 
 <details>
 
-<summary><strong>왜 필요한가? </strong></summary>
+<summary>
+
+<strong>왜 필요한가? </strong>
+
+</summary>
 
 > 우리는 Inner Product를 이용해 $||x||=\sqrt{<x,x>}$라고 벡터의 길이를 정의한다.
 ⟨x,x⟩는 항상 음이 아닌 값을 가져야 하며, 특히 $x≠0$이면 반드시 $⟨x,x⟩>0$이어야 한다.
@@ -190,7 +234,11 @@ Bilinearity는 이러한 선형결합 구조가 Inner Product의 계산에서도
 
 <details>
 
-<summary><strong>직관</strong></summary>
+<summary>
+
+<strong>직관</strong>
+
+</summary>
 
 >
 >
@@ -203,11 +251,19 @@ Inner Product는 그 벡터들 사이에 길이·각도·직교와 같은 기하
 
 <details>
 
-<summary><strong>여러 Vector Space에서의 Inner Product</strong></summary>
+<summary>
+
+<strong>여러 Vector Space에서의 Inner Product</strong>
+
+</summary>
 
 <details>
 
-<summary><strong>① </strong>$\mathbb{R}^n$<strong> : 숫자 배열</strong></summary>
+<summary>
+
+<strong>① </strong>$\mathbb{R}^n$<strong> : 숫자 배열</strong>
+
+</summary>
 
 > 가장 익숙한 경우다.<strong>  x와 y가 </strong>$\mathbb{R}^n$<strong>의 벡터라면 각 좌표를 대응시켜 곱한 뒤 모두 더한다.
 Inner Product = 각 좌표의 곱의 합 = Dot Product</strong>
@@ -218,7 +274,11 @@ Inner Product = 각 좌표의 곱의 합 = Dot Product</strong>
 
 <details>
 
-<summary><strong>② 함수공간 : 함수</strong></summary>
+<summary>
+
+<strong>② 함수공간 : 함수</strong>
+
+</summary>
 
 > 함수 $f(x)$와 $g(x)$를 생각하자. 이제 우리는 함수 자체를 하나의 vector 라고 취급할 수 있다.
 그렇다면 질문을 바꾼다. <strong>“두 함수의 관계를 어떻게 하나의 숫자로 표현할 것인가?”</strong>
@@ -228,7 +288,11 @@ Inner Product = 각 좌표의 곱의 합 = Dot Product</strong>
 
 <details>
 
-<summary><strong>왜 적분인가?</strong></summary>
+<summary>
+
+<strong>왜 적분인가?</strong>
+
+</summary>
 
 > $\mathbb{R}^n$에서는 $<x,y>=x_1y_1+x_2y_2 + ... + x_ny_n$였다.
 즉, <strong>“대응되는 성분을 곱하고, 그것들을 전체적으로 더한다”</strong> 였다.
@@ -247,7 +311,11 @@ Inner Product = 각 좌표의 곱의 합 = Dot Product</strong>
 
 <details>
 
-<summary><strong>함수의 크기는?</strong></summary>
+<summary>
+
+<strong>함수의 크기는?</strong>
+
+</summary>
 
 > <strong>Inner Product가 주어졌다면 그 Inner Product로부터 유도되는 Norm은 </strong>$||x||=\sqrt{<x,x>}$<strong>로 정의된다</strong>
 >
@@ -260,7 +328,11 @@ Inner Product = 각 좌표의 곱의 합 = Dot Product</strong>
 
 <details>
 
-<summary><strong>함수의 직교는?</strong></summary>
+<summary>
+
+<strong>함수의 직교는?</strong>
+
+</summary>
 
 > $<f,g>=0$이면 $\int_a^b f(x)g(x) dx=0$이므로 두 함수를 직교한다고 한다.
 >
@@ -280,7 +352,11 @@ Inner Product = 각 좌표의 곱의 합 = Dot Product</strong>
 
 <details>
 
-<summary><strong>③ 다항식 공간 : 다항식</strong></summary>
+<summary>
+
+<strong>③ 다항식 공간 : 다항식</strong>
+
+</summary>
 
 > 다항식은 $p(x)=a_0+a_1x+a_2x^2+...+a_nx^n$처럼 생긴 대수적 표현이다.
 그리고 이 다항식에 특정 값을 넣으면 $x \rightarrow p(x)$라는 값을 만들어낼 수 있다.
@@ -290,11 +366,19 @@ Inner Product = 각 좌표의 곱의 합 = Dot Product</strong>
 
 <details>
 
-<summary><strong>다항식의 inner product</strong></summary>
+<summary>
+
+<strong>다항식의 inner product</strong>
+
+</summary>
 
 <details>
 
-<summary><strong>1. 계수벡터를 이용한 inner product</strong></summary>
+<summary>
+
+<strong>1. 계수벡터를 이용한 inner product</strong>
+
+</summary>
 
 > 다음 두 다항식을 생각하자.
 >
@@ -309,7 +393,11 @@ ex. $\begin{cases}p(x)=1+2x+x^2\\q(x)=3-x+4x^2\end{cases} \Rightarrow \,\,<p,q>_
 
 <details>
 
-<summary><strong>2. 함수로 해석한 inner product</strong></summary>
+<summary>
+
+<strong>2. 함수로 해석한 inner product</strong>
+
+</summary>
 
 > $<p,q>_{func}=\int_a^b p(x)q(x)dx$
 
@@ -317,7 +405,11 @@ ex. $\begin{cases}p(x)=1+2x+x^2\\q(x)=3-x+4x^2\end{cases} \Rightarrow \,\,<p,q>_
 
 <details>
 
-<summary><strong>⇒ 각 경우의 Norm과 Orthogonal</strong></summary>
+<summary>
+
+<strong>⇒ 각 경우의 Norm과 Orthogonal</strong>
+
+</summary>
 
 > ※ 계수벡터를 이용한 inner product와 함수로 해석한 inner product는 서로 다르다.
 모두 다항식 공간에서 사용할 수 있지만, 일반적으로 서로 같은 값이 아니다.
@@ -342,7 +434,11 @@ $$
 
 <details>
 
-<summary><strong>④ 행렬 공간 : 행렬</strong></summary>
+<summary>
+
+<strong>④ 행렬 공간 : 행렬</strong>
+
+</summary>
 
 ※ 행렬의 inner product가 성립하기 위해선 두 행렬의 size가 같아야 한다.
 
@@ -358,7 +454,11 @@ $$
 
 <details>
 
-<summary>$\text{Dot Product}$와 같은 구조</summary>
+<summary>
+
+$\text{Dot Product}$와 같은 구조
+
+</summary>
 
 > $A=\begin{bmatrix}a&b\\c&d\end{bmatrix}$를 $(a, b, c, d)$처럼 펼쳐서 생각하면, $\text{Frobenius inner product}$는 두 행렬을 펼친 벡터들의 dot product와 같은 구조를 갖는다.
 
@@ -366,7 +466,11 @@ $$
 
 <details>
 
-<summary>$\text{Norm}$과 $\text{Orthogonal}$</summary>
+<summary>
+
+$\text{Norm}$과 $\text{Orthogonal}$
+
+</summary>
 
 - $\text{Norm}=||A||_F=\sqrt{<A,A>_F}=\sqrt{\sum_{i,j}(a_{ij})^2}$
 - $\text{Orthogonal}=<A,B>_F=\sum_{i,j}a_{ij}b_{ij}=0$      ※함수와 마찬가지로 물리적으로 행렬이 직각으로 놓인다는 것을 의미하는 게 아니다.
@@ -379,7 +483,11 @@ $$
 
 <details>
 
-<summary><strong>다양한 Vector Space에서 Inner Product를 바라보는 공통직관</strong></summary>
+<summary>
+
+<strong>다양한 Vector Space에서 Inner Product를 바라보는 공통직관</strong>
+
+</summary>
 
 > <strong>각 위치 또는 성분에서 두 Vector 사이의 관계를 계산한 뒤, 그 관계를 전체에 걸쳐 합산한다.</strong>
 
@@ -389,7 +497,11 @@ $$
 
 <details>
 
-<summary><strong>문제</strong></summary>
+<summary>
+
+<strong>문제</strong>
+
+</summary>
 
 [Untitled](https://app.notion.com/p/3ed09d87213b803da4c6c9755aff9c52)
 

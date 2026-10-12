@@ -8,7 +8,11 @@ order: 6
 
 <details>
 
-<summary><strong>1. Column Vectors와 Linear Transformation</strong></summary>
+<summary>
+
+<strong>1. Column Vectors와 Linear Transformation</strong>
+
+</summary>
 
 > 선형변환 $T$가 있을 때 이를 나타내는 행렬 $A$의 각 column은 사실 $T(e_i)$, 즉 <strong>표준기저벡터가 이동한 결과</strong>이다.
 >
@@ -19,7 +23,11 @@ order: 6
 
 <details>
 
-<summary><strong>왜 열벡터가 곧 기저벡터의 이동인가</strong></summary>
+<summary>
+
+<strong>왜 열벡터가 곧 기저벡터의 이동인가</strong>
+
+</summary>
 
 
 </details>
@@ -28,14 +36,22 @@ order: 6
 
 <details>
 
-<summary><strong>2. Rotation은 무엇을 보존하는가?</strong></summary>
+<summary>
+
+<strong>2. Rotation은 무엇을 보존하는가?</strong>
+
+</summary>
 
 > Rotation은 표준기저벡터의 <strong>방향</strong>을 바꾸지만, <strong>길이와 각도는 보존</strong>한다.
 즉 $\Vert{}T(e_i)\Vert{}=1$이고 $T(e_i)\perp T(e_j)\,\,(i\neq j)$이므로, 회전된 기저벡터들 $T(e_1),\dots,T(e_n)$ 역시 원래의 표준기저처럼 <strong>orthonormal</strong>하다.
 
 <details>
 
-<summary><strong>왜 길이·각도가 보존되면 Orthogonal Matrix인가</strong></summary>
+<summary>
+
+<strong>왜 길이·각도가 보존되면 Orthogonal Matrix인가</strong>
+
+</summary>
 
 > Rotation matrix $R$의 column들이 orthonormal하다는 것은 정확히 $R^\top R=I$를 만족한다는 것과 같다.
 그리고 $R^\top R=I$이면 임의의 $x,y$에 대해
@@ -50,7 +66,11 @@ $$
 
 <details>
 
-<summary><strong>참고: Orthogonal Matrix 전체가 Rotation은 아니다</strong></summary>
+<summary>
+
+<strong>참고: Orthogonal Matrix 전체가 Rotation은 아니다</strong>
+
+</summary>
 
 \*orthogonal matrix는 열벡터가 orthonormal인 matrix를 말한다. (orthogonal만으로는 만족 x)
 
@@ -61,11 +81,19 @@ $$
 
 <details>
 
-<summary><strong>행렬식, determinant의 의미</strong></summary>
+<summary>
+
+<strong>행렬식, determinant의 의미</strong>
+
+</summary>
 
 <details>
 
-<summary><strong>1. 2차원 공간: 면적 변화율</strong></summary>
+<summary>
+
+<strong>1. 2차원 공간: 면적 변화율</strong>
+
+</summary>
 
 > 행렬식(Determinant, $\det(A)$)의 기하학적 의미는 선형변환을 거쳤을 때 공간(면적이나 부피)이 몇 배로 확대 또는 축소되는지를 나타내는 변화율이다.
 >
@@ -75,7 +103,11 @@ $$
 
 <details>
 
-<summary><strong>2. 행렬식 부호(</strong>$\pm$<strong>)의 의미: 공간의 방향성</strong></summary>
+<summary>
+
+<strong>2. 행렬식 부호(</strong>$\pm$<strong>)의 의미: 공간의 방향성</strong>
+
+</summary>
 
 > 행렬식 값은 음수가 될 수도 있다. 부호는 <strong>공간이 거울처럼 뒤집혔는지 여부</strong>를 나타낸다.
 >
@@ -87,7 +119,11 @@ $e_1$에서 $e_2$로 향하는 반시계방향 관계가 변환 후 $Ae_1$에서
 
 <details>
 
-<summary><strong>3. </strong>$\det(A) = 0$<strong>의 의미: 차원 축소</strong></summary>
+<summary>
+
+<strong>3. </strong>$\det(A) = 0$<strong>의 의미: 차원 축소</strong>
+
+</summary>
 
 > 행렬식이 $0$이라는 것은 <strong>변환 후 면적(또는 부피)이 </strong>$0$<strong>으로 납작하게 압축되었다</strong>는 뜻이다.
 
@@ -101,7 +137,11 @@ $e_1$에서 $e_2$로 향하는 반시계방향 관계가 변환 후 $Ae_1$에서
 
 <details>
 
-<summary><strong>3. Rotation Axis</strong></summary>
+<summary>
+
+<strong>3. Rotation Axis</strong>
+
+</summary>
 
 > 3D rotation에서는 특정 축을 고정한 채, 나머지 2차원 평면 안에서만 회전이 일어나는 경우가 많다.
 예를 들어 $e_1$을 회전축으로 고정하면 $T(e_1)=e_1$이므로, 행렬의 첫 번째 column은
@@ -114,7 +154,11 @@ $$
 
 <details>
 
-<summary><strong>x축 회전행렬</strong></summary>
+<summary>
+
+<strong>x축 회전행렬</strong>
+
+</summary>
 
 > "첫 번째 축은 고정하고, 나머지 2차원 평면에서만 회전이 일어난다"는 구조를 그대로 행렬로 옮기면 다음과 같다.
 
@@ -138,14 +182,22 @@ OpenCV의 `cv2.Rodrigues()`나 로보틱스의 axis-angle 표현은 이 공식�
 
 <details>
 
-<summary><strong>4. 왜 sin, cos인가?</strong></summary>
+<summary>
+
+<strong>4. 왜 sin, cos인가?</strong>
+
+</summary>
 
 > 회전 후에도 단위벡터의 길이는 여전히 1이므로, 회전된 단위벡터는 항상 <strong>단위원 위</strong>에 존재한다.
 단위원 위에서 각도 $\theta$만큼 회전한 점의 좌표는 $(\cos\theta,\sin\theta)$로 표현되므로, 회전행렬의 column에 자연스럽게 $\sin,\cos$가 등장하게 된다.
 
 <details>
 
-<summary><strong>Column Vector 관점에서 다시 보기</strong></summary>
+<summary>
+
+<strong>Column Vector 관점에서 다시 보기</strong>
+
+</summary>
 
 > 1번 항목에서 본 것처럼 행렬의 첫 번째 column은 $T(e_1)$, 즉 회전된 $e_1$이다.
 
@@ -162,13 +214,21 @@ $$
 
 <details>
 
-<summary><strong>5. Rotation Composition</strong></summary>
+<summary>
+
+<strong>5. Rotation Composition</strong>
+
+</summary>
 
 > 여러 번의 회전을 연속으로 적용했을 때, 그 순서가 결과에 영향을 주는지는 <strong>차원과 회전축</strong>에 따라 달라진다.
 
 <details>
 
-<summary><strong>2D: 항상 교환 가능하다</strong></summary>
+<summary>
+
+<strong>2D: 항상 교환 가능하다</strong>
+
+</summary>
 
 >
 >
@@ -187,7 +247,11 @@ $$
 
 <details>
 
-<summary><strong>3D+: 교환 불가능하다</strong></summary>
+<summary>
+
+<strong>3D+: 교환 불가능하다</strong>
+
+</summary>
 
 >
 >
@@ -202,7 +266,11 @@ $$
 
 <details>
 
-<summary><strong>인터랙티브 그래픽</strong></summary>
+<summary>
+
+<strong>인터랙티브 그래픽</strong>
+
+</summary>
 
 
 </details>
@@ -211,7 +279,11 @@ $$
 
 <details>
 
-<summary><strong>AI Engineering Relevance</strong></summary>
+<summary>
+
+<strong>AI Engineering Relevance</strong>
+
+</summary>
 
 <div class="callout" role="note" data-kind="intuition">
 
@@ -227,7 +299,11 @@ $$
 
 <details>
 
-<summary><strong>문제</strong></summary>
+<summary>
+
+<strong>문제</strong>
+
+</summary>
 
 [Untitled](https://app.notion.com/p/3f009d87213b8002a18eecaf615b7ec8)
 

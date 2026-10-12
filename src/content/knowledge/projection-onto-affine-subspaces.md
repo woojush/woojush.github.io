@@ -6,11 +6,15 @@ status: seed
 order: 5
 ---
 
-> $\fbox{$\pi_L(x) = x_0 + \pi_U(x - x_0)$}$
+> $$ \fbox{$\pi_L(x) = x_0 + \pi_U(x - x_0)$} $$
 
 <details>
 
-<summary><strong>Affine Subspace</strong></summary>
+<summary>
+
+<strong>Affine Subspace</strong>
+
+</summary>
 
 > $L = x_0 + U$
 >
@@ -21,7 +25,11 @@ order: 5
 
 <details>
 
-<summary><strong>핵심 아이디어</strong></summary>
+<summary>
+
+<strong>핵심 아이디어</strong>
+
+</summary>
 
 > 현재까지 다룬 projection은 모두 공간이 원점을 지나는, vector space에서의 projection이었다.
 하지만 실제로는 공간이 원점을 지나지 않는 경우에서 projection을 하게 되는 경우도 빈번하다.
@@ -53,7 +61,11 @@ order: 5
 >
 > <details>
 >
-> <summary>인터렉티브 그래픽</summary>
+> <summary>
+>
+> 인터렉티브 그래픽
+>
+> </summary>
 >
 >
 > </details>
@@ -64,7 +76,11 @@ order: 5
 
 <details>
 
-<summary><strong>왜 필요한가?</strong></summary>
+<summary>
+
+<strong>왜 필요한가?</strong>
+
+</summary>
 
 >
 >
@@ -83,9 +99,13 @@ order: 5
 
 <details>
 
-<summary><strong>Projection Error의 직교성</strong></summary>
+<summary>
 
-$\fbox{$x - \pi_L(x) \perp U$}$
+<strong>Projection Error의 직교성</strong>
+
+</summary>
+
+$$ \fbox{$x - \pi_L(x) \perp U$} $$
 
 - $L = x_0 + U$는 $U$를 평행이동한 공간이므로, $L$의 방향성은 곧 $U$와 동일(평행)하다.
 - 따라서 $L$ 위로 내린 사영 오차 벡터 $x - \pi_L(x)$는 <strong>방향 공간인 </strong>$U$<strong>의 모든 벡터와 직교</strong>한다 $x - \pi_L(x) \in U^\perp$.

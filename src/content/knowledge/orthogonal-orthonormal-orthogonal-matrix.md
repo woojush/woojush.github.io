@@ -8,7 +8,11 @@ order: 1
 
 <details>
 
-<summary><strong>Orthogonal</strong></summary>
+<summary>
+
+<strong>Orthogonal</strong>
+
+</summary>
 
 > 두 벡터가 서로 직교 ⇒ $⟨x,y⟩=0$
 
@@ -18,7 +22,11 @@ ex. $\begin{bmatrix}1\\1\end{bmatrix},\begin{bmatrix}-1\\1\end{bmatrix}$
 
 <details>
 
-<summary><strong>Orthonormal</strong></summary>
+<summary>
+
+<strong>Orthonormal</strong>
+
+</summary>
 
 > 서로 직교 + 각각 길이가 1 ⇒ $⟨x,y⟩=0,\,\,∥x∥=∥y∥=1$
 
@@ -28,7 +36,11 @@ ex. $\begin{pmatrix} \frac{1}{\sqrt{2}} & -\frac{1}{\sqrt{2}} \\ \frac{1}{\sqrt{
 
 <details>
 
-<summary><strong>Orthogonal Matrix</strong></summary>
+<summary>
+
+<strong>Orthogonal Matrix</strong>
+
+</summary>
 
 >
 >

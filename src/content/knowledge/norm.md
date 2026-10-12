@@ -10,7 +10,11 @@ order: 1
 
 <details>
 
-<summary><strong>왜 Norm이 필요한가?</strong></summary>
+<summary>
+
+<strong>왜 Norm이 필요한가?</strong>
+
+</summary>
 
 > 벡터 $x=(x_1, x_2,...,x_n)$이 있을 때 “이 벡터 얼마나 크지?”, “이 두 벡터 서로 얼마나 떨어져있지?” 하는 질문이 필요한 순간이 있다.
 >
@@ -21,7 +25,11 @@ order: 1
 
 <details>
 
-<summary><strong>Euclidean Norm </strong></summary>
+<summary>
+
+<strong>Euclidean Norm </strong>
+
+</summary>
 
 > 피타고라스 정리를 2차원, 3차원을 넘어서 n차원으로 그대로 일반화한 것.
 >
@@ -31,7 +39,11 @@ order: 1
 
 <details>
 
-<summary><strong>Manhattan Norm</strong></summary>
+<summary>
+
+<strong>Manhattan Norm</strong>
+
+</summary>
 
 \*뉴욕 맨하튼 도로는 전부 격자 모양이라 건물을 뚫고 대각선으로 갈 수 없음.
 오로지 도로를 따라서 직각 이동.
@@ -58,7 +70,11 @@ Euclidean Norm은 우리가 익숙한 유클리드 기하학의 거리 개념을
 
 <details>
 
-<summary><strong>manhattan norm은 왜 필요함?</strong></summary>
+<summary>
+
+<strong>manhattan norm은 왜 필요함?</strong>
+
+</summary>
 
 > 모델에게 붙는 가중치를 조정할 때, Euclidean을 활용하면 가중치가 0.x 꼴인 경우 제곱하면 값이 더 작아져서 굳이 신경 쓰지도 않음. 그런데 Manhattan은 절댓값으로 곧이곧대로 받아들여서, 차라리 어설프게 남겨두지 말고 0으로 만들자! 하게 됨.
 
@@ -68,7 +84,11 @@ Euclidean Norm은 우리가 익숙한 유클리드 기하학의 거리 개념을
 
 <details>
 
-<summary>조건</summary>
+<summary>
+
+조건
+
+</summary>
 
 >
 >

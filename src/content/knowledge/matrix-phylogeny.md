@@ -18,7 +18,11 @@ order: 8
 
 <details>
 
-<summary><strong>계통도 표</strong></summary>
+<summary>
+
+<strong>계통도 표</strong>
+
+</summary>
 
 | 종류 | 조건 | 포함 관계 | 쓸 수 있는 것 |
 | --- | --- | --- | --- |
@@ -45,7 +49,11 @@ order: 8
 
 <details>
 
-<summary><strong>교재가 직접 말하는 구분</strong></summary>
+<summary>
+
+<strong>교재가 직접 말하는 구분</strong>
+
+</summary>
 
 > • <strong>정칙(non-singular)과 non-defective는 다르다.</strong> 회전행렬은 $\det\neq0$이라 가역이지만 실수에서 대각화되지 않는다.
 • 직교·대칭·PD 행렬의 성질은 위 표의 해당 행과 같다.
@@ -55,7 +63,11 @@ order: 8
 
 <details>
 
-<summary><strong>어떤 분해를 쓸까? 질문 순서 (교재 밖 정리)</strong></summary>
+<summary>
+
+<strong>어떤 분해를 쓸까? 질문 순서 (교재 밖 정리)</strong>
+
+</summary>
 
 > ※ 교재 밖 보충 : 위 표를 사용 순서로 바꾼 것이다.
 1. 정사각이 아니다 → <strong>SVD</strong>
@@ -68,7 +80,11 @@ order: 8
 
 <details>
 
-<summary><strong>추가정보 (교재 4.8 Further Reading 요약)</strong></summary>
+<summary>
+
+<strong>추가정보 (교재 4.8 Further Reading 요약)</strong>
+
+</summary>
 
 - 고유분해는 <strong>spectral methods</strong>의 바탕이다. PCA(10장), Fisher discriminant analysis, MDS가 대표적이고, Isomap, Laplacian eigenmaps, Hessian eigenmaps, spectral clustering도 양의 정부호 커널의 고유분해에 기댄다.
 - 이 방법들의 효율은 대칭 PSD 행렬의 <strong>최선의 rank-</strong>$k$<strong> 근사</strong>를 찾는 데서 나온다.
@@ -79,7 +95,11 @@ order: 8
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - 어떤 행렬에 어떤 분해·연산이 가능한지 판단
 - 5장 이후 최적화 · 6장 확률의 공분산 · 10장 PCA

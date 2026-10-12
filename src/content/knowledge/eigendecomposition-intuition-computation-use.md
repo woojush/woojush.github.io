@@ -19,7 +19,11 @@ order: 3
 
 <details>
 
-<summary><strong>기하학적 직관 (교재 Figure 4.7)</strong></summary>
+<summary>
+
+<strong>기하학적 직관 (교재 Figure 4.7)</strong>
+
+</summary>
 
 > $A$는 표준기저 기준의 변환행렬이다.
 ① $P^{-1}$ : 표준기저 $e_i$에서 고유기저 $p_i$로 <strong>기저변환</strong>한다. (좌표 읽는 방식만 바뀌고 벡터는 그대로)
@@ -36,13 +40,21 @@ order: 3
 
 <details>
 
-<summary><strong>예시 : 교재 Example 4.11 (대칭행렬의 고유분해)</strong></summary>
+<summary>
+
+<strong>예시 : 교재 Example 4.11 (대칭행렬의 고유분해)</strong>
+
+</summary>
 
 > $A=\dfrac12\begin{bmatrix}5&-2\\-2&5\end{bmatrix}$
 
 <details>
 
-<summary>Step 1. 고유값과 고유벡터</summary>
+<summary>
+
+Step 1. 고유값과 고유벡터
+
+</summary>
 
 > $p_A(\lambda)=\big(\tfrac52-\lambda\big)^2-1=\lambda^2-5\lambda+\tfrac{21}{4}=\big(\lambda-\tfrac72\big)\big(\lambda-\tfrac32\big)$
 $\lambda_1=\tfrac72,\;\lambda_2=\tfrac32$
@@ -53,7 +65,11 @@ $\lambda_1=\tfrac72,\;\lambda_2=\tfrac32$
 
 <details>
 
-<summary>Step 2. 존재 확인</summary>
+<summary>
+
+Step 2. 존재 확인
+
+</summary>
 
 > 고유값이 서로 다르므로 $p_1,p_2$는 독립이고 $\mathbb{R}^2$의 기저이다. 게다가 대칭이라 서로 직교한다. 따라서 대각화 가능하다.
 
@@ -61,7 +77,11 @@ $\lambda_1=\tfrac72,\;\lambda_2=\tfrac32$
 
 <details>
 
-<summary>Step 3. $P$와 $D$</summary>
+<summary>
+
+Step 3. $P$와 $D$
+
+</summary>
 
 > $P=[p_1\;p_2]=\dfrac{1}{\sqrt2}\begin{bmatrix}1&1\\-1&1\end{bmatrix}$, $D=\begin{bmatrix}\tfrac72&0\\0&\tfrac32\end{bmatrix}$
 $P$의 열이 정규직교이므로 $P^{-1}=P^\top$이다. 따라서
@@ -73,14 +93,22 @@ $A=PDP^\top=\dfrac{1}{\sqrt2}\begin{bmatrix}1&1\\-1&1\end{bmatrix}\begin{bmatrix
 
 <details>
 
-<summary><strong>활용 1 : 거듭제곱 </strong>$A^k=PD^kP^{-1}$</summary>
+<summary>
+
+<strong>활용 1 : 거듭제곱 </strong>$A^k=PD^kP^{-1}$
+
+</summary>
 
 > $A^k=(PDP^{-1})(PDP^{-1})\cdots(PDP^{-1})$에서 이웃한 $P^{-1}P$가 모두 $I$로 지워지므로 $A^k=PD^kP^{-1}$.
 $D^k$는 대각 성분을 각각 $k$제곱하면 된다.
 
 <details>
 
-<summary>예시 : Example 4.11의 $A^2$</summary>
+<summary>
+
+예시 : Example 4.11의 $A^2$
+
+</summary>
 
 > $D^2=\text{diag}\big(\tfrac{49}{4},\tfrac94\big)$이므로 $A^2=\tfrac{49}{4}\,p_1p_1^\top+\tfrac94\,p_2p_2^\top$.
 $p_1p_1^\top=\tfrac12\begin{bmatrix}1&-1\\-1&1\end{bmatrix}$, $p_2p_2^\top=\tfrac12\begin{bmatrix}1&1\\1&1\end{bmatrix}$
@@ -93,7 +121,11 @@ $A^2=\tfrac{49}{8}\begin{bmatrix}1&-1\\-1&1\end{bmatrix}+\tfrac98\begin{bmatrix}
 
 <details>
 
-<summary><strong>활용 2 : det와 역행렬</strong></summary>
+<summary>
+
+<strong>활용 2 : det와 역행렬</strong>
+
+</summary>
 
 > $\det(A)=\det(P)\det(D)\det(P^{-1})=\det(D)=\prod_id_{ii}$ (교재 (4.63)). 4.2의 Theorem 4.16과 같은 결론이다.
 $A^{-1}=PD^{-1}P^{-1}$ (모든 $\lambda_i\neq0$일 때). $D^{-1}$은 대각 성분의 역수이다.
@@ -103,7 +135,11 @@ Example 4.11 : $\det(A)=\tfrac72\cdot\tfrac32=\tfrac{21}{4}$. 직접 계산하�
 
 <details>
 
-<summary><strong>대각화 가능 여부와 가역성은 무관하다 (4가지 조합)</strong></summary>
+<summary>
+
+<strong>대각화 가능 여부와 가역성은 무관하다 (4가지 조합)</strong>
+
+</summary>
 
 |  | 가역 (모든 $\lambda\neq0$) | 가역 아님 ($\lambda=0$ 존재) |
 | --- | --- | --- |
@@ -116,7 +152,11 @@ Example 4.11 : $\det(A)=\tfrac72\cdot\tfrac32=\tfrac{21}{4}$. 직접 계산하�
 
 <details>
 
-<summary><strong>한계와 다음 노트</strong></summary>
+<summary>
+
+<strong>한계와 다음 노트</strong>
+
+</summary>
 
 > 고유분해는 <strong>정사각행렬</strong>에 대해서만 정의되고, 그중에서도 <strong>non-defective</strong>여야 한다.
 그런데 데이터 행렬은 보통 직사각형이다. (행 = 샘플, 열 = 특징) → <strong>어떤 행렬에도 존재하는 분해가 필요하다 → SVD (4.5)</strong>
@@ -125,7 +165,11 @@ Example 4.11 : $\det(A)=\tfrac72\cdot\tfrac32=\tfrac{21}{4}$. 직접 계산하�
 
 <details>
 
-<summary><strong>AI Engineering Relevance</strong></summary>
+<summary>
+
+<strong>AI Engineering Relevance</strong>
+
+</summary>
 
 <div class="callout" role="note" data-kind="intuition">
 
@@ -140,7 +184,11 @@ Example 4.11 : $\det(A)=\tfrac72\cdot\tfrac32=\tfrac{21}{4}$. 직접 계산하�
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - SVD (4.5), 행렬 근사 (4.6)
 - PCA (10장)
@@ -161,7 +209,11 @@ Example 4.11 : $\det(A)=\tfrac72\cdot\tfrac32=\tfrac{21}{4}$. 직접 계산하�
 
 <details>
 
-<summary><strong>문제</strong></summary>
+<summary>
+
+<strong>문제</strong>
+
+</summary>
 
 [Untitled](https://app.notion.com/p/3f409d87213b81f8ac15f8b48d800ba4)
 

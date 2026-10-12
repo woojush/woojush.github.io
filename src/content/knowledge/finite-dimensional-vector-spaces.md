@@ -11,7 +11,11 @@ order: 5
 
 <details>
 
-<summary><strong>주의 사항</strong></summary>
+<summary>
+
+<strong>주의 사항</strong>
+
+</summary>
 
 > <strong>“차원이 같으면 모든 선형변환이 bijection이다” </strong>인 것은 아니다.
 <strong>”차원이 같으면 bijection인 선형변환을 하나 이상 만들 수 있다”</strong> 는 것이다.
@@ -22,7 +26,11 @@ ex) $A=\begin{bmatrix}1&1\\2&2\end{bmatrix}$ 는 $\mathbb{R}^2\to\mathbb{R}^2$ �
 
 <details>
 
-<summary><strong>문제</strong></summary>
+<summary>
+
+<strong>문제</strong>
+
+</summary>
 
 [Untitled](https://app.notion.com/p/3cb09d87213b8003b14be8fe4ef82cc7)
 

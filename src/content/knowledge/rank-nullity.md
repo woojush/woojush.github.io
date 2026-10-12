@@ -23,7 +23,11 @@ $\ker(A) = \text{span}\left\{ \begin{bmatrix} 1 \\ -1 \\ 2 \end{bmatrix} \right\
 
 <details>
 
-<summary><strong>왜 필요한가?</strong></summary>
+<summary>
+
+<strong>왜 필요한가?</strong>
+
+</summary>
 
 > <strong>입력의 정보가 어떻게 분배되는지</strong>를 알려주는 가장 중요한 정리이다.
 
@@ -31,7 +35,11 @@ $\ker(A) = \text{span}\left\{ \begin{bmatrix} 1 \\ -1 \\ 2 \end{bmatrix} \right\
 
 <details>
 
-<summary><strong>직관</strong></summary>
+<summary>
+
+<strong>직관</strong>
+
+</summary>
 
 > 변수가 $x_1$\~$x_5$인 행렬을 가우스 소거했더니, Pivot이 $x_1$, $x_2$ 2개이다. → $x_3$\~$x_5$는 Free Variable이다.
 즉, <strong>전체 변수가5개 = Pivot 변수 2개 + Free Variable 3개</strong>인 것이며,
@@ -41,7 +49,11 @@ $\ker(A) = \text{span}\left\{ \begin{bmatrix} 1 \\ -1 \\ 2 \end{bmatrix} \right\
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - Image
 - Orthogonality
@@ -54,7 +66,11 @@ $\ker(A) = \text{span}\left\{ \begin{bmatrix} 1 \\ -1 \\ 2 \end{bmatrix} \right\
 
 <details>
 
-<summary><strong>추가정보</strong></summary>
+<summary>
+
+<strong>추가정보</strong>
+
+</summary>
 
 - $\text{nullity(A)}=\dim(\ker A) = \text{Kernel의 basis vector 개수} = \text{ Free Variable 개수} = n - \text{rank}(A)$
 

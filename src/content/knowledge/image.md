@@ -13,7 +13,11 @@ order: 2
 
 <details>
 
-<summary><strong>왜 필요한가?</strong></summary>
+<summary>
+
+<strong>왜 필요한가?</strong>
+
+</summary>
 
 > 선형방정식 $Ax=b$가 풀리려면 반드시 $b \in Image(A)$이어야 한다.
 즉, 도달할 수 없는 b는 절대로 만들 수 없다.
@@ -22,7 +26,11 @@ order: 2
 
 <details>
 
-<summary><strong>직관</strong></summary>
+<summary>
+
+<strong>직관</strong>
+
+</summary>
 
 > $Image$는 <strong>“행렬이 만들어낼 수 있는 모든 출력의 집합”</strong>이다.
 입력을 아무리 바꾸어도 $Image$ 밖으로는 절대 나갈 수 없다.
@@ -32,7 +40,11 @@ order: 2
 
 <details>
 
-<summary><strong>이걸 모르면? </strong></summary>
+<summary>
+
+<strong>이걸 모르면? </strong>
+
+</summary>
 
 - 해 존재 조건 \*rank(A)=rank(\[A\|b\])
 - Rank-Nullity
@@ -42,7 +54,11 @@ order: 2
 
 <details>
 
-<summary><strong>추가정보</strong></summary>
+<summary>
+
+<strong>추가정보</strong>
+
+</summary>
 
 > <strong>Image의 차원이 Rank이다.
 </strong>$\text {dim(Im(A))=rank(A)}$

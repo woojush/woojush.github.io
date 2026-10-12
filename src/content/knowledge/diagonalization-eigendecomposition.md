@@ -20,11 +20,19 @@ $D$<strong>의 대각 성분 = 고유값, </strong>$P$<strong>의 열 = 대응�
 
 <details>
 
-<summary><strong>배경지식 (0에서 시작)</strong></summary>
+<summary>
+
+<strong>배경지식 (0에서 시작)</strong>
+
+</summary>
 
 <details>
 
-<summary>① 대각행렬이 좋은 이유 (교재 (4.49))</summary>
+<summary>
+
+① 대각행렬이 좋은 이유 (교재 (4.49))
+
+</summary>
 
 > $D=\text{diag}(c_1,\dots,c_n)$이면
 • $\det(D)=\prod c_i$
@@ -35,7 +43,11 @@ $D$<strong>의 대각 성분 = 고유값, </strong>$P$<strong>의 열 = 대응�
 
 <details>
 
-<summary>② 닮음과 기저변환 (2.7.2 복습)</summary>
+<summary>
+
+② 닮음과 기저변환 (2.7.2 복습)
+
+</summary>
 
 > 같은 선형사상을 다른 기저에서 본 행렬 $\tilde A=S^{-1}AS$. 일반 공식은 $\tilde A_\Phi=T^{-1}A_\Phi S$이고, <strong>입력 기저와 출력 기저가 같으면 </strong>$S=T$가 되어 $S^{-1}AS$가 된다.
 대각화는 이 공식에서 “$S$로 어떤 기저를 고르면 $\tilde A$가 대각이 되는가”를 묻는 것이다.
@@ -44,7 +56,11 @@ $D$<strong>의 대각 성분 = 고유값, </strong>$P$<strong>의 열 = 대응�
 
 <details>
 
-<summary>③ 행렬곱을 열 단위로 읽기</summary>
+<summary>
+
+③ 행렬곱을 열 단위로 읽기
+
+</summary>
 
 > $AP=A[p_1\cdots p_n]=[Ap_1\;\cdots\;Ap_n]$ : $A$를 곱하면 $P$의 <strong>각 열에</strong> $A$가 곱해진다.
 $PD=[p_1\cdots p_n]\,\text{diag}(\lambda_1,\dots,\lambda_n)=[\lambda_1p_1\;\cdots\;\lambda_np_n]$ : 오른쪽에서 대각행렬을 곱하면 <strong>각 열이 </strong>$\lambda_i$<strong>배</strong>가 된다.
@@ -53,7 +69,11 @@ $PD=[p_1\cdots p_n]\,\text{diag}(\lambda_1,\dots,\lambda_n)=[\lambda_1p_1\;\cdot
 
 <details>
 
-<summary>④ 4.2 복습</summary>
+<summary>
+
+④ 4.2 복습
+
+</summary>
 
 > 서로 다른 고유값의 고유벡터는 독립(Theorem 4.12). 독립 고유벡터가 $n$개보다 적은 행렬이 defective. 대칭이면 정규직교 고유기저가 있다(Spectral Theorem).
 
@@ -63,7 +83,11 @@ $PD=[p_1\cdots p_n]\,\text{diag}(\lambda_1,\dots,\lambda_n)=[\lambda_1p_1\;\cdot
 
 <details>
 
-<summary><strong>왜 필요한가</strong></summary>
+<summary>
+
+<strong>왜 필요한가</strong>
+
+</summary>
 
 > <strong>원인 → 결과 사슬</strong>
 1. 대각행렬 $D$는 거듭제곱·역·det가 한 줄이다.
@@ -75,14 +99,22 @@ $PD=[p_1\cdots p_n]\,\text{diag}(\lambda_1,\dots,\lambda_n)=[\lambda_1p_1\;\cdot
 
 <details>
 
-<summary>$AP=PD$<strong> : 대각화의 핵심 한 줄</strong></summary>
+<summary>
+
+$AP=PD$<strong> : 대각화의 핵심 한 줄</strong>
+
+</summary>
 
 > 열 단위로 비교하면 $AP=PD$는 곧 $Ap_1=\lambda_1p_1,\;\dots,\;Ap_n=\lambda_np_n$이다.
 즉 $AP=PD$<strong> </strong>$\iff$<strong> </strong>$\lambda_i$<strong>는 고유값이고 </strong>$p_i$<strong>는 대응하는 고유벡터</strong>이다.
 
 <details>
 
-<summary>왜 “$\iff$” 인가 (Theorem 4.20 두 방향)</summary>
+<summary>
+
+왜 “$\iff$” 인가 (Theorem 4.20 두 방향)
+
+</summary>
 
 > ($\Leftarrow$) 고유벡터 $n$개가 기저이면 그것을 열로 모은 $P$는 열이 독립이라 invertible(full rank, Theorem 4.3). $AP=PD$의 양변에 $P^{-1}$을 곱하면 $A=PDP^{-1}$.
 ($\Rightarrow$) $A=PDP^{-1}$이면 $AP=PD$이므로 $P$의 열이 고유벡터이다. $P$가 invertible이므로 이 $n$개 열은 독립이고, 따라서 기저이다.
@@ -93,7 +125,11 @@ $PD=[p_1\cdots p_n]\,\text{diag}(\lambda_1,\dots,\lambda_n)=[\lambda_1p_1\;\cdot
 
 <details>
 
-<summary><strong>대각화 가능 여부 판정</strong></summary>
+<summary>
+
+<strong>대각화 가능 여부 판정</strong>
+
+</summary>
 
 | 상황 | 대각화 | 이유 |
 | --- | --- | --- |
@@ -112,11 +148,19 @@ $PD=[p_1\cdots p_n]\,\text{diag}(\lambda_1,\dots,\lambda_n)=[\lambda_1p_1\;\cdot
 
 <details>
 
-<summary><strong>예시</strong></summary>
+<summary>
+
+<strong>예시</strong>
+
+</summary>
 
 <details>
 
-<summary>① 대각화 가능 : 교재 Example 4.5의 행렬</summary>
+<summary>
+
+① 대각화 가능 : 교재 Example 4.5의 행렬
+
+</summary>
 
 > $A=\begin{bmatrix}4&2\\1&3\end{bmatrix}$, 고유쌍 $(5,\,(2,1)^\top)$, $(2,\,(1,-1)^\top)$
 $P=\begin{bmatrix}2&1\\1&-1\end{bmatrix}$, $D=\begin{bmatrix}5&0\\0&2\end{bmatrix}$
@@ -127,7 +171,11 @@ $\det(P)=-3\neq0$이므로 $P$는 invertible. 따라서 $A=PDP^{-1}$.
 
 <details>
 
-<summary>② 대각화 불가능 : 교재 Example 4.6의 행렬</summary>
+<summary>
+
+② 대각화 불가능 : 교재 Example 4.6의 행렬
+
+</summary>
 
 > $A=\begin{bmatrix}2&1\\0&2\end{bmatrix}$ : 고유값 $2$(algebraic 2), 독립 고유벡터는 $(1,0)^\top$ 하나뿐(geometric 1).
 $P$의 열로 쓸 독립 고유벡터가 2개 모자라서 invertible인 $P$를 만들 수 없다.
@@ -136,7 +184,11 @@ $P$의 열로 쓸 독립 고유벡터가 2개 모자라서 invertible인 $P$를 
 
 <details>
 
-<summary>③ 대칭이라 항상 가능 : 아래 Example 4.11</summary>
+<summary>
+
+③ 대칭이라 항상 가능 : 아래 Example 4.11
+
+</summary>
 
 > 다음 노트에서 계산한다.
 
@@ -146,7 +198,11 @@ $P$의 열로 쓸 독립 고유벡터가 2개 모자라서 invertible인 $P$를 
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - $A^k$ 계산, 안정성 분석
 - SVD (4.5) : 대각화의 일반화

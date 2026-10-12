@@ -10,11 +10,19 @@ order: 2
 
 <details>
 
-<summary><strong>배경지식 (0에서 시작)</strong></summary>
+<summary>
+
+<strong>배경지식 (0에서 시작)</strong>
+
+</summary>
 
 <details>
 
-<summary>① 소행렬(minor)과 여인수(cofactor)</summary>
+<summary>
+
+① 소행렬(minor)과 여인수(cofactor)
+
+</summary>
 
 > $A_{k,j}\in\mathbb{R}^{(n-1)\times(n-1)}$ : A에서 $k$<strong>행과 </strong>$j$<strong>열을 지워서</strong> 얻은 행렬.
 $\det(A_{k,j})$를 minor, $(-1)^{k+j}\det(A_{k,j})$를 cofactor라 부른다.
@@ -23,7 +31,11 @@ $\det(A_{k,j})$를 minor, $(-1)^{k+j}\det(A_{k,j})$를 cofactor라 부른다.
 
 <details>
 
-<summary>② 삼각행렬</summary>
+<summary>
+
+② 삼각행렬
+
+</summary>
 
 > 상삼각행렬(upper-triangular) : $T_{ij}=0\;(i>j)$, 즉 <strong>대각선 아래가 전부 0</strong>.
 하삼각행렬(lower-triangular) : 대각선 위가 전부 0.
@@ -32,7 +44,11 @@ $\det(A_{k,j})$를 minor, $(-1)^{k+j}\det(A_{k,j})$를 cofactor라 부른다.
 
 <details>
 
-<summary>③ 기본행연산 3종 (2장 가우스 소거)</summary>
+<summary>
+
+③ 기본행연산 3종 (2장 가우스 소거)
+
+</summary>
 
 > 행 교환 / 한 행에 0이 아닌 상수 곱하기 / 한 행을 다른 행에 더하기.
 가우스 소거는 이 세 연산만으로 행렬을 계단(삼각) 모양으로 만드는 알고리즘이다.
@@ -43,7 +59,11 @@ $\det(A_{k,j})$를 minor, $(-1)^{k+j}\det(A_{k,j})$를 cofactor라 부른다.
 
 <details>
 
-<summary><strong>왜 필요한가</strong></summary>
+<summary>
+
+<strong>왜 필요한가</strong>
+
+</summary>
 
 > $1\times1$, $2\times2$, $3\times3$에는 직접 쓰는 공식이 있지만, $n\ge4$부터는 <strong>일반 알고리즘</strong>이 필요하다.
 Laplace 전개는 $n\times n$ → $(n-1)\times(n-1)$ → … → $2\times2$로 문제를 줄여 준다.
@@ -54,7 +74,11 @@ Laplace 전개는 $n\times n$ → $(n-1)\times(n-1)$ → … → $2\times2$로 �
 
 <details>
 
-<summary><strong>1) 작은 행렬의 공식</strong></summary>
+<summary>
+
+<strong>1) 작은 행렬의 공식</strong>
+
+</summary>
 
 - $n=1$ : $\det(a_{11})=a_{11}$
 - $n=2$ : $\det(A)=a_{11}a_{22}-a_{12}a_{21}$
@@ -70,7 +94,11 @@ $$
 
 <details>
 
-<summary><strong>2) Laplace Expansion</strong></summary>
+<summary>
+
+<strong>2) Laplace Expansion</strong>
+
+</summary>
 
 > <strong>Theorem 4.2</strong> 고정된 $j$에 대해
 열 $j$를 따라 전개 : $\det(A)=\sum_{k=1}^{n}(-1)^{k+j}\,a_{kj}\,\det(A_{k,j})$
@@ -92,13 +120,21 @@ $j$ = 내가 고정한 행(열) 번호, $k$ = 합을 따라 움직이는 번호.
 
 <details>
 
-<summary>예시 : 같은 행렬, 세 가지 방법</summary>
+<summary>
+
+예시 : 같은 행렬, 세 가지 방법
+
+</summary>
 
 > $A=\begin{bmatrix}1&2&3\\3&1&2\\0&0&1\end{bmatrix}$
 
 <details>
 
-<summary>(a) 1행을 따라 전개</summary>
+<summary>
+
+(a) 1행을 따라 전개
+
+</summary>
 
 > $\det(A)=(+1)\cdot1\cdot\det\begin{bmatrix}1&2\\0&1\end{bmatrix}+(-1)\cdot2\cdot\det\begin{bmatrix}3&2\\0&1\end{bmatrix}+(+1)\cdot3\cdot\det\begin{bmatrix}3&1\\0&0\end{bmatrix}$
 $=1\cdot1-2\cdot3+3\cdot0=-5$
@@ -107,7 +143,11 @@ $=1\cdot1-2\cdot3+3\cdot0=-5$
 
 <details>
 
-<summary>(b) 3행을 따라 전개 : 0이 많은 행을 고르면 훨씬 쉽다</summary>
+<summary>
+
+(b) 3행을 따라 전개 : 0이 많은 행을 고르면 훨씬 쉽다
+
+</summary>
 
 > 3행은 $(0,0,1)$이라 $a_{33}$만 살아남는다.
 $\det(A)=(+1)\cdot1\cdot\det\begin{bmatrix}1&2\\3&1\end{bmatrix}=1\cdot(1-6)=-5$
@@ -116,7 +156,11 @@ $\det(A)=(+1)\cdot1\cdot\det\begin{bmatrix}1&2\\3&1\end{bmatrix}=1\cdot(1-6)=-5$
 
 <details>
 
-<summary>(c) Sarrus</summary>
+<summary>
+
+(c) Sarrus
+
+</summary>
 
 > $\det(A)=1\cdot1\cdot1+3\cdot0\cdot3+0\cdot2\cdot2-0\cdot1\cdot3-1\cdot0\cdot2-3\cdot2\cdot1=1-6=-5$
 
@@ -128,7 +172,11 @@ $\det(A)=(+1)\cdot1\cdot\det\begin{bmatrix}1&2\\3&1\end{bmatrix}=1\cdot(1-6)=-5$
 
 <details>
 
-<summary><strong>3) det의 성질</strong></summary>
+<summary>
+
+<strong>3) det의 성질</strong>
+
+</summary>
 
 | 성질 | 부피 · 좌표 관점의 이유 |
 | --- | --- |
@@ -143,7 +191,11 @@ $\det(A)=(+1)\cdot1\cdot\det\begin{bmatrix}1&2\\3&1\end{bmatrix}=1\cdot(1-6)=-5$
 
 <details>
 
-<summary>닮은 행렬이 같은 det를 갖는 이유 (한 줄 증명)</summary>
+<summary>
+
+닮은 행렬이 같은 det를 갖는 이유 (한 줄 증명)
+
+</summary>
 
 > $\det(S^{-1}AS)=\det(S^{-1})\det(A)\det(S)=\dfrac{1}{\det(S)}\det(A)\det(S)=\det(A)$
 즉 det는 행렬 한 장의 성질이 아니라 <strong>선형사상 자체의 성질</strong>이다.
@@ -154,7 +206,11 @@ $\det(A)=(+1)\cdot1\cdot\det\begin{bmatrix}1&2\\3&1\end{bmatrix}=1\cdot(1-6)=-5$
 
 <details>
 
-<summary><strong>4) 실전 계산법 : 가우스 소거로 삼각화</strong></summary>
+<summary>
+
+<strong>4) 실전 계산법 : 가우스 소거로 삼각화</strong>
+
+</summary>
 
 <div class="callout" role="note" data-kind="intuition">
 
@@ -174,7 +230,11 @@ $\det(A)=(+1)\cdot1\cdot\det\begin{bmatrix}1&2\\3&1\end{bmatrix}=1\cdot(1-6)=-5$
 
 <details>
 
-<summary><strong>5) Determinant와 Rank</strong></summary>
+<summary>
+
+<strong>5) Determinant와 Rank</strong>
+
+</summary>
 
 > <strong>Theorem 4.3</strong> $\det(A)\neq0\iff\text{rank}(A)=n$. 즉 A가 invertible $\iff$ full rank.
 직관 : $\det\neq0$이면 평행육면체가 $n$차원으로 살아 있으므로 열벡터 $n$개가 서로 독립이고, 따라서 rank가 $n$이다.
@@ -183,7 +243,11 @@ $\det(A)=(+1)\cdot1\cdot\det\begin{bmatrix}1&2\\3&1\end{bmatrix}=1\cdot(1-6)=-5$
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - 가우스 소거로 det 계산
 - 특성다항식 · 고유값 (4.2)
@@ -206,7 +270,11 @@ $\det(A)=(+1)\cdot1\cdot\det\begin{bmatrix}1&2\\3&1\end{bmatrix}=1\cdot(1-6)=-5$
 
 <details>
 
-<summary><strong>문제</strong></summary>
+<summary>
+
+<strong>문제</strong>
+
+</summary>
 
 [Untitled](https://app.notion.com/p/3f409d87213b81abaa3bc8ea427084e1)
 

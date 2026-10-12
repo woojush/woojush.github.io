@@ -20,11 +20,19 @@ order: 7
 
 <details>
 
-<summary><strong>배경지식 (0에서 시작)</strong></summary>
+<summary>
+
+<strong>배경지식 (0에서 시작)</strong>
+
+</summary>
 
 <details>
 
-<summary>① 외적과 rank-1 행렬</summary>
+<summary>
+
+① 외적과 rank-1 행렬
+
+</summary>
 
 > $u\in\mathbb R^m$, $v\in\mathbb R^n$이면 $uv^\top\in\mathbb R^{m\times n}$이고 $(uv^\top)_{ij}=u_iv_j$이다. 모든 열이 $u$의 상수배이므로 <strong>rank 1</strong>이다.
 
@@ -32,7 +40,11 @@ order: 7
 
 <details>
 
-<summary>② 행렬의 노름</summary>
+<summary>
+
+② 행렬의 노름
+
+</summary>
 
 > 3장에서 벡터의 길이를 노름으로 쟀듯, 행렬에도 노름을 정의해 “두 행렬이 얼마나 다른가”(오차)를 잴 수 있다. 교재는 그중 스펙트럴 노름을 쓴다.
 
@@ -40,7 +52,11 @@ order: 7
 
 <details>
 
-<summary>③ rank</summary>
+<summary>
+
+③ rank
+
+</summary>
 
 > rank는 독립인 열의 개수이다. rank-$k$ 행렬은 정보를 $k$개 방향으로만 담는다. (2장)
 
@@ -50,7 +66,11 @@ order: 7
 
 <details>
 
-<summary><strong>왜 필요한가</strong></summary>
+<summary>
+
+<strong>왜 필요한가</strong>
+
+</summary>
 
 > <strong>큰 행렬을 “충분히 비슷한 작은 행렬”로 바꾸고 싶다.</strong>
 
@@ -65,7 +85,11 @@ order: 7
 
 <details>
 
-<summary><strong>유도 : 왜 합으로 쓸 수 있는가 (교재 (4.91))</strong></summary>
+<summary>
+
+<strong>유도 : 왜 합으로 쓸 수 있는가 (교재 (4.91))</strong>
+
+</summary>
 
 > $\Sigma$가 대각이므로 $U\Sigma V^\top$을 열과 행의 곱으로 펼치면 $u_i$와 $v_j$가 짝이 맞는 항($i=j$)만 남는다.
 $i\neq j$이면 $\Sigma_{ij}=0$이라 사라지고, $i>r$이면 $\sigma_i=0$이라 사라진다. 따라서 $A=\sum_{i=1}^{r}\sigma_iu_iv_i^\top=\sum_{i=1}^{r}\sigma_iA_i$, $A_i:=u_iv_i^\top$ (rank-1)
@@ -74,7 +98,11 @@ $i\neq j$이면 $\Sigma_{ij}=0$이라 사라지고, $i>r$이면 $\sigma_i=0$이�
 
 <details>
 
-<summary><strong>스펙트럴 노름 (Definition 4.23, Theorem 4.24)</strong></summary>
+<summary>
+
+<strong>스펙트럴 노름 (Definition 4.23, Theorem 4.24)</strong>
+
+</summary>
 
 > $\Vert A\Vert_2:=\max_{x\neq0}\dfrac{\Vert Ax\Vert_2}{\Vert x\Vert_2}$ : $A$가 벡터를 <strong>최대 몇 배까지 늘리는가</strong>이다.
 <strong>Theorem 4.24</strong> : $\Vert A\Vert_2=\sigma_1$ (가장 큰 특이값). 교재는 증명을 연습문제 4.12로 남겨 둔다.
@@ -84,7 +112,11 @@ $i\neq j$이면 $\Sigma_{ij}=0$이라 사라지고, $i>r$이면 $\sigma_i=0$이�
 
 <details>
 
-<summary><strong>Eckart-Young의 증명 아이디어 (교재 4.6)</strong></summary>
+<summary>
+
+<strong>Eckart-Young의 증명 아이디어 (교재 4.6)</strong>
+
+</summary>
 
 > $\text{rank}(B)\le k$인 $B$가 $\Vert A-B\Vert_2<\sigma_{k+1}$을 만족한다고 가정하고 모순을 찾는다.
 ① $B$의 kernel $Z$는 차원이 적어도 $n-k$이고, $x\in Z$이면 $Bx=0$이므로 $\Vert Ax\Vert=\Vert(A-B)x\Vert\le\Vert A-B\Vert_2\Vert x\Vert<\sigma_{k+1}\Vert x\Vert$.
@@ -95,7 +127,11 @@ $i\neq j$이면 $\Sigma_{ij}=0$이라 사라지고, $i>r$이면 $\sigma_i=0$이�
 
 <details>
 
-<summary><strong>예시 : 교재 Example 4.15 (영화 평점 이어서)</strong></summary>
+<summary>
+
+<strong>예시 : 교재 Example 4.15 (영화 평점 이어서)</strong>
+
+</summary>
 
 > 4.5의 평점 행렬 $A$에서 rank-1 항 두 개를 보자.
 $A_1=u_1v_1^\top\approx\begin{bmatrix}0.49&0.44&0.12\\0.53&0.47&0.13\\0.07&0.06&0.02\\0.11&0.10&0.03\end{bmatrix}$ : Ali와 Beatrix가 SF 영화를 좋아한다는 것은 담지만 Chandra의 평점은 못 담는다.
@@ -108,7 +144,11 @@ $\widehat A(2)=\sigma_1A_1+\sigma_2A_2\approx\begin{bmatrix}4.78&4.24&1.02\\5.23
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - PCA (10장)
 - 이미지 압축 · 노이즈 제거
@@ -119,7 +159,11 @@ $\widehat A(2)=\sigma_1A_1+\sigma_2A_2\approx\begin{bmatrix}4.78&4.24&1.02\\5.23
 
 <details>
 
-<summary><strong>추가정보</strong></summary>
+<summary>
+
+<strong>추가정보</strong>
+
+</summary>
 
 - 교재는 이 근사를 “손실 압축의 한 형태”로 해석한다. 이미지 처리, 노이즈 필터링, ill-posed 문제의 정규화, 차원 축소와 PCA에 쓰인다.
 - 교재 Further Reading : 저차원 근사는 계산 효율을 위해 자주 쓰이고, 결측값이 있는 행렬 처리에도 쓰인다.
@@ -141,7 +185,11 @@ $\widehat A(2)=\sigma_1A_1+\sigma_2A_2\approx\begin{bmatrix}4.78&4.24&1.02\\5.23
 
 <details>
 
-<summary><strong>문제</strong></summary>
+<summary>
+
+<strong>문제</strong>
+
+</summary>
 
 [Untitled](https://app.notion.com/p/3f409d87213b81ea9f3ec0f8bca00a05)
 

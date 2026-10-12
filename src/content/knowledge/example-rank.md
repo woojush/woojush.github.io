@@ -30,7 +30,11 @@ $$
 
 <details>
 
-<summary>풀이 보기</summary>
+<summary>
+
+풀이 보기
+
+</summary>
 
 $A = \begin{pmatrix} 1 & 2 \\ 2 & 4 \end{pmatrix}$에서 둘째 열이 첫째 열의 2배이므로 $\operatorname{rk}(A)=1$이다.
 

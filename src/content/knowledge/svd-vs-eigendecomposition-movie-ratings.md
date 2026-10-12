@@ -18,7 +18,11 @@ order: 6
 
 <details>
 
-<summary><strong>비교표</strong></summary>
+<summary>
+
+<strong>비교표</strong>
+
+</summary>
 
 |  | 고유분해 $A=PDP^{-1}$ | SVD $A=U\Sigma V^\top$ |
 | --- | --- | --- |
@@ -33,7 +37,11 @@ order: 6
 
 <details>
 
-<summary><strong>둘의 연결 고리</strong></summary>
+<summary>
+
+<strong>둘의 연결 고리</strong>
+
+</summary>
 
 > • $A$의 <strong>왼쪽 특이벡터</strong> $u_i$는 $AA^\top$의 고유벡터이다.
 • $A$의 <strong>오른쪽 특이벡터</strong> $v_i$는 $A^\top A$의 고유벡터이다.
@@ -44,7 +52,11 @@ order: 6
 
 <details>
 
-<summary><strong>예시 : 교재 Example 4.14 (영화 평점)</strong></summary>
+<summary>
+
+<strong>예시 : 교재 Example 4.14 (영화 평점)</strong>
+
+</summary>
 
 > 세 명(Ali, Beatrix, Chandra)이 네 영화(Star Wars, Blade Runner, Amelie, Delicatessen)에 매긴 평점이다. 행 = 영화, 열 = 사람이다.
 $A=\begin{bmatrix}5&4&1\\5&5&0\\0&0&5\\1&0&4\end{bmatrix}$, $\Sigma$의 특이값은 $9.6438,\;6.3639,\;0.7056$ (계산으로 확인 ✓)
@@ -63,7 +75,11 @@ $A=\begin{bmatrix}5&4&1\\5&5&0\\0&0&5\\1&0&4\end{bmatrix}$, $\Sigma$의 특이�
 
 <details>
 
-<summary><strong>용어 : full SVD · reduced SVD · truncated SVD</strong></summary>
+<summary>
+
+<strong>용어 : full SVD · reduced SVD · truncated SVD</strong>
+
+</summary>
 
 > • <strong>full SVD</strong> : 교재의 정의 (4.64). $U$는 $m\times m$, $V$는 $n\times n$, $\Sigma$는 $m\times n$이다.
 • <strong>reduced SVD</strong> : $m\ge n$일 때 $U$를 $m\times n$, $\Sigma$를 $n\times n$ 대각행렬로 줄인 꼴이다. 수학 구조는 같고 행렬을 만드는 방식만 다르다.
@@ -74,7 +90,11 @@ $A=\begin{bmatrix}5&4&1\\5&5&0\\0&0&5\\1&0&4\end{bmatrix}$, $\Sigma$의 특이�
 
 <details>
 
-<summary><strong>추가정보</strong></summary>
+<summary>
+
+<strong>추가정보</strong>
+
+</summary>
 
 - 교재는 SVD가 곡선 맞춤의 최소제곱, 연립방정식의 풀이 등 여러 ML 문제에서 쓰이고, 행렬을 SVD로 바꿔 계산하면 반올림 오차에 더 안정적일 때가 많다고 소개한다.
 - 교재는 SVD가 행렬(2차원 배열)을 넘어 <strong>텐서</strong>로 일반화되는 분해 족의 특수한 경우라고 언급한다. (Tucker, CP 분해, Further Reading)
@@ -83,7 +103,11 @@ $A=\begin{bmatrix}5&4&1\\5&5&0\\0&0&5\\1&0&4\end{bmatrix}$, $\Sigma$의 특이�
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - 행렬 근사 · Eckart-Young (4.6)
 - PCA (10장)
@@ -103,7 +127,11 @@ $A=\begin{bmatrix}5&4&1\\5&5&0\\0&0&5\\1&0&4\end{bmatrix}$, $\Sigma$의 특이�
 
 <details>
 
-<summary><strong>문제</strong></summary>
+<summary>
+
+<strong>문제</strong>
+
+</summary>
 
 [Untitled](https://app.notion.com/p/3f409d87213b81c6bf80fc9e9e40fdb7)
 

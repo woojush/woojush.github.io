@@ -24,7 +24,11 @@ Spectral Theorem은 모든 실수 대칭행렬이 정규직교 고유벡터 기�
 >
 > <details>
 >
-> <summary>$A\in\mathbb{R}^{n\times n}$<strong>이 대칭이면 서로 다른 고유값의 고유벡터는 직교한다.</strong></summary>
+> <summary>
+>
+> $A\in\mathbb{R}^{n\times n}$<strong>이 대칭이면 서로 다른 고유값의 고유벡터는 직교한다.</strong>
+>
+> </summary>
 >
 > >
 > >
@@ -36,7 +40,11 @@ $\Rightarrow(\lambda-\mu)\,x^\top y=0$이고 $\lambda\neq\mu$이므로 $x^\top y
 >
 > <details>
 >
-> <summary>$A\in\mathbb{R}^{n\times n}$<strong>이 대칭이면 모든 고유값은 실수이다.</strong></summary>
+> <summary>
+>
+> $A\in\mathbb{R}^{n\times n}$<strong>이 대칭이면 모든 고유값은 실수이다.</strong>
+>
+> </summary>
 >
 > > 복소벡터 $x$에 대해 $Ax=\lambda x$이면 $x^*Ax=\lambda\,x^*x$이다. $A$가 실대칭이면 $(x^*Ax)^*=x^*A^*x=x^*Ax$이므로 $x^*Ax$는 실수이고, $x^*x=\Vert x\Vert^2>0$도 실수이다. 따라서 $\lambda=\dfrac{x^*Ax}{x^*x}$는 실수이다
 >
@@ -44,7 +52,11 @@ $\Rightarrow(\lambda-\mu)\,x^\top y=0$이고 $\lambda\neq\mu$이므로 $x^\top y
 >
 > <details>
 >
-> <summary>$A=PDP^\top$의 의미</summary>
+> <summary>
+>
+> $A=PDP^\top$의 의미
+>
+> </summary>
 >
 > > $P=[p_1\cdots p_n]$ : 정규직교 고유벡터를 열로 가진 orthogonal 행렬, $D=\text{diag}(\lambda_1,\dots,\lambda_n)$.
 $x\to P^\top x$는 $x$를 고유벡터 좌표로 바꾸고(내적만 하면 된다), $D$가 각 좌표를 $\lambda_i$배 하고, $P$가 되돌린다. 앞에서 본 “기저변환 → 늘임 → 되돌림”이 역행렬 계산 없이 이루어진다.
@@ -53,7 +65,11 @@ $x\to P^\top x$는 $x$를 고유벡터 좌표로 바꾸고(내적만 하면 된�
 
 <details>
 
-<summary><strong>왜 필요한가</strong></summary>
+<summary>
+
+<strong>왜 필요한가</strong>
+
+</summary>
 
 > 일반 행렬은 고유벡터가 서로 비스듬하고, 심지어 개수가 모자라 대각화가 안 될 수도 있다(defective, 4.2). 그런데 <strong>대칭행렬은 항상 가장 깔끔한 경우</strong>이다.
 
@@ -67,14 +83,22 @@ $x\to P^\top x$는 $x$를 고유벡터 좌표로 바꾸고(내적만 하면 된�
 
 <details>
 
-<summary><strong>예시 : 교재 Example 4.8 (중복 고유값이 있는 대칭행렬)</strong></summary>
+<summary>
+
+<strong>예시 : 교재 Example 4.8 (중복 고유값이 있는 대칭행렬)</strong>
+
+</summary>
 
 > $A=\begin{bmatrix}3&2&2\\2&3&2\\2&2&3\end{bmatrix}$, $p_A(\lambda)=-(\lambda-1)^2(\lambda-7)$ $\Rightarrow$ $\lambda_1=1$ (중복), $\lambda_2=7$.
 검산 : 합 $1+1+7=9=\text{tr}(A)$, 곱 $1\cdot1\cdot7=7=\det(A)$ ✓
 
 <details>
 
-<summary>Eigenspace</summary>
+<summary>
+
+Eigenspace
+
+</summary>
 
 > $E_1=\text{span}\Big\{x_1=\begin{bmatrix}-1\\1\\0\end{bmatrix},\;x_2=\begin{bmatrix}-1\\0\\1\end{bmatrix}\Big\}$, $E_7=\text{span}\Big\{x_3=\begin{bmatrix}1\\1\\1\end{bmatrix}\Big\}$
 • $x_3\perp x_1,\;x_3\perp x_2$ ✓ (서로 다른 고유값이라 자동으로 직교)
@@ -84,7 +108,11 @@ $x\to P^\top x$는 $x$를 고유벡터 좌표로 바꾸고(내적만 하면 된�
 
 <details>
 
-<summary>해결 : $E_1$ 안에서 Gram–Schmidt</summary>
+<summary>
+
+해결 : $E_1$ 안에서 Gram–Schmidt
+
+</summary>
 
 > $x_1,x_2$는 같은 고유값의 고유벡터이므로 <strong>그 선형결합도 같은 고유값의 고유벡터</strong>이다 : $A(\alpha x_1+\beta x_2)=\lambda(\alpha x_1+\beta x_2)$.
 따라서 Gram–Schmidt로 $x_2$에서 $x_1$ 방향 성분을 빼도 여전히 고유벡터이다.
@@ -98,7 +126,11 @@ $x_2'=x_2-\dfrac{x_2^\top x_1}{x_1^\top x_1}x_1=(-1,0,1)^\top-\tfrac12(-1,1,0)^\
 
 <details>
 
-<summary><strong>AI Engineering Relevance</strong></summary>
+<summary>
+
+<strong>AI Engineering Relevance</strong>
+
+</summary>
 
 <div class="callout" role="note" data-kind="intuition">
 
@@ -114,7 +146,11 @@ $x_2'=x_2-\dfrac{x_2^\top x_1}{x_1^\top x_1}x_1=(-1,0,1)^\top-\tfrac12(-1,1,0)^\
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - Cholesky (4.3), 대각화 (4.4), SVD (4.5)
 - PCA (10장), 다변량 Gaussian 공분산 (6장)

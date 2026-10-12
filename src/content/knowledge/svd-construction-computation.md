@@ -19,11 +19,19 @@ $v_i$<strong>를 먼저 만들고, </strong>$u_i$<strong>는 </strong>$v_i$<stro
 
 <details>
 
-<summary><strong>유도 : 왜 이렇게 만들면 되는가</strong></summary>
+<summary>
+
+<strong>유도 : 왜 이렇게 만들면 되는가</strong>
+
+</summary>
 
 <details>
 
-<summary>Step 1. $V$와 $\sigma_i$는 $A^\top A$의 고유분해에서 나온다</summary>
+<summary>
+
+Step 1. $V$와 $\sigma_i$는 $A^\top A$의 고유분해에서 나온다
+
+</summary>
 
 > $A=U\Sigma V^\top$이 있다고 가정하고 $A^\top A$에 대입한다.
 $A^\top A=(U\Sigma V^\top)^\top(U\Sigma V^\top)=V\Sigma^\top U^\top U\Sigma V^\top=V(\Sigma^\top\Sigma)V^\top$ ($U^\top U=I$)
@@ -35,7 +43,11 @@ $v_i$<strong> = </strong>$A^\top A$<strong>의 정규직교 고유벡터, </stro
 
 <details>
 
-<summary>Step 2. $Av_i$들은 서로 직교하고 길이가 $\sigma_i$이다</summary>
+<summary>
+
+Step 2. $Av_i$들은 서로 직교하고 길이가 $\sigma_i$이다
+
+</summary>
 
 > $i\neq j$이면 $(Av_i)^\top(Av_j)=v_i^\top(A^\top A)v_j=\lambda_jv_i^\top v_j=0$이다. (교재 (4.77))
 길이 : $\Vert Av_i\Vert^2=v_i^\top A^\top Av_i=\lambda_i\,v_i^\top v_i=\lambda_i=\sigma_i^2$이므로 $\Vert Av_i\Vert=\sigma_i$이다.
@@ -44,7 +56,11 @@ $v_i$<strong> = </strong>$A^\top A$<strong>의 정규직교 고유벡터, </stro
 
 <details>
 
-<summary>Step 3. $u_i$는 $Av_i$를 정규화해서 얻는다</summary>
+<summary>
+
+Step 3. $u_i$는 $Av_i$를 정규화해서 얻는다
+
+</summary>
 
 > $u_i:=\dfrac{Av_i}{\Vert Av_i\Vert}=\dfrac1{\sigma_i}Av_i$ ($\sigma_i>0$인 $i\le r$). Step 2에 의해 $u_i$들은 정규직교이다. (교재 (4.78))
 정리하면 <strong>singular value equation</strong> $Av_i=\sigma_iu_i$이다. (교재 (4.79)) 열로 모으면 $AV=U\Sigma$이고, 오른쪽에 $V^\top$를 곱하면 $A=U\Sigma V^\top$이다.
@@ -60,7 +76,11 @@ $v_i$<strong> = </strong>$A^\top A$<strong>의 정규직교 고유벡터, </stro
 
 <details>
 
-<summary>$i>r$인 경우 (kernel과 남는 $u_i$)</summary>
+<summary>
+
+$i>r$인 경우 (kernel과 남는 $u_i$)
+
+</summary>
 
 > $\sigma_i=0$인 $v_i$는 $Av_i=0$이므로 $\ker(A)$<strong>의 정규직교 기저</strong>가 된다. 이 경우 $u_i=Av_i/\sigma_i$는 0으로 나눠서 쓸 수 없다. $u_{r+1},\dots,u_m$은 정규직교이기만 하면 된다. (교재 4.5.2)
 ※ 교재 밖 보충 : 실제로는 span($u_1,\dots,u_r$)의 직교여공간에서 정규직교기저를 고르면 된다. (3장 Gram-Schmidt)
@@ -71,7 +91,11 @@ $v_i$<strong> = </strong>$A^\top A$<strong>의 정규직교 고유벡터, </stro
 
 <details>
 
-<summary><strong>계산 순서</strong></summary>
+<summary>
+
+<strong>계산 순서</strong>
+
+</summary>
 
 > 1. $A^\top A$의 고유값 $\lambda_i$와 정규직교 고유벡터 $v_i$를 구한다. ($V$)
 2. $\sigma_i=\sqrt{\lambda_i}$로 $\Sigma$를 만든다. $A$와 같은 크기이다.
@@ -87,13 +111,21 @@ $v_i$<strong> = </strong>$A^\top A$<strong>의 정규직교 고유벡터, </stro
 
 <details>
 
-<summary><strong>예시 : 교재 Example 4.13</strong></summary>
+<summary>
+
+<strong>예시 : 교재 Example 4.13</strong>
+
+</summary>
 
 > $A=\begin{bmatrix}1&0&1\\-2&1&0\end{bmatrix}$ ($2\times3$, rank 2)
 
 <details>
 
-<summary>Step 1. 오른쪽 특이벡터 $V$</summary>
+<summary>
+
+Step 1. 오른쪽 특이벡터 $V$
+
+</summary>
 
 > $A^\top A=\begin{bmatrix}5&-2&1\\-2&1&0\\1&0&1\end{bmatrix}$의 고유값은 $6,\;1,\;0$이고 정규직교 고유벡터는
 $v_1=\dfrac1{\sqrt{30}}\begin{bmatrix}5\\-2\\1\end{bmatrix},\;v_2=\dfrac1{\sqrt5}\begin{bmatrix}0\\1\\2\end{bmatrix},\;v_3=\dfrac1{\sqrt6}\begin{bmatrix}-1\\-2\\1\end{bmatrix}$이다.
@@ -102,7 +134,11 @@ $v_1=\dfrac1{\sqrt{30}}\begin{bmatrix}5\\-2\\1\end{bmatrix},\;v_2=\dfrac1{\sqrt5
 
 <details>
 
-<summary>Step 2. 특이값 행렬 $\Sigma$</summary>
+<summary>
+
+Step 2. 특이값 행렬 $\Sigma$
+
+</summary>
 
 > $\sigma_1=\sqrt6$, $\sigma_2=1$ (rank 2이므로 0이 아닌 특이값은 2개)
 $\Sigma$는 $A$와 같은 $2\times3$ 크기이므로 $\Sigma=\begin{bmatrix}\sqrt6&0&0\\0&1&0\end{bmatrix}$이다.
@@ -111,7 +147,11 @@ $\Sigma$는 $A$와 같은 $2\times3$ 크기이므로 $\Sigma=\begin{bmatrix}\sqr
 
 <details>
 
-<summary>Step 3. 왼쪽 특이벡터 $U$</summary>
+<summary>
+
+Step 3. 왼쪽 특이벡터 $U$
+
+</summary>
 
 > $u_1=\dfrac1{\sqrt6}Av_1=\dfrac1{\sqrt5}\begin{bmatrix}1\\-2\end{bmatrix},\;u_2=\dfrac11Av_2=\dfrac1{\sqrt5}\begin{bmatrix}2\\1\end{bmatrix}$
 $U=\dfrac1{\sqrt5}\begin{bmatrix}1&2\\-2&1\end{bmatrix}$ ($m=2$이므로 두 열로 충분하다.)
@@ -120,7 +160,11 @@ $U=\dfrac1{\sqrt5}\begin{bmatrix}1&2\\-2&1\end{bmatrix}$ ($m=2$이므로 두 열
 
 <details>
 
-<summary>검산</summary>
+<summary>
+
+검산
+
+</summary>
 
 > • $Av_3=\begin{bmatrix}-1+0+1\\2-2+0\end{bmatrix}=\begin{bmatrix}0\\0\end{bmatrix}$ : $v_3$는 $\ker(A)$의 기저이다. ($\sigma_3=0$)
 • $\sigma_1u_1v_1^\top+\sigma_2u_2v_2^\top=\tfrac15\begin{bmatrix}5&-2&1\\-10&4&-2\end{bmatrix}+\tfrac15\begin{bmatrix}0&2&4\\0&1&2\end{bmatrix}=\begin{bmatrix}1&0&1\\-2&1&0\end{bmatrix}=A$ ✓

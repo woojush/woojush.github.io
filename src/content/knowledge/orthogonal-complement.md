@@ -8,11 +8,19 @@ order: 2
 
 <details>
 
-<summary><strong>무엇이며 왜 필요한가?</strong></summary>
+<summary>
+
+<strong>무엇이며 왜 필요한가?</strong>
+
+</summary>
 
 <details>
 
-<summary><strong>개념 간단 이해 </strong></summary>
+<summary>
+
+<strong>개념 간단 이해 </strong>
+
+</summary>
 
 > 3차원 공간에 떠 있는 <strong>드론의 위치</strong>를 AI가 계산한다고 해보자.
 >
@@ -28,7 +36,11 @@ order: 2
 
 <details>
 
-<summary><strong>AI는 이걸로 뭘 하나요?</strong></summary>
+<summary>
+
+<strong>AI는 이걸로 뭘 하나요?</strong>
+
+</summary>
 
 >
 >
@@ -45,7 +57,11 @@ order: 2
 
 <details>
 
-<summary><strong>정의</strong></summary>
+<summary>
+
+<strong>정의</strong>
+
+</summary>
 
 > 공간 $V$의 부분공간 $U$가 있을 때, $U^\perp$는<strong> "</strong>$U$<strong> 안의 모든 벡터 </strong>$u$<strong>와 내적했을 때 </strong>$0$<strong>이 되는 벡터 </strong>$x$<strong>들의 집합"</strong>입니다.
 >
@@ -55,7 +71,11 @@ order: 2
 
 <details>
 
-<summary><strong>Direct Sum Decomposition, 직합분해</strong></summary>
+<summary>
+
+<strong>Direct Sum Decomposition, 직합분해</strong>
+
+</summary>
 
 > 전체 공간 $V$의 어떤 벡터 $x$를 가져와도, $U$에 속하는 벡터 $x_U$와 $U^\perp$에 속하는 벡터 $x_{U^\perp}$의 합으로 단 한 가지 방법(유일하게)으로 쪼갤 수 있다.
 >
@@ -70,7 +90,11 @@ order: 2
 
 <details>
 
-<summary><strong>Dimension Theorem, 차원의 정리</strong></summary>
+<summary>
+
+<strong>Dimension Theorem, 차원의 정리</strong>
+
+</summary>
 
 > 두 직교 공간의 차원을 더하면 정확히 전체 공간의 차원이 된다
 >
@@ -82,7 +106,11 @@ order: 2
 
 <details>
 
-<summary><strong>Trivial Intersection, 영벡터 교집합</strong></summary>
+<summary>
+
+<strong>Trivial Intersection, 영벡터 교집합</strong>
+
+</summary>
 
 > $U$에 속하면서 동시에 $U$의 모든 벡터와 직교하는 벡터는 0벡터뿐이다.
 >
@@ -92,7 +120,11 @@ order: 2
 
 <details>
 
-<summary><strong>Normal Vector, 법선 벡터</strong></summary>
+<summary>
+
+<strong>Normal Vector, 법선 벡터</strong>
+
+</summary>
 
 > <strong>어떤 평면이나 곡면, 직선에 수직인 방향을 가리키는 벡터</strong>
 
@@ -103,7 +135,11 @@ order: 2
 
 <details>
 
-<summary><strong>추가정보</strong></summary>
+<summary>
+
+<strong>추가정보</strong>
+
+</summary>
 
 > 고차원 공간($D$차원)에서 $(D-1)$차원의 초평면(Hyperplane)을 정의할 때도, $1$차원 직교여공간 $U^\perp$의 법선 벡터 $w$ 하나만으로 간단하게 표현할 수 있다.
 

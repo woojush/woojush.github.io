@@ -11,7 +11,11 @@ $\text{rank(A)}$로 표기 \* rank(A) = dim(Im(A))=Pivot의 개수
 
 <details>
 
-<summary><strong>왜 필요한가</strong></summary>
+<summary>
+
+<strong>왜 필요한가</strong>
+
+</summary>
 
 > 행렬의 크기 (m x n)는 단순히 행과 열의 개수일 뿐이다.
 반면 Rank에는 행렬이 실제로 <strong>“몇개의 독립된 정보를 가지고 있는지”</strong> 를 나타내는 숫자이다.
@@ -20,7 +24,11 @@ $\text{rank(A)}$로 표기 \* rank(A) = dim(Im(A))=Pivot의 개수
 
 <details>
 
-<summary><strong>직관</strong></summary>
+<summary>
+
+<strong>직관</strong>
+
+</summary>
 
 > $A∈R^{m×n}$에 대해, $A : \mathbb{R}^n \rightarrow\mathbb{R}^m$으로 벡터를 보내는 함수라고 생각하자.
 Rank는 행렬이 <strong>출력 공간에서 만들어낼 수 있는 독립적인 방향의 수</strong>
@@ -31,7 +39,11 @@ Rank는 행렬이 <strong>출력 공간에서 만들어낼 수 있는 독립적�
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - Column Space / Image
 - Kernel / Null Space
@@ -46,7 +58,11 @@ Rank는 행렬이 <strong>출력 공간에서 만들어낼 수 있는 독립적�
 
 <details>
 
-<summary><strong>추가 정보</strong></summary>
+<summary>
+
+<strong>추가 정보</strong>
+
+</summary>
 
 > <strong>Full Rank</strong> : 가능한 최대의 rank를 가진 행렬 $\text{rank}(A) = \min(m, n)$
 <strong>Rank Deficient</strong> : 가능한 최대의 rank보다 rank가 작은 행렬

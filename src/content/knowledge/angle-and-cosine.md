@@ -8,7 +8,11 @@ order: 5
 
 <details>
 
-<summary>$\R^2, \R^3$</summary>
+<summary>
+
+$\R^2, \R^3$
+
+</summary>
 
 > $\R^2, \R^3$에서 <strong>일반적인 Euclidean geometry의 Dot Product를 사용할 때 </strong>다음이 성립한다.
 >
@@ -16,7 +20,11 @@ order: 5
 
 <details>
 
-<summary><strong>증명</strong></summary>
+<summary>
+
+<strong>증명</strong>
+
+</summary>
 
 ![](/images/knowledge/angle-and-cosine/2b29d26e.png)
 
@@ -43,7 +51,11 @@ $\therefore \mathbf{x} \cdot \mathbf{y} = \Vert{}\mathbf{x}\Vert{}\Vert{}\mathbf
 
 <details>
 
-<summary><strong>일반적인 Inner Product Space</strong></summary>
+<summary>
+
+<strong>일반적인 Inner Product Space</strong>
+
+</summary>
 
 >
 >
@@ -54,7 +66,11 @@ Cauchy–Schwarz가 바로 이것을 보장한다.
 >
 > <details>
 >
-> <summary>어케 보장하는지 직관적 이해 - <strong>값의 범위에 따른 분석</strong></summary>
+> <summary>
+>
+> 어케 보장하는지 직관적 이해 - <strong>값의 범위에 따른 분석</strong>
+>
+> </summary>
 >
 > > 1. <strong>분모와 분자가 같을 때 (등호 성립 조건: </strong>$x,y$<strong>가 선형종속 관계일 때) </strong>$\Vert{}x\Vert{} \Vert{}y\Vert{} = \vert{}\langle x, y \rangle\vert{}$
 > >
@@ -63,9 +79,13 @@ Cauchy–Schwarz가 바로 이것을 보장한다.
 > >
 > > <details>
 > >
-> > <summary><strong>왜 </strong>$\Vert{}x\Vert{} \Vert{}y\Vert{} = \vert{}\langle x, y \rangle\vert{}$인 경우가 <strong> </strong>$x,y$<strong>가 선형종속 관계</strong>인가?</summary>
+> > <summary>
 > >
-> > > $<x,y>$가 의미하는건, $\fbox{$ 한 \,\,벡터의 \,\,길이 \times 다른 벡터가\,\, 그 방향에 \,\,기여하고 \,\,있는 \,\,정도$}$ 를 나타내는 거임.
+> > <strong>왜 </strong>$\Vert{}x\Vert{} \Vert{}y\Vert{} = \vert{}\langle x, y \rangle\vert{}$인 경우가 <strong> </strong>$x,y$<strong>가 선형종속 관계</strong>인가?
+> >
+> > </summary>
+> >
+> > > $<x,y>$가 의미하는건, $$ \fbox{$ 한 \,\,벡터의 \,\,길이 \times 다른 벡터가\,\, 그 방향에 \,\,기여하고 \,\,있는 \,\,정도$} $$ 를 나타내는 거임.
 이때, 한 벡터의 길이가 $||x||$를 의미한다면, 다른 벡터가 그 방향에 기여하고 있는 정도는 $||\pi_x(y)||$.
 즉, 사영을 내린 벡터의 norm : 벡터 y가 벡터 x의 방향에 기여하고 있는정도.
 > > >
@@ -91,7 +111,11 @@ Cauchy–Schwarz가 바로 이것을 보장한다.
 
 <details>
 
-<summary><strong>문제</strong></summary>
+<summary>
+
+<strong>문제</strong>
+
+</summary>
 
 [Untitled](https://app.notion.com/p/3ee09d87213b80daab83f907a0a110fd)
 

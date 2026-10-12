@@ -8,7 +8,11 @@ order: 4
 
 <details>
 
-<summary><strong>한 줄 정의</strong></summary>
+<summary>
+
+<strong>한 줄 정의</strong>
+
+</summary>
 
 > $|<x,y>| \leq||x||\,\,|y||$
 >
@@ -18,7 +22,11 @@ order: 4
 
 <details>
 
-<summary><strong>왜 필요한가</strong></summary>
+<summary>
+
+<strong>왜 필요한가</strong>
+
+</summary>
 
 > Inner Product와 Norm 사이의 관계를 보장한다.
 >
@@ -30,7 +38,11 @@ order: 4
 
 <details>
 
-<summary><strong>증명</strong></summary>
+<summary>
+
+<strong>증명</strong>
+
+</summary>
 
 > Inner Product가 만들어내는 norm은 $||x||=\sqrt{<x,x>}$이다. 
 따라서 어떤 실수 t에 대해서도 $||x-ty|| \ge 0$이고, $||x-ty||^2 \ge 0$이다.

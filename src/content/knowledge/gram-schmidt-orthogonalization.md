@@ -8,7 +8,11 @@ order: 4
 
 <details>
 
-<summary><strong>왜 필요한가?</strong></summary>
+<summary>
+
+<strong>왜 필요한가?</strong>
+
+</summary>
 
 > 일반 basis에서는 $B(B^\top B)^{-1}B^\top$와 같이 basis 사이의 관계를 반영하는 연산이 필요하다.
 >
@@ -22,7 +26,11 @@ order: 4
 
 <details>
 
-<summary><strong>핵심 아이디어</strong></summary>
+<summary>
+
+<strong>핵심 아이디어</strong>
+
+</summary>
 
 > Gram-schmidt의 핵심 알고리즘은 <strong>Orthogonal Projeciton</strong>이다.
 기존의 기저벡터 행렬 $B = \begin{bmatrix} \mid & \mid & & \mid \\ b_1 & b_2 & \dots & b_m \\ \mid & \mid & & \mid \end{bmatrix}$을 통해 새로운 직교기저벡터 행렬 $U=\begin{bmatrix} \mid & \mid & & \mid \\ u_1 & u_2 & \dots & u_m \\ \mid & \mid & & \mid \end{bmatrix}$ 를 만드는 방식이다.
@@ -56,7 +64,11 @@ order: 4
 
 <details>
 
-<summary><strong>성분적 측면의 분해</strong></summary>
+<summary>
+
+<strong>성분적 측면의 분해</strong>
+
+</summary>
 
 > $k$번째 basis vector $b_k$를 생각해 봅시다. 앞에서 이미 $u_1,\dots,u_{k-1}$을 만들어 두었다고 하자.
 >
@@ -102,7 +114,11 @@ $$
 
 <details>
 
-<summary><strong>Span preservation</strong></summary>
+<summary>
+
+<strong>Span preservation</strong>
+
+</summary>
 
 > $u_k$는 $b_k$와 이전 $u_i$들의 선형결합이므로 $u_k \in \operatorname{span}(b_1, \dots, b_k)$이다.
 ( $u_i$의 가장 처음 모습인 $u_1=b_1$이므로)
@@ -121,7 +137,11 @@ $$
 
 <details>
 
-<summary><strong>Orthonormalization</strong></summary>
+<summary>
+
+<strong>Orthonormalization</strong>
+
+</summary>
 
 > 앞서 설명했듯, ONB일 때에 그 수식이 단순해지는 것이므로, orthogonal → orthonormal의 과정이 필요하다.
 
@@ -137,13 +157,21 @@ normalization은 벡터의 방향은 유지하면서 norm을 1로 만드는 작�
 
 <details>
 
-<summary><strong>예시</strong></summary>
+<summary>
+
+<strong>예시</strong>
+
+</summary>
 
 > $b_1 = \begin{bmatrix} 2 \\ 0 \end{bmatrix}$, $b_2 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$이 $\mathbb{R}^2$의 basis라고 하자.
 
 <details>
 
-<summary><strong>Step 1. 첫 번째 벡터</strong></summary>
+<summary>
+
+<strong>Step 1. 첫 번째 벡터</strong>
+
+</summary>
 
 > 처음에는 비교할 기존 공간이 없으므로 그대로 둔다.
 $u_1 = b_1 = \begin{bmatrix} 2 \\ 0 \end{bmatrix}$
@@ -152,7 +180,11 @@ $u_1 = b_1 = \begin{bmatrix} 2 \\ 0 \end{bmatrix}$
 
 <details>
 
-<summary><strong>Step 2. 두 번째 벡터에서 기존 방향 제거</strong></summary>
+<summary>
+
+<strong>Step 2. 두 번째 벡터에서 기존 방향 제거</strong>
+
+</summary>
 
 현재 기존 공간은 $U_1=\operatorname{span}(u_1)$이다.
 따라서 $b_2$에서 $u_1$ 방향 성분을 제거한다.
@@ -178,7 +210,11 @@ $\operatorname{span}(b_1, b_2) = \operatorname{span}(u_1, u_2)$이고 $u_1 \perp
 
 <details>
 
-<summary><strong>문제</strong></summary>
+<summary>
+
+<strong>문제</strong>
+
+</summary>
 
 [Untitled](https://app.notion.com/p/3f009d87213b803792f5c917905f3f4b)
 

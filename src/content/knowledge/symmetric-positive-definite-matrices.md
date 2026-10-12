@@ -12,7 +12,11 @@ order: 3
 > 1. $\R^n$에서의 내적, dot product의 한계를 보완하기 위해 필요한 개념.
 >    <details>
 >
->    <summary>$\text{Dot Product}$는 동일한 가치를 가정한다.</summary>
+>    <summary>
+>
+>    $\text{Dot Product}$는 동일한 가치를 가정한다.
+>
+>    </summary>
 >
 >    > 기본 내적 $x^\top y$는 공간의 모든 방향이 대등하고 균일하다는 등방성(Isotropy)을 가정한 특별한 케이스이다,
 
@@ -30,7 +34,11 @@ order: 3
 >
 >    <details>
 >
->    <summary>$x^\top A y$는 공간을 뒤틀어 가치를 다르게 설정한다.</summary>
+>    <summary>
+>
+>    $x^\top A y$는 공간을 뒤틀어 가치를 다르게 설정한다.
+>
+>    </summary>
 >
 >    > 변환된 공간에서 눈으로 볼 때(기본 직교좌표계) 두 화살표 $x$와 $y$의 사이각이 60도나 120도로 보이더라도,
 $x^\top A y = 0$이라면
@@ -40,7 +48,11 @@ $x^\top A y = 0$이라면
 >
 > <details>
 >
-> <summary>$x^\top A y$는 다시 일반적인 내적의 형태, $z^{\top}w$로 전환된다.</summary>
+> <summary>
+>
+> $x^\top A y$는 다시 일반적인 내적의 형태, $z^{\top}w$로 전환된다.
+>
+> </summary>
 >
 > > $A=A^{1/2}A^{1/2}$이므로, $\begin{cases} z=A^{1/2}x \\ w=A^{1/2}y \end{cases}$ 으로 두면 ($A^{1/2}$ 는 대칭) $x^\top Ay=(A^{1/2}x)^\top(A^{1/2}y)=z^\top w$ 이다.
 즉, 왜곡된 공간에서 $x^\top Ay$ 라는 복잡한 자(Metric)를 쓰며 계산하는 대신, 벡터 자체에 $A^{1/2}$ 변환을 먼저 가하면 <strong>새로운 공간에서는 기본 내적 </strong>$z^\top w$<strong> 만 써도 정확하게 똑같은 결과</strong>가 나온다.
@@ -49,7 +61,11 @@ $x^\top A y = 0$이라면
 
 <details>
 
-<summary>$<x,y>=\hat x^T A\hat y$   ※여기서 A가 SPD면 내적의 조건을 만족.</summary>
+<summary>
+
+$<x,y>=\hat x^T A\hat y$   ※여기서 A가 SPD면 내적의 조건을 만족.
+
+</summary>
 
 - $x,y$ : 원래 vector space의 vector
 - $\hat x,\,\hat y$ : 선택한 기저에 대한 좌표벡터
@@ -63,7 +79,11 @@ $x^\top A y = 0$이라면
 
 <details>
 
-<summary><strong>벡터가 함수인 경우는.. A를 어떻게 알아내는가</strong></summary>
+<summary>
+
+<strong>벡터가 함수인 경우는.. A를 어떻게 알아내는가</strong>
+
+</summary>
 
 <div class="callout" role="note" data-kind="intuition">
 
@@ -85,7 +105,11 @@ $f(x) =a(1+x)+b(x+x^2)+c(1-x^2)$이 되도록 $a,b,c$를 구하면 된다.
 
 <details>
 
-<summary><strong>수식적 이해</strong></summary>
+<summary>
+
+<strong>수식적 이해</strong>
+
+</summary>
 
 > $<x,y>$를 $\hat x^TA\hat y$꼴로 표현하기 위해서는, 먼저 추상적인 벡터 $x,y$를 좌표 벡터로 표현하는 과정이 필요하다.
 >
@@ -116,7 +140,11 @@ $f(x) =a(1+x)+b(x+x^2)+c(1-x^2)$이 되도록 $a,b,c$를 구하면 된다.
 
 <details>
 
-<summary><strong>행렬의 곱을 통한 직관적 증명</strong></summary>
+<summary>
+
+<strong>행렬의 곱을 통한 직관적 증명</strong>
+
+</summary>
 
 > $n=2$를 가정해보자. $\sum_{i=1}^2\sum_{j=1}^2\Psi_i\lambda_j<b_i,b_j>$
 >
@@ -141,11 +169,19 @@ $[\Psi_1\,\,\Psi_2]\begin{bmatrix}<b_1, b_1>&<b_1, b_2>\\<b_2, b_1> &<b_2, b_2>\
 
 <details>
 
-<summary><strong>행렬 A에 대한 직관</strong></summary>
+<summary>
+
+<strong>행렬 A에 대한 직관</strong>
+
+</summary>
 
 <details>
 
-<summary>① A는 무엇인가?</summary>
+<summary>
+
+① A는 무엇인가?
+
+</summary>
 
 > $A_{ij}=<b_i,b_j>$ 즉, $A=\begin{pmatrix}\langle b_1,b_1\rangle&\cdots&\langle b_1,b_n\rangle\\ \vdots&\ddots&\vdots\\ \langle b_n,b_1\rangle&\cdots&\langle b_n,b_n\rangle\end{pmatrix}$ (Gram 행렬)
 
@@ -153,7 +189,11 @@ $[\Psi_1\,\,\Psi_2]\begin{bmatrix}<b_1, b_1>&<b_1, b_2>\\<b_2, b_1> &<b_2, b_2>\
 
 <details>
 
-<summary>② 대각 원소에는 무엇이 들어있는가?</summary>
+<summary>
+
+② 대각 원소에는 무엇이 들어있는가?
+
+</summary>
 
 > $A_{ii}=<b_i,b_i>=||b_i||^2$ 따라서 <strong>“대각원소 → 각 기저벡터의 길이의 제곱”</strong>
 
@@ -161,7 +201,11 @@ $[\Psi_1\,\,\Psi_2]\begin{bmatrix}<b_1, b_1>&<b_1, b_2>\\<b_2, b_1> &<b_2, b_2>\
 
 <details>
 
-<summary>③ 비대각 원소에는 무엇이 들어있는가?</summary>
+<summary>
+
+③ 비대각 원소에는 무엇이 들어있는가?
+
+</summary>
 
 > $A_{ij}=<b_i,b_j>=||b_i||\,\,||b_j||cos(\theta_{ij}) \,\,\,(i\neq j)$
 따라서 “비대각 원소 → 두 기저벡터의 크기와 서로의 방향 관게를 담고 있는 정보”이다.
@@ -173,7 +217,11 @@ $[\Psi_1\,\,\Psi_2]\begin{bmatrix}<b_1, b_1>&<b_1, b_2>\\<b_2, b_1> &<b_2, b_2>\
 
 <details>
 
-<summary>④ 그러면 $\hat x^TA\hat y$에서는 어떻게 사용되는가?</summary>
+<summary>
+
+④ 그러면 $\hat x^TA\hat y$에서는 어떻게 사용되는가?
+
+</summary>
 
 > $x=\sum_{i=1}^nx_ib_i,\,\,y=\sum_{j=1}^ny_jb_j$라 하자.
 >
@@ -186,7 +234,11 @@ A는 그 기저벡터들이 서로 어떤 inner product 관계를 갖는지 알�
 
 <details>
 
-<summary><strong>추가정보</strong></summary>
+<summary>
+
+<strong>추가정보</strong>
+
+</summary>
 
 > 기저 B가 orthonormal basis이면 $A=I$이므로 $<x,y>=\hat x^T \hat y$꼴 즉, Dot product이다.
 >
@@ -199,7 +251,11 @@ A는 그 기저벡터들이 서로 어떤 inner product 관계를 갖는지 알�
 
 <details>
 
-<summary><strong>SPD와 Inner Product의 관계</strong></summary>
+<summary>
+
+<strong>SPD와 Inner Product의 관계</strong>
+
+</summary>
 
 > 주어긴 기저 B에 대해 $<x,y>=\hat x^T A \hat y$로 Inner Product를 표현할 때, 행렬 A는 반드시 Symmetric Positive Definite, SPD여야한다.
 반대로 A가 SPD이면 위 식은 Inner Product를 정의한다.
@@ -210,7 +266,11 @@ A는 그 기저벡터들이 서로 어떤 inner product 관계를 갖는지 알�
 
 <details>
 
-<summary><strong>Inner Product의 조건은 A에서 어떻게 나타나는가?</strong></summary>
+<summary>
+
+<strong>Inner Product의 조건은 A에서 어떻게 나타나는가?</strong>
+
+</summary>
 
 - Bilinearity : $<x,y>=\hat x^T A \hat y$의 형태에서 행렬곱의 선형성에 의해 만족된다.
 - Symmetric : $A=A^T$이면 symmetric이다.
@@ -220,7 +280,11 @@ A는 그 기저벡터들이 서로 어떤 inner product 관계를 갖는지 알�
 
 <details>
 
-<summary><strong>문제</strong></summary>
+<summary>
+
+<strong>문제</strong>
+
+</summary>
 
 [Untitled](https://app.notion.com/p/3ee09d87213b80e89ff9d0ade859b6c3)
 

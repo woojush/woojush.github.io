@@ -20,11 +20,19 @@ $\sigma_i$ : singular value (관례상 $\sigma_1\ge\sigma_2\ge\cdots\ge0$), $u_i
 
 <details>
 
-<summary><strong>배경지식 (0에서 시작)</strong></summary>
+<summary>
+
+<strong>배경지식 (0에서 시작)</strong>
+
+</summary>
 
 <details>
 
-<summary>① 직교행렬 (3장 복습)</summary>
+<summary>
+
+① 직교행렬 (3장 복습)
+
+</summary>
 
 > 열이 정규직교인 정사각행렬 $Q$는 $Q^\top Q=I$, 즉 $Q^{-1}=Q^\top$이다. 길이와 사이각을 보존하므로 <strong>회전 또는 반사</strong>이다.
 
@@ -32,7 +40,11 @@ $\sigma_i$ : singular value (관례상 $\sigma_1\ge\sigma_2\ge\cdots\ge0$), $u_i
 
 <details>
 
-<summary>② $A^\top A$는 항상 대칭 PSD (4.2)</summary>
+<summary>
+
+② $A^\top A$는 항상 대칭 PSD (4.2)
+
+</summary>
 
 > $A$가 직사각이어도 $A^\top A\in\mathbb R^{n\times n}$, $AA^\top\in\mathbb R^{m\times m}$은 정사각 대칭행렬이다. (Theorem 4.14) Spectral Theorem(Theorem 4.15)에 의해 정규직교 고유기저가 있고, 고유값은 $\ge0$이다. <strong>SVD는 이 사실 위에 서 있다.</strong>
 
@@ -40,7 +52,11 @@ $\sigma_i$ : singular value (관례상 $\sigma_1\ge\sigma_2\ge\cdots\ge0$), $u_i
 
 <details>
 
-<summary>③ 기저변환은 도메인과 코도메인에서 따로 일어난다 (2장)</summary>
+<summary>
+
+③ 기저변환은 도메인과 코도메인에서 따로 일어난다 (2장)
+
+</summary>
 
 > $\tilde A_\Phi=T^{-1}A_\Phi S$에서 $S$는 도메인 $\mathbb R^n$의 기저변환, $T$는 코도메인 $\mathbb R^m$의 기저변환이다.
 고유분해는 $S=T$인 경우였다. SVD는 $S$<strong>와 </strong>$T$<strong>를 따로 고른다.</strong>
@@ -49,7 +65,11 @@ $\sigma_i$ : singular value (관례상 $\sigma_1\ge\sigma_2\ge\cdots\ge0$), $u_i
 
 <details>
 
-<summary>④ rank와 kernel (2장)</summary>
+<summary>
+
+④ rank와 kernel (2장)
+
+</summary>
 
 > $\text{rank}(A)=r$이면 $\dim\ker(A)=n-r$이다. (Rank-Nullity) 0이 아닌 singular value의 개수가 곧 $r$이다. ※ 교재 밖 보충 : $A^\top Ax=0\Rightarrow x^\top A^\top Ax=\Vert Ax\Vert^2=0\Rightarrow Ax=0$이므로 $\ker(A^\top A)=\ker(A)$이고, $\text{rank}(A^\top A)=\text{rank}(A)=r$이다. 즉 $A^\top A$의 0이 아닌 고유값이 정확히 $r$개이다.
 
@@ -59,7 +79,11 @@ $\sigma_i$ : singular value (관례상 $\sigma_1\ge\sigma_2\ge\cdots\ge0$), $u_i
 
 <details>
 
-<summary><strong>왜 필요한가</strong></summary>
+<summary>
+
+<strong>왜 필요한가</strong>
+
+</summary>
 
 > <strong>고유분해의 한계(정사각·non-defective)는 4.4 끝에서 정리했다.</strong> 교재는 SVD가 “fundamental theorem of linear algebra”라고 불려 왔다고 소개한다. 모든 행렬에 적용되고 항상 존재하기 때문이다.
 
@@ -74,7 +98,11 @@ $\sigma_i$ : singular value (관례상 $\sigma_1\ge\sigma_2\ge\cdots\ge0$), $u_i
 
 <details>
 
-<summary><strong>기하학적 직관 (교재 4.5.1, Figure 4.8)</strong></summary>
+<summary>
+
+<strong>기하학적 직관 (교재 4.5.1, Figure 4.8)</strong>
+
+</summary>
 
 > $A=U\Sigma V^\top$을 <strong>오른쪽부터</strong> 읽으면 세 단계이다. 고유분해(4.4)와 같은 구조이다.
 ① $V^\top$ : 도메인 $\mathbb R^n$에서 표준기저를 $v_i$<strong> 기저로 기저변환</strong>한다. ($V^\top=V^{-1}$)
@@ -91,7 +119,11 @@ $\sigma_i$ : singular value (관례상 $\sigma_1\ge\sigma_2\ge\cdots\ge0$), $u_i
 
 <details>
 
-<summary><strong>예시 : 교재 Example 4.12 (격자 점의 변환)</strong></summary>
+<summary>
+
+<strong>예시 : 교재 Example 4.12 (격자 점의 변환)</strong>
+
+</summary>
 
 > $A=\begin{bmatrix}1&-0.8\\0&1\\1&0\end{bmatrix}\in\mathbb R^{3\times2}$
 2차원 격자 점들을 $V^\top$으로 돌리고, $\Sigma$로 늘려서 3차원의 $x_1x_2$ 평면에 올린 뒤, $U$로 3차원 안에서 돌려놓는다. 결과는 3차원 안의 <strong>타원 모양 평면 조각</strong>이다. (Figure 4.9)
@@ -101,7 +133,11 @@ $\sigma_i$ : singular value (관례상 $\sigma_1\ge\sigma_2\ge\cdots\ge0$), $u_i
 
 <details>
 
-<summary><strong>특수한 경우 : SPD 행렬의 SVD = 고유분해</strong></summary>
+<summary>
+
+<strong>특수한 경우 : SPD 행렬의 SVD = 고유분해</strong>
+
+</summary>
 
 > $S=S^\top=PDP^\top$이고 SVD가 $S=U\Sigma V^\top$일 때 $U=P=V$, $\Sigma=D$로 두면 둘이 같아진다. (교재 4.5.2 Remark)
 ※ 교재 밖 보충 : 일반 대칭행렬에서 음의 고유값이 있으면 $\sigma_i=|\lambda_i|$가 되어 SVD와 고유분해가 달라진다.
@@ -110,7 +146,11 @@ $\sigma_i$ : singular value (관례상 $\sigma_1\ge\sigma_2\ge\cdots\ge0$), $u_i
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - 행렬 근사 · Eckart-Young (4.6)
 - PCA (10장)

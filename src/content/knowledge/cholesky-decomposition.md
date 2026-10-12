@@ -19,11 +19,19 @@ order: 1
 
 <details>
 
-<summary><strong>배경지식 (0에서 시작)</strong></summary>
+<summary>
+
+<strong>배경지식 (0에서 시작)</strong>
+
+</summary>
 
 <details>
 
-<summary>① SPD 복습 (3장)</summary>
+<summary>
+
+① SPD 복습 (3장)
+
+</summary>
 
 > $A=A^\top$(Symmetric)이고 $x\neq0\Rightarrow x^\top Ax>0$.
 3장에서 “내적을 행렬로 표현할 때 $A$가 반드시 가져야 하는 조건”으로 만났다. 공분산행렬도 이 부류이다. (6장)
@@ -32,7 +40,11 @@ order: 1
 
 <details>
 
-<summary>② 하삼각행렬 (4.1 복습)</summary>
+<summary>
+
+② 하삼각행렬 (4.1 복습)
+
+</summary>
 
 > 대각선 위가 전부 0인 행렬. 4.1에서 $\det(T)=\prod T_{ii}$를 봤다. 하삼각행렬을 쓰는 이유는 계산이 쉽기 때문이다.
 
@@ -40,7 +52,11 @@ order: 1
 
 <details>
 
-<summary>③ 제곱근과 인수분해의 비유</summary>
+<summary>
+
+③ 제곱근과 인수분해의 비유
+
+</summary>
 
 > 양수 $a$는 $a=\sqrt a\cdot\sqrt a$로 쪼갤 수 있다. 행렬 분해(matrix factorization)는 <strong>행렬을 해석하기 쉬운 인수들의 곱으로 쪼개는 것</strong>이다. (교재 4장 서두)
 $LL^\top$은 “$L$ 곱하기 $L$의 전치”이므로 $\sqrt a\cdot\sqrt a$의 행렬 버전이다.
@@ -49,7 +65,11 @@ $LL^\top$은 “$L$ 곱하기 $L$의 전치”이므로 $\sqrt a\cdot\sqrt a$의
 
 <details>
 
-<summary>④ $LL^\top$의 성분</summary>
+<summary>
+
+④ $LL^\top$의 성분
+
+</summary>
 
 > 여기서 $A$의 $i$행 $j$열에 있는 원소를 구하려면, $L$의 $i$행과 $L^\top$의 $j$열을 곱해서 더하면 된다.
 그런데 $L^\top$의 $j$열은 원래 $L$의 $j$행을 세로로 세운 것과 같다.
@@ -57,7 +77,11 @@ $LL^\top$은 “$L$ 곱하기 $L$의 전치”이므로 $\sqrt a\cdot\sqrt a$의
 
 <details>
 
-<summary>$a_{ij}=(LL^\top)_{ij}=\sum_k l_{ik}l_{jk}$</summary>
+<summary>
+
+$a_{ij}=(LL^\top)_{ij}=\sum_k l_{ik}l_{jk}$
+
+</summary>
 
 > $i$: 첫 번째로 선택한 행의 번호
 $j$: 두 번째로 선택한 행의 번호
@@ -87,7 +111,11 @@ $k$: 열의 번호
 
 <details>
 
-<summary><strong>왜 필요한가</strong></summary>
+<summary>
+
+<strong>왜 필요한가</strong>
+
+</summary>
 
 > <strong>ML에서는 SPD 행렬(공분산, 커널, 헤시안 근사)을 계속 다룬다.</strong> 이 행렬을 삼각행렬 곱으로 바꿔 두면 아래 일들이 한꺼번에 쉬워진다.
 
@@ -99,13 +127,21 @@ $k$: 열의 번호
 
 <details>
 
-<summary><strong>위 세 줄이 막막하다면 : 숫자 예시로 풀어 쓰기 (0에서 시작)</strong></summary>
+<summary>
+
+<strong>위 세 줄이 막막하다면 : 숫자 예시로 풀어 쓰기 (0에서 시작)</strong>
+
+</summary>
 
 > 위 세 줄은 가우시안, 공분산, 표준정규분포, VAE를 이미 안다고 가정하고 쓴 요약이다. 여기서는 이 개념들이 <strong>어떤 문제를 풀려고 등장했는지</strong>부터 숫자 예시로 풀어 본다. 확률과 통계를 몰라도 따라올 수 있게 썼다.
 
 <details>
 
-<summary><strong>용어 먼저 : 가우시안, 공분산, 표준정규분포</strong></summary>
+<summary>
+
+<strong>용어 먼저 : 가우시안, 공분산, 표준정규분포</strong>
+
+</summary>
 
 > <strong>가우시안(Gaussian) = 정규분포(Normal distribution)
 </strong>값이 평균 근처에 많이 모이고, 평균에서 멀어질수록 드물게 나오는 분포이다.
@@ -132,7 +168,11 @@ $k$: 열의 번호
 
 <details>
 
-<summary><strong>① 가우시안에서 표본 뽑기 : 무관한 난수로 "상관 있는 데이터"를 만든다</strong></summary>
+<summary>
+
+<strong>① 가우시안에서 표본 뽑기 : 무관한 난수로 "상관 있는 데이터"를 만든다</strong>
+
+</summary>
 
 > <strong>풀려는 문제</strong> : 공분산이 $\Sigma=\begin{bmatrix}4&2\\2&3\end{bmatrix}$인 두 변수 $(x_1,x_2)$를 무작위로 만들고 싶다. 그런데 컴퓨터가 바로 줄 수 있는 것은 서로 무관한 $z_1,z_2$뿐이다. <strong>무관한 난수를 "원하는 공분산을 가진 값"으로 바꾸는 변환</strong>이 필요하고, 그 변환이 $L$이다.
 
@@ -150,7 +190,11 @@ $$
 
 <details>
 
-<summary>왜 상관이 생기는가 : $L$의 열로 읽기</summary>
+<summary>
+
+왜 상관이 생기는가 : $L$의 열로 읽기
+
+</summary>
 
 > 3장에서 본 대로 행렬의 열은 "표준기저가 이동한 곳"이다. $L$의 열은 $(2,1)^\top$과 $(0,\sqrt2)^\top$이므로
 $Lz=z_1\begin{bmatrix}2\\1\end{bmatrix}+z_2\begin{bmatrix}0\\\sqrt2\end{bmatrix}=\begin{bmatrix}2z_1\\z_1+\sqrt2\,z_2\end{bmatrix}$
@@ -162,7 +206,11 @@ $Lz=z_1\begin{bmatrix}2\\1\end{bmatrix}+z_2\begin{bmatrix}0\\\sqrt2\end{bmatrix}
 
 <details>
 
-<summary>왜 공분산이 정확히 $\Sigma$가 되는가</summary>
+<summary>
+
+왜 공분산이 정확히 $\Sigma$가 되는가
+
+</summary>
 
 > $\text{Cov}(Lz)=L\,\text{Cov}(z)\,L^\top=L\,I\,L^\top=LL^\top=\Sigma$
 둘째 등호가 성립하는 이유는 $\text{Cov}(z)=I$이기 때문이다. $z_1,z_2$가 서로 독립이고 각각 분산이 1이므로 대각은 1, 비대각은 0이다.
@@ -181,7 +229,11 @@ $Lz=z_1\begin{bmatrix}2\\1\end{bmatrix}+z_2\begin{bmatrix}0\\\sqrt2\end{bmatrix}
 
 <details>
 
-<summary><strong>② Reparametrization trick : 난수가 낀 계산을 미분 가능하게 만든다</strong></summary>
+<summary>
+
+<strong>② Reparametrization trick : 난수가 낀 계산을 미분 가능하게 만든다</strong>
+
+</summary>
 
 > <strong>미분이 왜 필요한가.</strong> 신경망은 (1) 현재 매개변수로 결과를 계산하고, (2) 정답과의 차이(손실)를 재고, (3) <strong>손실을 매개변수로 미분해서</strong> 매개변수를 어느 쪽으로 얼마나 바꿀지 정한다.
 
@@ -197,7 +249,11 @@ $z$는 바깥에서 들어오는 입력값처럼 취급하고, $\mu,L$만 학습
 
 <details>
 
-<summary>숫자 예시 (1차원)</summary>
+<summary>
+
+숫자 예시 (1차원)
+
+</summary>
 
 > $x=\mu+\sigma z$에서 지금 $\mu=1,\ \sigma=2$이고 뽑힌 난수가 $z=0.5$라 하자. (1차원에서는 $L=\sigma$)
 $x=1+2\cdot0.5=2$
@@ -212,7 +268,11 @@ $x=1+2\cdot0.5=2$
 
 <details>
 
-<summary>VAE와의 관계</summary>
+<summary>
+
+VAE와의 관계
+
+</summary>
 
 > VAE(Variational Autoencoder)는 데이터를 압축했다가 다시 생성하도록 학습하는 신경망이다. 압축하는 단계에서 확률분포로부터 표본을 뽑는 과정이 있어서, 그 과정을 위의 꼴로 바꿔 미분이 통과하게 한다.
 
@@ -224,7 +284,11 @@ $x=1+2\cdot0.5=2$
 
 <details>
 
-<summary><strong>③ det를 싸게 계산 : 삼각행렬의 대각곱</strong></summary>
+<summary>
+
+<strong>③ det를 싸게 계산 : 삼각행렬의 대각곱</strong>
+
+</summary>
 
 > 이 항목은 확률을 몰라도 이해할 수 있다. 위 예시의 $L$을 다시 보자.
 
@@ -239,7 +303,11 @@ $A=LL^\top$이므로 $\det(A)=\det(L)\det(L^\top)=\det(L)^2=(2\sqrt2)^2=8$.
 
 <details>
 
-<summary>$n\times n$이 커지면 : 일반식과 로그</summary>
+<summary>
+
+$n\times n$이 커지면 : 일반식과 로그
+
+</summary>
 
 > $100\times100$처럼 커져도 Cholesky 인수 $L$이 이미 있으면 대각 성분 100개를 곱하면 끝이다.
 
@@ -273,11 +341,19 @@ $$
 
 <details>
 
-<summary><strong>직관</strong></summary>
+<summary>
+
+<strong>직관</strong>
+
+</summary>
 
 <details>
 
-<summary>$1\times1$에서 시작</summary>
+<summary>
+
+$1\times1$에서 시작
+
+</summary>
 
 > $A=[a]$이면 $L=[\sqrt a]$이고 $LL^\top=a$이다. 제곱근이 실수로 존재하려면 $a>0$이어야 한다. <strong>이 “양수여야 한다”가 행렬에서는 “양의 정부호여야 한다”가 된다.</strong>
 
@@ -285,7 +361,11 @@ $$
 
 <details>
 
-<summary>왜 양의 정부호가 필요한가 (필요성 쪽)</summary>
+<summary>
+
+왜 양의 정부호가 필요한가 (필요성 쪽)
+
+</summary>
 
 > $A=LL^\top$이고 $L$이 invertible(대각 성분이 양수인 하삼각)이면
 $x^\top Ax=x^\top LL^\top x=(L^\top x)^\top(L^\top x)=\Vert{}L^\top x\Vert{}^2>0\;(x\neq0)$
@@ -295,7 +375,11 @@ $x^\top Ax=x^\top LL^\top x=(L^\top x)^\top(L^\top x)=\Vert{}L^\top x\Vert{}^2>0
 
 <details>
 
-<summary>가우시안에서의 의미 (기하)</summary>
+<summary>
+
+가우시안에서의 의미 (기하)
+
+</summary>
 
 > $z$의 분포는 공 모양(등방)이다. $L$은 이 공을 <strong>늘이고 기울여서</strong> 공분산 $\Sigma$를 가진 타원 모양으로 바꾸는 선형사상이다. $\mu$는 위치를 옮긴다.
 
@@ -305,7 +389,11 @@ $x^\top Ax=x^\top LL^\top x=(L^\top x)^\top(L^\top x)=\Vert{}L^\top x\Vert{}^2>0
 
 <details>
 
-<summary><strong>유도 : 성분을 앞에서부터 하나씩 결정 (교재 Example 4.10)</strong></summary>
+<summary>
+
+<strong>유도 : 성분을 앞에서부터 하나씩 결정 (교재 Example 4.10)</strong>
+
+</summary>
 
 > $3\times3$에서 $A=LL^\top$을 성분으로 풀어 쓰면
 $a_{11}=l_{11}^2$, $a_{21}=l_{21}l_{11}$, $a_{31}=l_{31}l_{11}$
@@ -326,11 +414,19 @@ $a_{22}=l_{21}^2+l_{22}^2$, $a_{32}=l_{31}l_{21}+l_{32}l_{22}$, $a_{33}=l_{31}^2
 
 <details>
 
-<summary><strong>예시</strong></summary>
+<summary>
+
+<strong>예시</strong>
+
+</summary>
 
 <details>
 
-<summary>① $3\times3$ 숫자 계산</summary>
+<summary>
+
+① $3\times3$ 숫자 계산
+
+</summary>
 
 > $A=\begin{bmatrix}4&2&2\\2&5&3\\2&3&6\end{bmatrix}$
 $l_{11}=\sqrt4=2$, $l_{21}=2/2=1$, $l_{31}=2/2=1$
@@ -345,7 +441,11 @@ det : $\det(A)=(2\cdot2\cdot2)^2=64$. (직접 계산해도 $64$)
 
 <details>
 
-<summary>② 가우시안 표본 만들기</summary>
+<summary>
+
+② 가우시안 표본 만들기
+
+</summary>
 
 > $\Sigma=\begin{bmatrix}4&2\\2&3\end{bmatrix}$ : $l_{11}=2$, $l_{21}=1$, $l_{22}=\sqrt{3-1}=\sqrt2$ → $L=\begin{bmatrix}2&0\\1&\sqrt2\end{bmatrix}$
 $x-\mu=Lz=(2z_1,\;z_1+\sqrt2z_2)$
@@ -358,7 +458,11 @@ $z_1,z_2$는 독립이고 분산이 1이므로, 공분산의 각 성분이 정�
 
 <details>
 
-<summary>③ 실패하는 경우 : 대칭이지만 PD가 아니다</summary>
+<summary>
+
+③ 실패하는 경우 : 대칭이지만 PD가 아니다
+
+</summary>
 
 > $A=\begin{bmatrix}1&2\\2&1\end{bmatrix}$ : $l_{11}=1$, $l_{21}=2$, $l_{22}=\sqrt{1-4}=\sqrt{-3}$ → 실수 해가 없다.
 고유값이 $3,-1$로 하나가 음수이기 때문이다. (고유값이 전부 양수여야 PD이다 — 4.2의 성질)
@@ -369,7 +473,11 @@ $z_1,z_2$는 독립이고 분산이 1이므로, 공분산의 각 성분이 정�
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - 다변량 가우시안 표본 추출 (6장)
 - Reparametrization trick · VAE
@@ -380,7 +488,11 @@ $z_1,z_2$는 독립이고 분산이 1이므로, 공분산의 각 성분이 정�
 
 <details>
 
-<summary><strong>추가정보</strong></summary>
+<summary>
+
+<strong>추가정보</strong>
+
+</summary>
 
 - 교재는 Cholesky가 “확률적 사건을 계산하거나 시뮬레이션할 때 자주 다시 나타난다”고 소개한다. (Further Reading)
 - ※ 교재 밖 보충(일반적 사실) : $Ax=b$를 풀 때 $A=LL^\top$이면 $Ly=b$를 앞에서부터, $L^\top x=y$를 뒤에서부터 풀면 된다. 삼각행렬이라 각각 쉽다.

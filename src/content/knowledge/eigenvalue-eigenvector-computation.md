@@ -10,11 +10,19 @@ order: 2
 
 <details>
 
-<summary><strong>배경지식 (0에서 시작)</strong></summary>
+<summary>
+
+<strong>배경지식 (0에서 시작)</strong>
+
+</summary>
 
 <details>
 
-<summary>① 동차 연립방정식과 Kernel</summary>
+<summary>
+
+① 동차 연립방정식과 Kernel
+
+</summary>
 
 > $Mx=0$을 동차(homogeneous) 방정식이라 하고, 그 해 집합이 $\ker(M)$이다. 가우스 소거로 free variable을 잡아 해를 $t\cdot(\text{방향벡터})$ 꼴로 쓴다. (Kernel, Rank-Nullity 노트)
 
@@ -24,7 +32,11 @@ order: 2
 
 <details>
 
-<summary><strong>왜 필요한가</strong></summary>
+<summary>
+
+<strong>왜 필요한가</strong>
+
+</summary>
 
 > 정의 $Ax=\lambda x$만으로는 $\lambda$와 $x$를 동시에 찾아야 해서 막막하다. 앞 노트에서 만든 특성다항식이 이 문제를 <strong>두 단계로 쪼갠다.</strong>
 ① $\lambda$만의 방정식을 푼다. ② 구한 $\lambda$마다 $x$를 푼다.
@@ -33,7 +45,11 @@ order: 2
 
 <details>
 
-<summary><strong>표준 절차 (3 Step)</strong></summary>
+<summary>
+
+<strong>표준 절차 (3 Step)</strong>
+
+</summary>
 
 <div class="callout" role="note" data-kind="intuition">
 
@@ -49,13 +65,21 @@ order: 2
 
 <details>
 
-<summary><strong>예시 : 교재 Example 4.5</strong></summary>
+<summary>
+
+<strong>예시 : 교재 Example 4.5</strong>
+
+</summary>
 
 > $A=\begin{bmatrix}4&2\\1&3\end{bmatrix}$
 
 <details>
 
-<summary>Step 1–2. 고유값</summary>
+<summary>
+
+Step 1–2. 고유값
+
+</summary>
 
 > $p_A(\lambda)=(4-\lambda)(3-\lambda)-2\cdot1=\lambda^2-7\lambda+10=(\lambda-2)(\lambda-5)$
 따라서 $\lambda_1=2,\;\lambda_2=5$.
@@ -64,7 +88,11 @@ order: 2
 
 <details>
 
-<summary>Step 3. $\lambda=5$의 eigenspace</summary>
+<summary>
+
+Step 3. $\lambda=5$의 eigenspace
+
+</summary>
 
 > $A-5I=\begin{bmatrix}-1&2\\1&-2\end{bmatrix}$, $(A-5I)x=0\Rightarrow x_1=2x_2$.
 $E_5=\text{span}\Big\{\begin{bmatrix}2\\1\end{bmatrix}\Big\}$
@@ -73,7 +101,11 @@ $E_5=\text{span}\Big\{\begin{bmatrix}2\\1\end{bmatrix}\Big\}$
 
 <details>
 
-<summary>Step 3. $\lambda=2$의 eigenspace</summary>
+<summary>
+
+Step 3. $\lambda=2$의 eigenspace
+
+</summary>
 
 > $A-2I=\begin{bmatrix}2&2\\1&1\end{bmatrix}$, $(A-2I)x=0\Rightarrow x_2=-x_1$.
 $E_2=\text{span}\Big\{\begin{bmatrix}1\\-1\end{bmatrix}\Big\}$
@@ -82,7 +114,11 @@ $E_2=\text{span}\Big\{\begin{bmatrix}1\\-1\end{bmatrix}\Big\}$
 
 <details>
 
-<summary>검산 (반드시 하는 습관)</summary>
+<summary>
+
+검산 (반드시 하는 습관)
+
+</summary>
 
 > • $A(2,1)^\top=(8+2,\,2+3)=(10,5)=5(2,1)^\top$ ✓
 • $A(1,-1)^\top=(4-2,\,1-3)=(2,-2)=2(1,-1)^\top$ ✓
@@ -94,7 +130,11 @@ $E_2=\text{span}\Big\{\begin{bmatrix}1\\-1\end{bmatrix}\Big\}$
 
 <details>
 
-<summary><strong>중복도 : Algebraic vs Geometric Multiplicity</strong></summary>
+<summary>
+
+<strong>중복도 : Algebraic vs Geometric Multiplicity</strong>
+
+</summary>
 
 고유값·고유벡터를 통해 대각화가 가능하다. 대각화는 선형변환을 더 단순하게 표현할 수 있게 한다.
 
@@ -111,7 +151,11 @@ n by n행렬 A를 대각화하려면 <strong>선형독립인 고유벡터가 n�
 
 <details>
 
-<summary>대수적 중복도 (Algebraic Multiplicity, AM)</summary>
+<summary>
+
+대수적 중복도 (Algebraic Multiplicity, AM)
+
+</summary>
 
 > AM은 특성다항식에서 특정 고윳값이 근으로 등장하는 중복 횟수이다.
 
@@ -126,7 +170,11 @@ $\text{AM}$은 고윳값의 중복 횟수를 알려주지만, 이것만으로 �
 
 <details>
 
-<summary>기하적 중복도 (Geometric Multiplicity, GM)</summary>
+<summary>
+
+기하적 중복도 (Geometric Multiplicity, GM)
+
+</summary>
 
 > $(A-\lambda I)\mathbf{v}=\mathbf{0}$의 해 전체(영벡터 포함)인 고유공간 $E_\lambda=\ker(A-\lambda I)$의 <strong>차원</strong>이다. 즉 해당 고윳값에 대응하는 <strong>선형독립인 고유벡터를 최대 몇 개 확보할 수 있는지</strong>이며, rank-nullity에 의해 $\text{GM}=n-\text{rank}(A-\lambda I)$이다.
 
@@ -134,7 +182,11 @@ $\text{AM}$은 고윳값의 중복 횟수를 알려주지만, 이것만으로 �
 
 <details>
 
-<summary><strong>\[예시\] 대각화 불가능한 행렬 (</strong>$3\times3$<strong>)</strong></summary>
+<summary>
+
+<strong>\[예시\] 대각화 불가능한 행렬 (</strong>$3\times3$<strong>)</strong>
+
+</summary>
 
 <strong>1. 대상 행렬</strong> : $A=\begin{pmatrix}2&1&0\\0&2&0\\0&0&5\end{pmatrix}$
 
@@ -156,14 +208,22 @@ $\text{AM}$은 고윳값의 중복 횟수를 알려주지만, 이것만으로 �
 
 <details>
 
-<summary><strong>Theorem 4.12 : 서로 다른 고유값의 고유벡터는 선형독립 (Defective 노트 병합)</strong></summary>
+<summary>
+
+<strong>Theorem 4.12 : 서로 다른 고유값의 고유벡터는 선형독립 (Defective 노트 병합)</strong>
+
+</summary>
 
 > <strong>Theorem 4.12</strong> 서로 다른 고유값 $\lambda_1,\dots,\lambda_n$이 $n$개이면 그 고유벡터 $x_1,\dots,x_n$은 <strong>선형독립</strong>이다. 따라서 $\mathbb{R}^n$의 기저가 된다.
 <strong>Definition 4.13</strong> 선형독립인 고유벡터가 $n$개보다 적은 정사각행렬을 <strong>defective</strong>라 한다.
 
 <details>
 
-<summary>핵심 아이디어</summary>
+<summary>
+
+핵심 아이디어
+
+</summary>
 
 > ※ 교재 밖 보충. 서로 다른 고유값의 고유벡터들이 선형종속이라고 가정하고, 계수가 모두 0이 아닌 <strong>가장 짧은</strong> 관계식 $\sum_i c_ix_i=0$을 잡는다.
 양변에 $(A-\lambda_1I)$를 곱하면 $x_1$ 항은 사라지고 $\sum_{i\ge2}c_i(\lambda_i-\lambda_1)x_i=0$이 남는다. $\lambda_i\neq\lambda_1$이므로 계수는 모두 0이 아니고, 더 짧은 관계식이 되어 “가장 짧다”에 모순이다.
@@ -174,7 +234,11 @@ $\text{AM}$은 고윳값의 중복 횟수를 알려주지만, 이것만으로 �
 
 <details>
 
-<summary><strong>경우 나누기 : 언제 독립 고유벡터가 </strong>$n$<strong>개 나오는가</strong></summary>
+<summary>
+
+<strong>경우 나누기 : 언제 독립 고유벡터가 </strong>$n$<strong>개 나오는가</strong>
+
+</summary>
 
 | 경우 | 고유벡터 | 예 |
 | --- | --- | --- |
@@ -206,7 +270,11 @@ $\text{AM}$은 고윳값의 중복 횟수를 알려주지만, 이것만으로 �
 
 <details>
 
-<summary><strong>이걸 모르면?</strong></summary>
+<summary>
+
+<strong>이걸 모르면?</strong>
+
+</summary>
 
 - "$\lambda=2$가 두 번 나오니 고유벡터도 2개겠지"처럼 AM만 보고 단정하게 된다. 그러면 존재하지 않는 $P$를 만들려다 막힌다. 대각화 여부는 GM으로 판정한다 (4.4)
 - Defective 행렬(GM이 AM보다 작은 경우)의 정의 자체를 읽지 못한다 (다음 노트)
@@ -216,7 +284,11 @@ $\text{AM}$은 고윳값의 중복 횟수를 알려주지만, 이것만으로 �
 
 <details>
 
-<summary><strong>문제</strong></summary>
+<summary>
+
+<strong>문제</strong>
+
+</summary>
 
 [Untitled](https://app.notion.com/p/3f409d87213b816ca933da113e051a15)
 

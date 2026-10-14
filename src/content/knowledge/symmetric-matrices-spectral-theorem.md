@@ -1,6 +1,7 @@
 ---
 title: "대칭행렬과 Spectral Theorem"
 date: 2026-10-11
+updated: 2026-10-14
 topic: ai/mathematics/linear-algebra/eigen-theory
 status: seed
 order: 4
@@ -158,13 +159,53 @@ $x_2'=x_2-\dfrac{x_2^\top x_1}{x_1^\top x_1}x_1=(-1,0,1)^\top-\tfrac12(-1,1,0)^\
 
 </details>
 
+---
+
+> 대칭행렬이 실제로 쓰이는 첫 장면은 <strong>양의 정부호(PD) 판별</strong>이다. 고유값은 이 판별을 “모든 $x$ 검사”에서 “$n$개의 부호 확인”으로 바꿔 준다.
+
+정의 (교재 Def. 3.4) : 대칭행렬 $A$가 모든 $x\neq0$에 대해 $x^\top Ax>0$이면 PD이다.
+
+문제 : 정의대로면 무한히 많은 $x$를 전부 확인해야 한다.
+
+해결 : Spectral Theorem으로 $A=PDP^\top$이므로, $y=P^\top x$ (고유벡터 좌표)로 놓으면
+
+$$
+x^\top Ax=y^\top Dy=\lambda_1y_1^2+\cdots+\lambda_ny_n^2
+$$
+
+교차항이 사라지고 제곱항만 남는다. $y_i^2\ge0$이므로 <strong>부호는 전적으로 </strong>$\lambda_i$<strong>가 정한다.</strong>
+
+- 모든 $\lambda_i>0$이면 : $x\neq0$ $\Rightarrow$ $y\neq0$ ($P$가 가역)이므로 양수 항들의 합 $>0$ $\Rightarrow$ PD
+- 반대로 PD이면 : $x=p_i$ (고유벡터, $\Vert p_i\Vert=1$)를 넣으면 $x^\top Ax=\lambda_i>0$ $\Rightarrow$ 모든 고유값이 양수
+- 따라서 $A$<strong>가 PD </strong>$\iff$<strong> 모든 고유값 </strong>$>0$
+
+| 고유값 | 이름 | $x^\top Ax$ |
+| --- | --- | --- |
+| 모두 $>0$ | PD | $x\neq0$이면 항상 $>0$ |
+| $\ge0$ (0 포함) | PSD | 항상 $\ge0$, 0이 되는 방향이 있다 |
+| 양수와 음수가 섞임 | 불정 (indefinite) | 방향에 따라 부호가 바뀐다 |
+
+<details>
+
+<summary>
+
+<strong>예시 : 그릇 vs 안장</strong>
+
+</summary>
+
+> $B=\begin{bmatrix}1&2\\2&1\end{bmatrix}$ : $\lambda=3,\,-1$, 고유벡터 $(1,1)^\top,\,(1,-1)^\top$. $y_1=\tfrac{x_1+x_2}{\sqrt2},\,y_2=\tfrac{x_1-x_2}{\sqrt2}$로 놓으면 $x^\top Bx=x_1^2+4x_1x_2+x_2^2=3y_1^2-y_2^2$.
+$x=(1,-1)^\top$ $\Rightarrow$ $x^\top Bx=-2<0$ $\Rightarrow$ PD 아님 (한 방향은 올라가고 한 방향은 내려가는 <strong>안장</strong>).
+$A=\begin{bmatrix}4&2\\2&5\end{bmatrix}$ : $\lambda=\tfrac{9\pm\sqrt{17}}{2}\approx6.56,\,2.44$ 둘 다 양수 $\Rightarrow$ PD (모든 방향으로 올라가는 <strong>그릇</strong>).
+
+</details>
+
 <div class="callout" role="note" data-kind="note">
 
 <strong>\[보완\] 풀린 것 / 남은 것 (Spectral Theorem → 다음 노트)</strong>
 
-<strong>풀린 것</strong> : 대칭행렬은 고유값이 실수이고 정규직교 고유기저가 있어서 $A=PDP^\top$로 쓸 수 있다. 역행렬 계산 없이 “기저변환 → 늘임 → 되돌림”이 된다.
+<strong>풀린 것</strong> : 대칭행렬은 고유값이 실수이고 정규직교 고유기저가 있어서 $A=PDP^\top$로 쓸 수 있다. 역행렬 계산 없이 “기저변환 → 늘임 → 되돌림”이 된다. 이 구조 덕분에 $x^\top Ax=\sum\lambda_iy_i^2$로 풀려서, <strong>PD </strong>$\iff$<strong> 모든 고유값 </strong>$>0$이 된다.
 
-<strong>남은 것 1 (다음 노트 Cholesky)</strong> : 공분산처럼 대칭이면서 양의 정부호인(SPD) 행렬로 가우시안 표본 추출이나 det 계산을 할 때, 고유벡터까지 구하지 않고도 쓸 수 있는 더 싼 분해는 없는가?
+<strong>남은 것 1 (다음 노트 Cholesky)</strong> : 공분산처럼 대칭이면서 양의 정부호인(SPD) 행렬로 가우시안 표본 추출이나 det 계산을 할 때, 고유벡터까지 구하지 않고도 쓸 수 있는 더 싼 분해는 없는가? 고유값으로 PD를 판별하려면 고유분해부터 해야 하는데, 분해하면서 PD 여부까지 확인되는 방법은 없는가?
 
 <strong>남은 것 2 (그다음 노트들)</strong> : 대칭이 아닌 일반 정사각행렬은 어디까지 $PDP^{-1}$로 쓸 수 있는가? 정사각도 아닌 행렬은?
 
